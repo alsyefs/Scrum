@@ -17,7 +17,6 @@ namespace Scrum
             //check input
             //if input = true, send it to database code to store it
         }
-        
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
             bool correctInput = checkInput();
@@ -56,7 +55,6 @@ namespace Scrum
                 }
             }
         }
-
         protected void btnCancel_Click(object sender, EventArgs e)
         {
             //Go home:
@@ -125,7 +123,6 @@ namespace Scrum
             }
             return correct;
         }
-
         //The below is the database code which can be separated in another class if needed:
         protected void storeInput()
         {
@@ -148,7 +145,6 @@ namespace Scrum
             cmd.ExecuteScalar();
             connect.Close();
         }
-
         protected void drpRole_SelectedIndexChanged(object sender, EventArgs e)
         {
             

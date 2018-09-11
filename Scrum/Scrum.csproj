@@ -133,7 +133,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="About.aspx" />
+    <Content Include="Accounts\Admin\Account.aspx" />
+    <Content Include="Accounts\Admin\ChangeSecurityQuestions.aspx" />
+    <Content Include="Accounts\Admin\ChangePassword.aspx" />
+    <Content Include="Accounts\Admin\CreateProject.aspx" />
     <Content Include="Accounts\Admin\Home.aspx" />
+    <Content Include="Accounts\Admin\Notifications.aspx" />
+    <Content Include="Accounts\Admin\ReviewProjects.aspx" />
+    <Content Include="Accounts\Admin\ReviewUsers.aspx" />
     <Content Include="Accounts\Developer\Home.aspx" />
     <Content Include="Accounts\Master\Home.aspx" />
     <Content Include="ChangePassword.aspx" />
@@ -227,12 +234,61 @@
     <Content Include="Site.Mobile.Master" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Accounts\Admin\Account.aspx.cs">
+      <DependentUpon>Account.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\Account.aspx.designer.cs">
+      <DependentUpon>Account.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ChangeSecurityQuestions.aspx.cs">
+      <DependentUpon>ChangeSecurityQuestions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ChangeSecurityQuestions.aspx.designer.cs">
+      <DependentUpon>ChangeSecurityQuestions.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ChangePassword.aspx.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ChangePassword.aspx.designer.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\CreateProject.aspx.cs">
+      <DependentUpon>CreateProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\CreateProject.aspx.designer.cs">
+      <DependentUpon>CreateProject.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Accounts\Admin\Home.aspx.cs">
       <DependentUpon>Home.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Accounts\Admin\Home.aspx.designer.cs">
       <DependentUpon>Home.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\Notifications.aspx.cs">
+      <DependentUpon>Notifications.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\Notifications.aspx.designer.cs">
+      <DependentUpon>Notifications.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ReviewProjects.aspx.cs">
+      <DependentUpon>ReviewProjects.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ReviewProjects.aspx.designer.cs">
+      <DependentUpon>ReviewProjects.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ReviewUsers.aspx.cs">
+      <DependentUpon>ReviewUsers.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ReviewUsers.aspx.designer.cs">
+      <DependentUpon>ReviewUsers.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Developer\Home.aspx.cs">
       <DependentUpon>Home.aspx</DependentUpon>
@@ -307,6 +363,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Layouts.cs" />
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -367,6 +424,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="images\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

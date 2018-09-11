@@ -53,5 +53,53 @@ namespace Scrum
             }
             return itIsEmpty;
         }
+        public int adminAlerts()
+        {
+            int count = 0;
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            //count users to be approved:
+            cmd.CommandText = "select count(*) from registrations";
+            count = Convert.ToInt32(cmd.ExecuteScalar());
+            //Count new projects to be approved:
+            cmd.CommandText = "select count(*) from Projects where project_isApproved = 0 and project_isDenied = 0 and project_isTerminated = 0 and project_isDeleted = 0";
+            count = count + Convert.ToInt32(cmd.ExecuteScalar());
+            ////count users to be approved for projects:
+            //cmd.CommandText = "select count(*) from UsersForProjects where usersForProjects_isApproved = 0 ";
+            //count = count + Convert.ToInt32(cmd.ExecuteScalar());
+            connect.Close();
+            return count;
+        }
+        public int masterAlerts()
+        {
+            int count = 0;
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            //count users to be approved for projects:
+            cmd.CommandText = "select count(*) from UsersForProjects where usersForProjects_isApproved = 0 ";
+            count = Convert.ToInt32(cmd.ExecuteScalar());
+            connect.Close();
+            return count;
+        }
+        public int developerAlerts()
+        {
+            int count = 0;
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            //count new assignments for user stories:
+            cmd.CommandText = "select count(*) from UsersForUserStories where usersForUserSroties_isNotified = 0 ";
+            count = Convert.ToInt32(cmd.ExecuteScalar());
+            //count new assignments for sprint tasks:
+            cmd.CommandText = "select count(*) from UsersForSprintTasks where usersForSprintTasks_isNotified = 0 ";
+            count += Convert.ToInt32(cmd.ExecuteScalar());
+            //count new assignments for test cases:
+            cmd.CommandText = "select count(*) from UsersForTestCases where usersForTestCases_isNotified = 0 ";
+            count += Convert.ToInt32(cmd.ExecuteScalar());
+            connect.Close();
+            return count;
+        }
     }
 }
