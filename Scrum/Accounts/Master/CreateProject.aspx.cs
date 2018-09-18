@@ -11,7 +11,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace Scrum.Accounts.Admin
+namespace Scrum.Accounts.Master
 {
     public partial class CreateProject : System.Web.UI.Page
     {
@@ -20,14 +20,45 @@ namespace Scrum.Accounts.Admin
         string username, roleId, loginId, token;
         protected void Page_Load(object sender, EventArgs e)
         {
+            initialPageAccess();
+        }
+        protected void initialPageAccess()
+        {
             Configuration config = new Configuration();
             conn = config.getConnectionString();
             connect = new SqlConnection(conn);
             getSession();
+            //Get from and to pages:
+            string current_page = "", previous_page = "";
+            if (HttpContext.Current.Request.Url.AbsoluteUri != null) current_page = HttpContext.Current.Request.Url.AbsoluteUri;
+            if (Request.UrlReferrer != null) previous_page = Request.UrlReferrer.ToString();
+            //Get current time:
+            DateTime currentTime = DateTime.Now;
+            //Get user's IP:
+            string userIP = GetIPAddress();
             CheckSession session = new CheckSession();
-            bool correctSession = session.sessionIsCorrect(username, roleId, token);
+            bool correctSession = session.sessionIsCorrect(username, roleId, token, current_page, previous_page, currentTime, userIP);
             if (!correctSession)
                 clearSession();
+            int int_roleId = Convert.ToInt32(roleId);
+            if (int_roleId != 2)//2 = Master role.
+                clearSession();
+        }
+        protected string GetIPAddress()
+        {
+            System.Web.HttpContext context = System.Web.HttpContext.Current;
+            string ipAddress = context.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+            if (!string.IsNullOrEmpty(ipAddress))
+            {
+                string[] addresses = ipAddress.Split(',');
+                if (addresses.Length != 0)
+                {
+                    return addresses[0];
+                }
+            }
+
+            return context.Request.ServerVariables["REMOTE_ADDR"];
         }
         protected void clearSession()
         {
@@ -77,8 +108,8 @@ namespace Scrum.Accounts.Admin
             string userId = cmd.ExecuteScalar().ToString();
             //Note: by adding the user to this table, he/she is given access to the newly-created table.
             //Add the creator to UsersForProjects table: 
-            cmd.CommandText = "insert into UsersForProjects (userId, projectId, usersForProjects_joinedTime, usersForProjects_isApproved) values " +
-                "('" + userId + "', '" + projectId + "', '" + DateTime.Now + "', 1)";
+            cmd.CommandText = "insert into UsersForProjects (userId, projectId, usersForProjects_joinedTime) values " +
+                "('" + userId + "', '" + projectId + "', '" + DateTime.Now + "')";
             cmd.ExecuteScalar();
             connect.Close();
         }
@@ -100,7 +131,6 @@ namespace Scrum.Accounts.Admin
         }
         protected void addNewEntry()
         {
-            //string imageName="";
             int hasImage = 0;
             ArrayList files = new ArrayList();
             if (FileUpload1.HasFile)
@@ -207,8 +237,8 @@ namespace Scrum.Accounts.Admin
             //Get the current user's ID:
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "insert into Projects (project_name, project_description, project_createdBy, project_createdDate, project_isApproved, project_isDenied, project_isTerminated, project_isDeleted, project_startedDate, project_hasImage) values " +
-                "('"+project_name+"', '"+description+"', '"+userId+"', '"+ entryTime + "', 0, 0, 0, 0, '"+calStartDate.SelectedDate+"', '"+hasImage+"') ";
+            cmd.CommandText = "insert into Projects (project_name, project_description, project_createdBy, project_createdDate, project_isTerminated, project_isDeleted, project_startedDate, project_hasImage) values " +
+                "('"+project_name+"', '"+description+"', '"+userId+"', '"+ entryTime + "', 0, 0, '"+calStartDate.SelectedDate+"', '"+hasImage+"') ";
             cmd.ExecuteScalar();
             cmd.CommandText = "select [projectId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY projectId ASC), * FROM [Projects] " +
                 "where project_createdBy = '" + userId + "' and project_name like '" + project_name + "' and project_createdDate like '" + entryTime + "' "
@@ -265,11 +295,12 @@ namespace Scrum.Accounts.Admin
                 lblDescriptionError.Visible = true;
                 lblDescriptionError.Text = "Input Error: Please type something for the description.";
             }
+            //Check for the correct start date and ensure that it's in the future:
             if (calStartDate.SelectedDate < DateTime.Now)
             {
                 correct = false;
                 lblStartDateError.Visible = true;
-                lblStartDateError.Text = "Input Error: Please select a start date that is not from the past.";
+                lblStartDateError.Text = "Input Error: Please select a future start date.";
             }
             return correct;
         }

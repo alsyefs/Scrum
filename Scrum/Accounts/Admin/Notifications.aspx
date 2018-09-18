@@ -13,12 +13,6 @@
                         <td>
                             <asp:Button ID="btnNewUsers" runat="server" Text="Review Users" Width="100%" BackColor="Green" Font-Bold="True" Font-Size="Medium" Height="34px" OnClick="btnNewUsers_Click" /></td>
                     </tr>
-                    <tr>
-                        <td>
-                            <asp:Label ID="lblNewProjects" runat="server" Text="Label" Width="100%"></asp:Label></td>
-                        <td>
-                            <asp:Button ID="btnNewProjects" runat="server" Text="Review Projects" Width="100%" BackColor="Green" Font-Bold="True" Font-Size="Medium" Height="34px" OnClick="btnNewProjects_Click" /></td>
-                    </tr>
                 </table>
                 <br />
                 <%--General error message:--%>

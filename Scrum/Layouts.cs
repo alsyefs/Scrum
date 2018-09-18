@@ -62,5 +62,15 @@ namespace Scrum
             phone_output = "(" + area_code + ") " + three_digits + "-" + four_digits;
             return phone_output;
         }
+        public static string getOriginalTimeFormat(string oldFormat)
+        {
+            string newFormat = "";
+            if (!string.IsNullOrWhiteSpace(oldFormat))
+            {
+                DateTime dateTime = Convert.ToDateTime(oldFormat);
+                newFormat = string.Format("{0:yyyy-MM-dd HH:mm:ss}", dateTime);
+            }
+            return newFormat;
+        }
     }
 }

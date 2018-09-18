@@ -10,12 +10,12 @@ namespace Scrum
     {
         string username = "", roleId = "", token = "";
         Configuration config = new Configuration();
-        public Boolean sessionIsCorrect(string temp_username, string temp_roleId, string temp_token)
+        public Boolean sessionIsCorrect(string temp_username, string temp_roleId, string temp_token,
+            string currentPage, string previousPage, DateTime currentTime, string userIP)
         {
             username = temp_username;
             roleId = temp_roleId;
             token = temp_token;
-
             Boolean correctSession = true;
             Boolean isEmptySession = checkIfSessionIsEmpty();
             if (isEmptySession)
@@ -25,6 +25,7 @@ namespace Scrum
             {
                 correctSession = false;
             }
+            Logs log = new Logs(temp_username, temp_roleId, temp_token, currentPage, previousPage, currentTime, userIP);
             return correctSession;
         }
         protected Boolean checkSeesionValues()
@@ -62,12 +63,7 @@ namespace Scrum
             //count users to be approved:
             cmd.CommandText = "select count(*) from registrations";
             count = Convert.ToInt32(cmd.ExecuteScalar());
-            //Count new projects to be approved:
-            cmd.CommandText = "select count(*) from Projects where project_isApproved = 0 and project_isDenied = 0 and project_isTerminated = 0 and project_isDeleted = 0";
-            count = count + Convert.ToInt32(cmd.ExecuteScalar());
-            ////count users to be approved for projects:
-            //cmd.CommandText = "select count(*) from UsersForProjects where usersForProjects_isApproved = 0 ";
-            //count = count + Convert.ToInt32(cmd.ExecuteScalar());
+            //count more things as needed in the future...
             connect.Close();
             return count;
         }

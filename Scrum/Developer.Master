@@ -50,7 +50,6 @@
                     <a class="navbar-brand" runat="server" href="Accounts/Developer/Home">Scrum</a>
                     <div class="navbar-collapse collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav mr-auto">
-                            <li class="nav-item"><a runat="server" href="Accounts/Developer/CreateProject" class="nav-link">Create Project</a></li>
                             <li class="nav-item"><a runat="server" href="Accounts/Developer/MyProjects" class="nav-link">My Projects</a></li>
                             <li class="nav-item"><a runat="server" href="Accounts/Developer/Search" class="nav-link">Search</a></li>
                             <li class="nav-item"><a runat="server" href="Accounts/Developer/About" class="nav-link">About</a></li>

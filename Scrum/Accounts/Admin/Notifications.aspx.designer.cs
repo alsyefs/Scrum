@@ -31,24 +31,6 @@ namespace Scrum.Accounts.Admin {
         protected global::System.Web.UI.WebControls.Button btnNewUsers;
         
         /// <summary>
-        /// lblNewProjects control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblNewProjects;
-        
-        /// <summary>
-        /// btnNewProjects control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnNewProjects;
-        
-        /// <summary>
         /// lblError control.
         /// </summary>
         /// <remarks>
