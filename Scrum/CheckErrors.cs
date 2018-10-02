@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
@@ -8,6 +9,60 @@ namespace Scrum
 {
     public class CheckErrors
     {
+        public bool checkProjectAccess(string id, string loginId)
+        {
+            bool correct = true;
+            if (isDigit(id))
+            {
+                Configuration config = new Configuration();
+                SqlConnection connect = new SqlConnection(config.getConnectionString());
+                SqlCommand cmd = connect.CreateCommand();
+                connect.Open();
+                //Check if the project exists:
+                cmd.CommandText = "select count(projectId) from Projects where projectId = '" + id + "' ";
+                int projectExists = Convert.ToInt32(cmd.ExecuteScalar());
+                if (projectExists > 0)
+                {
+                    //Check if the user with the login ID has access to the project:
+                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (userExists > 0)
+                    {
+                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                        string userId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select count(userId) from UsersForProjects where projectId = '" + id + "' and userId = '" + userId + "'  ";
+                        int userHasAccessToProject = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userHasAccessToProject > 0)
+                        {
+                            //The user has access to the selected project. Good for you :D
+                        }
+                        else
+                        {
+                            //The user doesn't have access to the selected project.
+                            correct = !correct;
+                        }
+                    }
+                    else
+                    {
+                        //That user doesn't exist in the database.
+                        correct = !correct;
+                    }
+                }
+                else
+                {
+                    //The project doesn't exist in the database.
+                    correct = !correct;
+                }
+                connect.Close();
+            }
+            else
+            {
+                
+                //The prject ID was not a set of digits.
+                correct = !correct;
+            }
+            return correct;
+        }
         public bool isDigit(string value)
         {
             bool correct = true;

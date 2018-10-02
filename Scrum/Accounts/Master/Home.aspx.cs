@@ -82,7 +82,7 @@ namespace Scrum.Accounts.Master
         protected void rebindValues()
         {
             //Hide the header called "User ID":
-            grdProjects.HeaderRow.Cells[1].Visible = false;
+            grdProjects.HeaderRow.Cells[3].Visible = false;
             //Hide IDs column and content which are located in column index 3:
             for (int i = 0; i < grdProjects.Rows.Count; i++)
             {

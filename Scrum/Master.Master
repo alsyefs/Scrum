@@ -47,7 +47,7 @@
                 </button>
                 <asp:ContentPlaceHolder ID="default" runat="server">
                     <%--Header start --%>
-                    <a class="navbar-brand" runat="server" href="Accounts/Developer/Home">Scrum</a>
+                    <a class="navbar-brand" runat="server" href="Accounts/Master/Home">Scrum</a>
                     <div class="navbar-collapse collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav mr-auto">
                             <li class="nav-item"><a runat="server" href="Accounts/Master/CreateProject" class="nav-link">Create Project</a></li>

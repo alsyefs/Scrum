@@ -31,7 +31,14 @@ namespace Scrum
                 Subject = subject,
                 Body = body
             })
-                smtp.Send(message);
+                try
+                {
+                    smtp.Send(message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error: " + e);
+                }
         }
     }
 }

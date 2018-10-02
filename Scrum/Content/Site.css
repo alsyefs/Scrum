@@ -34,7 +34,7 @@ textarea {
 body {
     padding-top: 50px;
     padding-bottom: 20px;
-    background-image: url('../images/background_2.jpg');
+    /*background-image: url('../images/background_2.jpg');*/
     background-size: 100%;
     font-size: large;
     font-weight: bold;
@@ -251,9 +251,9 @@ iframe {
     border-radius: 5px;
 }
 
-    .dropdown-item:hover {
-        background-color: yellow;
-        outline: none;
-        border-color: #9ecaed;
-        box-shadow: 0 0 10px #9ecaed;
-    }
+.dropdown-item:hover {
+    background-color: yellow;
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}
