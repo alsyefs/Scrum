@@ -8,6 +8,41 @@ namespace Scrum
 {
     public class Layouts
     {
+        public static string projectHeader(string projectId, string roleId, string loginId, string userId, string project_name, string project_description,
+            string createdByUserId, string createdBy, string createdDate, string startDate, int isTerminated, int isDeleted, int hasImage, string imagesHTML)
+        {
+            string terminateCommand = "";
+            string deleteCommand = "";
+            string profileLink = "Created by " + createdBy + " ";
+            //Check if the user viewing the project is the creator, or if the current user viewing is an admin:
+            int int_roleId = Convert.ToInt32(roleId);
+            if (createdByUserId.Equals(userId) || int_roleId == 1)
+            {
+                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeProject('" + projectId + "', '" + createdByUserId + "')\">Remove Project </button>";
+            }
+            //if (int_roleId == 1)
+            //{
+                profileLink = "Created by <a href=\"Profile.aspx?id=" + createdByUserId + "\">" + createdBy + " </a>";
+                terminateCommand = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id='terminate_button' type='button' onclick=\"terminateProject('" + projectId + "', '" + createdByUserId + "')\">Terminate Project </button>";
+            //}
+            if (isTerminated == 1)
+                terminateCommand = "";
+            if (isDeleted == 1)
+            {
+                deleteCommand = "";
+                terminateCommand = "";
+            }
+            string header = 
+                "<div id=\"header\">" +
+                "<div id=\"messageHead\">" +
+                "&nbsp;\"" + project_name + "\" " + profileLink + " on (" + getTimeFormat(createdDate) + "), start date is on (" + getTimeFormat(startDate) + ")</div>" +
+                "<div id=\"messageDescription\"><br/>" + project_description + "<br /><br/>" +
+                imagesHTML + "<br/></div>" +
+                deleteCommand +
+                terminateCommand +
+                "</div>";
+            return header;
+        }
         public static string getTimeFormat(string originalTime)
         {
             string format = "";

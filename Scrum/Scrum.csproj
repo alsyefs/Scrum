@@ -410,6 +410,7 @@
     <Compile Include="Accounts\Master\ViewProject.aspx.designer.cs">
       <DependentUpon>ViewProject.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Accounts\Process.cs" />
     <Compile Include="Admin.Master.cs">
       <DependentUpon>Admin.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

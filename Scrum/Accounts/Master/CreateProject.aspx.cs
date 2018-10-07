@@ -124,6 +124,8 @@ namespace Scrum.Accounts.Master
         }
         protected void sendEmail()
         {
+            //Process process = new Process();
+            //process.sendEmail(loginId, txtTitle.Text, txtDescription.Text);
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
@@ -133,8 +135,8 @@ namespace Scrum.Accounts.Master
             cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + userId + "' ";
             string name = cmd.ExecuteScalar().ToString();
             connect.Close();
-            string messageBody = "Hello " + name + ",\nThis email is to notify you that your project (" + txtTitle.Text + ") has been successfully submitted and will be reviewed.\n" +
-                "You will be notified by email once the review is complete. The below is the description you typed: \n\n\"" + txtDescription.Text + "\"\n\nBest regards,\nNephroNet Support\nScrum.UWL@gmail.com";
+            string messageBody = "Hello " + name + ",\nThis email is to notify you that your project (" + txtTitle.Text + ") has been successfully submitted.\n" +
+                "The below is the description you typed: \n\n\"" + txtDescription.Text + "\"\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
             Email email = new Email();
             email.sendEmail(emailTo, messageBody);
         }
@@ -153,8 +155,27 @@ namespace Scrum.Accounts.Master
             storeImagesInDB(projectId, hasImage, files);
             lblError.Visible = true;
             lblError.ForeColor = System.Drawing.Color.Green;
-            lblError.Text = "The project has been successfully submitted and an email notification has been sent to you. <br/>" +
-                "Your project will be reviewed and you will be notified by email once the review is complete.";
+            lblError.Text = "The project has been successfully submitted and an email notification has been sent to you. <br/>";
+            wait.Visible = false;
+            try
+            {
+                if(files != null)
+                    files.Clear();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error: " + e.ToString());
+            }
+            calStartDate.SelectedDate = DateTime.Now;
+
+        }
+        protected void dayRender(object sender, DayRenderEventArgs e)
+        {
+            if (e.Day.Date < DateTime.Now.Date)
+            {
+                e.Day.IsSelectable = false;
+                e.Cell.ForeColor = System.Drawing.Color.Gray;
+            }
         }
         protected void storeImagesInDB(string projectId, int hasImage, List<HttpPostedFile> files)
         {
@@ -192,12 +213,17 @@ namespace Scrum.Accounts.Master
                 {
                     try
                     {
-                        //System.Drawing.Image sourceimage = System.Drawing.Image.FromStream(files[i].InputStream);
-                        //System.Drawing.Bitmap image = new System.Drawing.Bitmap(sourceimage);
-                        //System.Drawing.Bitmap image = new System.Drawing.Bitmap(files[i].InputStream);
-                        //System.Drawing.Bitmap image_copy = new System.Drawing.Bitmap(image);
+                        ////System.Drawing.Image sourceimage = System.Drawing.Image.FromStream(files[i].InputStream);
+                        ////System.Drawing.Bitmap image = new System.Drawing.Bitmap(sourceimage);
+                        ////System.Drawing.Bitmap image = new System.Drawing.Bitmap(files[i].InputStream);
+                        ////System.Drawing.Bitmap image_copy = new System.Drawing.Bitmap(image);
+                        //System.Drawing.Image img = RezizeImage(System.Drawing.Image.FromStream(files[i].InputStream), 500, 500);
+                        //img.Save(path, ImageFormat.Jpeg);
+                        System.Drawing.Bitmap image = new System.Drawing.Bitmap(files[i].InputStream);
+                        System.Drawing.Bitmap image_copy = new System.Drawing.Bitmap(image);
                         System.Drawing.Image img = RezizeImage(System.Drawing.Image.FromStream(files[i].InputStream), 500, 500);
                         img.Save(path, ImageFormat.Jpeg);
+
                     }
                     catch (Exception e)
                     {
@@ -352,7 +378,6 @@ namespace Scrum.Accounts.Master
         }
         protected void btnUpload_Click(object sender, EventArgs e)
         {
-            
             if (Request.Files.Count > 0)
             {
                 int fileCount = Request.Files.Count;
@@ -364,28 +389,11 @@ namespace Scrum.Accounts.Master
                 }
                 if (fileCount == 1)
                     fileNames.InnerHtml = "You have successfully uploaded your file!";
-                else
+                else if (fileCount > 1)
                     fileNames.InnerHtml = "You have successfully uploaded your files!";
+                else
+                    fileNames.InnerHtml = "You have not uploaded any files!";
             }
-
-
-            //HttpPostedFile filePosted = Request.Files["uploadFieldNameFromHTML"];
-            //if (filePosted != null && filePosted.ContentLength > 0)
-            //{
-            //    List<HttpPostedFile> filesPosted = new List<HttpPostedFile>();
-            //    filesPosted.Add(Request.Files[i]["FileUpload1"]);
-            //    int fileCount = filesPosted.Count;
-            //    for (int i = 0; i < fileCount; i++)
-            //    {
-            //        files.Add(Request.Files[i]["FileUpload1"]);
-            //        //Store the file names in an array list:
-            //        files.Add(FileUpload1.PostedFiles[i]);
-            //    }
-            //    if(fileCount == 1)
-            //    fileNames.InnerHtml = "You have successfully uploaded your file!";
-            //    else
-            //        fileNames.InnerHtml = "You have successfully uploaded your files!";
-            //}
         }
     }
 }

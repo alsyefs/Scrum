@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -16,6 +21,10 @@ namespace Scrum.Accounts.Master
         string username, roleId, loginId, token;
         string previousPage = "";
         string projectId = "";
+        static ArrayList searchedUsers = new ArrayList();
+        //static ArrayList usersToAdd = new ArrayList();
+        static SortedSet<string> usersToAdd = new SortedSet<string>();
+        static List<HttpPostedFile> files;
         protected void Page_Load(object sender, EventArgs e)
         {
             initialPageAccess();
@@ -23,7 +32,13 @@ namespace Scrum.Accounts.Master
             projectId = Request.QueryString["id"];
             if(!check.checkProjectAccess(projectId, loginId))
                 goBack();
-            createTable();
+            if (!IsPostBack)
+            {
+                files = new List<HttpPostedFile>();
+                getProjectInfo();
+                createTable();
+                showView();
+            }
         }
         protected void initialPageAccess()
         {
@@ -92,20 +107,77 @@ namespace Scrum.Accounts.Master
             if (!string.IsNullOrWhiteSpace(previousPage)) Response.Redirect(previousPage);
             else Response.Redirect("Home.aspx");
         }
+        protected void getProjectInfo()
+        {
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select project_name from Projects where projectId = '"+projectId+"' ";
+            string name = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_description from Projects where projectId = '" + projectId + "' ";
+            string description = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_createdBy from Projects where projectId = '" + projectId + "' ";
+            string createdByUserId = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_createdDate from Projects where projectId = '" + projectId + "' ";
+            string createdDate = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_isTerminated from Projects where projectId = '" + projectId + "' ";
+            int isTerminated = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select project_isDeleted from Projects where projectId = '" + projectId + "' ";
+            int isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select project_hasImage from Projects where projectId = '" + projectId + "' ";
+            int hasImage = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select project_startedDate from Projects where projectId = '" + projectId + "' ";
+            string startDate = cmd.ExecuteScalar().ToString();
+            //Convert the createdByUserId to a name:
+            cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '"+createdByUserId+"' ";
+            string createdBy = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+            string userId = cmd.ExecuteScalar().ToString();
+            string imagesHTML = "";
+            if (hasImage == 1)
+            {
+                cmd.CommandText = "select count(*) from ImagesForProjects where projectId = '" + projectId + "' ";
+                int totalImages = Convert.ToInt32(cmd.ExecuteScalar());
+                for (int i = 1; i <= totalImages; i++)
+                {
+                    cmd.CommandText = "select [imageId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY imageId ASC), * FROM [ImagesForProjects] where projectId = '" + projectId + "') as t where rowNum = '" + i + "'";
+                    string imageId = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "select image_name from Images where imageId = '" + imageId + "' ";
+                    string image_name = cmd.ExecuteScalar().ToString();
+                    //imagesHTML = imagesHTML + "<img src='../../images/" + image_name + "'></img> <br />";
+                    imagesHTML = imagesHTML + "<a href='../../images/" + image_name + "' target=\"_blank\">" + image_name + "</a> <br />";
+                }
+            }
+            //Construct an HTML output to post it:
+            lblProjectInfo.Text = Layouts.projectHeader(projectId, roleId, loginId, userId, name, description,
+                createdByUserId, createdBy, createdDate, startDate, isTerminated, isDeleted, hasImage, imagesHTML);
+            connect.Close();
+        }
+        protected void showView()
+        {
+            View.Visible = true;
+            AddNewUserStory.Visible = false;
+        }
+        protected void showNewUserStory()
+        {
+            View.Visible = false;
+            AddNewUserStory.Visible = true;
+        }
         protected void rebindValues()
         {
             //Hide the header called "User ID":
             grdUserStories.HeaderRow.Cells[8].Visible = false;
+            grdUserStories.HeaderRow.Cells[9].Visible = false;
             //Hide IDs column and content which are located in column index 8:
             for (int i = 0; i < grdUserStories.Rows.Count; i++)
             {
                 grdUserStories.Rows[i].Cells[8].Visible = false;
+                grdUserStories.Rows[i].Cells[9].Visible = false;
             }
-            connect.Open();
             SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
             string userStoryId = "", asARole = "", iWant = "", soThat = "", dateIntroduced = "", dateConsidered = "",
-                   developerResponsible = "", currentStatus = "";
-            string creatorId = "";
+                   developersResponsible = "", currentStatus = "";
+            string creatorId = "", db_userStoryId="";
             for (int row = 0; row < grdUserStories.Rows.Count; row++)
             {
                 //Set links to review a user:
@@ -115,17 +187,38 @@ namespace Scrum.Accounts.Master
                 soThat = grdUserStories.Rows[row].Cells[3].Text;
                 dateIntroduced = grdUserStories.Rows[row].Cells[4].Text;
                 dateConsidered = grdUserStories.Rows[row].Cells[5].Text;
-                developerResponsible = grdUserStories.Rows[row].Cells[6].Text;
+                developersResponsible = grdUserStories.Rows[row].Cells[6].Text;
                 currentStatus = grdUserStories.Rows[row].Cells[7].Text;
                 creatorId = grdUserStories.Rows[row].Cells[8].Text;
-                cmd.CommandText = "select userId from Users where (user_firstname + ' ' + user_lastname) like '" + developerResponsible + "' ";
-                string developerId = cmd.ExecuteScalar().ToString();
+                db_userStoryId = grdUserStories.Rows[row].Cells[9].Text;
+                //Loop through the developers for the selected User Story:
+                cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '" + db_userStoryId + "' ";
+                int usersForUserStory = Convert.ToInt32(cmd.ExecuteScalar());
+                HyperLink developerResponsibleLink = new HyperLink();
+                for (int j = 1; j <= usersForUserStory; j++)
+                {
+                    HyperLink participantLink = new HyperLink();
+                    cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForUserStoriesId ASC), * FROM [UsersForUserStories] where userStoryId = '" + db_userStoryId + "' ) as t where rowNum = '" + j + "'";
+                    string developerId = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + developerId + "' ";
+                    string developer_name = cmd.ExecuteScalar().ToString();
+                    participantLink.Text = developer_name + " ";
+                    participantLink.NavigateUrl = "Profile.aspx?id=" + developerId;
+                    grdUserStories.Rows[row].Cells[6].Controls.Add(participantLink);
+                    if (usersForUserStory > 1)
+                    {
+                        HyperLink temp = new HyperLink();
+                        temp.Text = "<br/>";
+                        grdUserStories.Rows[row].Cells[6].Controls.Add(temp);
+                    }
+                }
                 //Get the User Story ID:
-                cmd.CommandText = "select [userStoryId] from [UserStories] where userStory_createdBy like '" + creatorId + "' and " +
-                    "userStory_uniqueId = '"+userStoryId+"' and userStory_asARole = '"+asARole+"' and userStory_iWantTo = '"+iWant+"' and  userStory_soThat = '"+soThat+"'  " +
-                    "userStory_dateIntroduced = '" + Layouts.getOriginalTimeFormat(dateIntroduced) + "' and userStory_dateConsideredForImplementation = '" + Layouts.getOriginalTimeFormat(dateConsidered) + "' " +
-                    "and userStory_developerResponsibleUserId = '"+ developerId + "' and userStory_currentStatus = '"+currentStatus+"' ";
-                string id = cmd.ExecuteScalar().ToString();
+                //cmd.CommandText = "select [userStoryId] from [UserStories] where userStory_createdBy like '" + creatorId + "' and " +
+                //    "userStory_uniqueId = '"+userStoryId+"' and userStory_asARole = '"+asARole+"' and userStory_iWantTo = '"+iWant+"' and  userStory_soThat = '"+soThat+"'  " +
+                //    "and userStory_dateIntroduced = '" + Layouts.getOriginalTimeFormat(dateIntroduced) + "' and userStory_dateConsideredForImplementation = '" + Layouts.getOriginalTimeFormat(dateConsidered) + "' " +
+                //    "and userStory_currentStatus = '"+currentStatus+"' ";
+                //string id = cmd.ExecuteScalar().ToString();
+                string id = db_userStoryId;
                 string userStoryUrl = "ViewUserStory.aspx?id=" + id;
                 HyperLink idLink = new HyperLink();
                 HyperLink asARoleLink = new HyperLink();
@@ -133,7 +226,6 @@ namespace Scrum.Accounts.Master
                 HyperLink soThatLink = new HyperLink();
                 HyperLink dateIntroducedLink = new HyperLink();
                 HyperLink dateConsideredLink = new HyperLink();
-                HyperLink developerResponsibleLink = new HyperLink();
                 HyperLink currentStatusLink = new HyperLink();
                 idLink.Text = userStoryId + " ";
                 asARoleLink.Text = asARole + " ";
@@ -141,7 +233,6 @@ namespace Scrum.Accounts.Master
                 soThatLink.Text = soThat + " ";
                 dateIntroducedLink.Text = Layouts.getTimeFormat(dateIntroduced) + " ";
                 dateConsideredLink.Text = Layouts.getTimeFormat(dateConsidered) + " ";
-                developerResponsibleLink.Text = developerResponsible + " ";
                 currentStatusLink.Text = currentStatus + " ";
                 idLink.NavigateUrl = userStoryUrl;
                 asARoleLink.NavigateUrl = userStoryUrl;
@@ -149,7 +240,6 @@ namespace Scrum.Accounts.Master
                 soThatLink.NavigateUrl = userStoryUrl;
                 dateIntroducedLink.NavigateUrl = userStoryUrl;
                 dateConsideredLink.NavigateUrl = userStoryUrl;
-                developerResponsibleLink.NavigateUrl = "Profile.aspx?id=" + creatorId;
                 currentStatusLink.NavigateUrl = userStoryUrl;
                 grdUserStories.Rows[row].Cells[0].Controls.Add(idLink);
                 grdUserStories.Rows[row].Cells[1].Controls.Add(asARoleLink);
@@ -157,7 +247,6 @@ namespace Scrum.Accounts.Master
                 grdUserStories.Rows[row].Cells[3].Controls.Add(soThatLink);
                 grdUserStories.Rows[row].Cells[4].Controls.Add(dateIntroducedLink);
                 grdUserStories.Rows[row].Cells[5].Controls.Add(dateConsideredLink);
-                grdUserStories.Rows[row].Cells[6].Controls.Add(developerResponsibleLink);
                 grdUserStories.Rows[row].Cells[7].Controls.Add(currentStatusLink);
             }
             connect.Close();
@@ -184,16 +273,17 @@ namespace Scrum.Accounts.Master
                 lblMessage.Visible = false;
                 DataTable dt = new DataTable();
                 dt.Columns.Add("User story ID", typeof(string));
-                dt.Columns.Add("As a <<type of user>>", typeof(string));
-                dt.Columns.Add("I want to <<some goal>>", typeof(string));
-                dt.Columns.Add("So that <<reason>>", typeof(string));
+                dt.Columns.Add("As a (type of user)", typeof(string));
+                dt.Columns.Add("I want to (some goal)", typeof(string));
+                dt.Columns.Add("So that (reason)", typeof(string));
                 dt.Columns.Add("Date introduced", typeof(string));
                 dt.Columns.Add("Date considered for implementation", typeof(string));
-                dt.Columns.Add("Developer responsible for", typeof(string));
+                dt.Columns.Add("Developers responsible for", typeof(string));
                 dt.Columns.Add("Current status", typeof(string));
-                dt.Columns.Add("Developer User ID", typeof(string));
+                dt.Columns.Add("Creator User ID", typeof(string));
+                dt.Columns.Add("DB User Story ID", typeof(string));
                 string id = "", userStoryId = "", asARole = "", iWant = "", soThat = "", dateIntroduced = "", dateConsidered = "",
-                    developerResponsible = "", currentStatus = "";
+                    developersResponsible = "", currentStatus = "";
                 string creatorId = "";
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
@@ -214,16 +304,25 @@ namespace Scrum.Accounts.Master
                     dateIntroduced = cmd.ExecuteScalar().ToString();
                     cmd.CommandText = "select userStory_dateConsideredForImplementation from UserStories where userStoryId = '" + id + "' ";
                     dateConsidered = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_developerResponsibleUserId from UserStories where userStoryId = '" + id + "' ";
-                    string developerId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + developerId + "' ";
-                    developerResponsible = cmd.ExecuteScalar().ToString();
+                    //Loop through the developers for the selected User Story:
+                    cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '"+id+"' ";
+                    int usersForUserStory = Convert.ToInt32(cmd.ExecuteScalar());
+                    for (int j=1; j<= usersForUserStory; j++)
+                    {
+                        cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForUserStoriesId ASC), * FROM [UsersForUserStories] where userStoryId = '" + id + "' ) as t where rowNum = '" + j + "'";
+                        string developerId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + developerId + "' ";
+                        if(j==1)
+                            developersResponsible = cmd.ExecuteScalar().ToString();
+                        else
+                            developersResponsible = developersResponsible + ", " + cmd.ExecuteScalar().ToString();
+                    }
                     cmd.CommandText = "select userStory_currentStatus from UserStories where userStoryId = '" + id + "' ";
                     currentStatus = cmd.ExecuteScalar().ToString();
                     //Creator's info, which will be hidden:
                     cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + id + "' ";
                     creatorId = cmd.ExecuteScalar().ToString();
-                    dt.Rows.Add(userStoryId, asARole, iWant, soThat, Layouts.getTimeFormat(dateIntroduced), Layouts.getTimeFormat(dateConsidered), creatorId);
+                    dt.Rows.Add(userStoryId, asARole, iWant, soThat, Layouts.getTimeFormat(dateIntroduced), Layouts.getTimeFormat(dateConsidered), developersResponsible, currentStatus,creatorId, id);
                     //Creator ID is not needed here, but it's used to uniquely identify the names in the system in case we have duplicate names.
                 }
                 connect.Close();
@@ -237,6 +336,483 @@ namespace Scrum.Accounts.Master
             grdUserStories.PageIndex = e.NewPageIndex;
             grdUserStories.DataBind();
             rebindValues();
+        }
+        protected void calDateIntroduced_SelectionChanged(object sender, EventArgs e)
+        {
+            
+        }
+        protected void calDateConsidered_SelectionChanged(object sender, EventArgs e)
+        {
+
+        }
+        protected void dayRender(object sender, DayRenderEventArgs e)
+        {
+            if (e.Day.Date < DateTime.Now.Date)
+            {
+                e.Day.IsSelectable = false;
+                e.Cell.ForeColor = System.Drawing.Color.Gray;
+            }
+        }
+        protected void btnAddNewUserStory_Click(object sender, EventArgs e)
+        {
+            showNewUserStory();
+            //count the number of the current stories, then add one to the total
+            //So the new user story Unique ID will the resulting number:
+            int newId = grdUserStories.Rows.Count + 1;
+            txtUniqueUserStoryID.Text = newId.ToString();
+            clearNewUserStoryInputs();
+            hideErrorLabels();
+        }
+        protected void clearNewUserStoryInputs()
+        {
+            try
+            {
+                drpAsRole.SelectedIndex = 0;
+                txtIWantTo.Text = "";
+                txtSoThat.Text = "";
+                //calDateConsidered.SelectedDate = DateTime.Now;
+                calDateIntroduced.SelectedDates.Clear();
+                calDateConsidered.SelectedDates.Clear();
+                calDateIntroduced.SelectedDate = DateTime.Now;
+                txtDeveloperResponsible.Text = "";
+                drpFindUser.Items.Clear();
+                lblFindUserResult.Text = "";
+                drpCurrentStatus.SelectedIndex = 0;
+                if(searchedUsers != null)
+                    searchedUsers.Clear();
+                if (usersToAdd != null)
+                    usersToAdd.Clear();
+                if (files != null)
+                    files.Clear();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error: " + e.ToString());
+            }
+        }
+        protected void hideErrorLabels()
+        {
+            lblAsRoleError.Visible = false;
+            lblIWantToError.Visible = false;
+            lblSoThatError.Visible = false;
+            lblDateConsideredError.Visible = false;
+            lblDateIntroducedError.Visible = false;
+            lblDeveloperResponsibleError.Visible = false;
+            lblCurrentStatusError.Visible = false;
+            lblFindUserResult.Visible = false;
+            lblAddUserStoryMessage.Visible = false;
+            lblListOfUsers.Visible = false;
+            fileNames.InnerHtml = "";
+            //Hide the calendar for Date Introduced:
+            lblDateIntroduced.Visible = false;
+            calDateIntroduced.Visible = false;
+
+        }
+        protected void drpFindUser_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int userIndex = drpFindUser.SelectedIndex;
+            string selectedUser = drpFindUser.SelectedValue;
+            var digits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+            string result = selectedUser.TrimStart(digits);
+            lblFindUserResult.Text = "Selected user: " + (userIndex + 1) + " " + result;
+            lblFindUserResult.Visible = true;
+        }
+        protected void txtDeveloperResponsible_TextChanged(object sender, EventArgs e)
+        {
+            drpFindUser.Items.Clear();
+            searchedUsers.Clear();
+            int counter = 0;
+            string searchKeyword = txtDeveloperResponsible.Text.Replace("'", "''");
+            string[] words = searchKeyword.Split(' ');
+            SortedSet<string> set_results = new SortedSet<string>();
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            foreach (string word in words)
+            {
+                cmd.CommandText = "select userId from Users where (user_firstname + ' ' + user_lastname) like '%" + word + "%'  ";
+                string temp_Id = cmd.ExecuteScalar().ToString();
+                set_results.Add(temp_Id);
+            }
+            for (int i = 0; i < set_results.Count; i++)
+            {
+                string temp_userId = set_results.ElementAt(i);
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '" + temp_userId + "' ";
+                string temp_user = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select loginId from Users where userId = '" + temp_userId + "' ";
+                int temp_loginId = Convert.ToInt32(cmd.ExecuteScalar());
+                cmd.CommandText = "select login_isActive from Logins where loginId = '" + temp_loginId + "' ";
+                int temp_isActive = Convert.ToInt32(cmd.ExecuteScalar());
+                cmd.CommandText = "select roleId from Logins where loginId = '" + temp_loginId + "' ";
+                int temp_roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                int int_loginId = Convert.ToInt32(loginId);
+                int int_roleId = Convert.ToInt32(roleId);
+                cmd.CommandText = "select count(*) from UsersForProjects where projectId = '"+projectId+"' and userId = '"+temp_userId+"'  ";
+                int memberOfProject = Convert.ToInt32(cmd.ExecuteScalar());
+                if (memberOfProject == 1)//If the user searched for is a member of the current project
+                {
+                    //add the searched user if his/her account is active, and the user is not the current user searching:
+                    if (temp_isActive == 1 && int_loginId!= temp_loginId)
+                    {
+                        searchedUsers.Add(temp_userId);
+                        drpFindUser.Items.Add(++counter + " " + temp_user);
+                    }
+                }
+                
+            }
+            connect.Close();
+        }
+        protected void btnSaveUserStory_Click(object sender, EventArgs e)
+        {
+            hideErrorLabels();
+            if (correctInput())
+            {
+                //storeInDB();
+                addNewEntry();
+                clearNewUserStoryInputs();
+                sendEmail();
+            }
+        }
+        protected void sendEmail()
+        {
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            Email email = new Email();
+            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+            string userId = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select user_email from Users where userId like '" + userId + "' ";
+            string emailTo = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + userId + "' ";
+            string name = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_name from Projects where projectId = '"+projectId+"' ";
+            string project_name = cmd.ExecuteScalar().ToString();
+            connect.Close();
+            string messageBody = "Hello " + name + ",\nThis email is to notify you that your user story#(" + txtUniqueUserStoryID.Text + ") has been successfully submitted for the project ("+project_name+").\n" +
+                "\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
+            email.sendEmail(emailTo, messageBody);
+            //Email every developer who has been added to this user story:
+            for (int i = 0; i < usersToAdd.Count; i++)
+            {
+                string temp_id = usersToAdd.ElementAt(i);
+                connect.Open();
+                cmd.CommandText = "select user_email from Users where userId like '" + temp_id + "' ";
+                string temp_emailTo = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + temp_id + "' ";
+                string temp_name = cmd.ExecuteScalar().ToString();
+                connect.Close();
+                string temp_messageBody = "Hello " + temp_name + ",\nThis email is to notify you that you have been added to the list of developers in user story#(" + txtUniqueUserStoryID.Text + ") for the project ("+project_name+").\n" +
+                "\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
+                email.sendEmail(temp_emailTo, temp_messageBody);
+            }
+        }
+        protected void addNewEntry()
+        {
+            int hasImage = 0;
+            if (files.Count > 0)
+            {
+                storeImagesInServer();
+                hasImage = 1;
+            }
+            //Store new topic as neither approved nor denied and return its ID:
+            string userStoryId = storeUserStory(hasImage);
+            //Allow the creator of topic to access it when it's approved and add the new tags to the topic:
+            allowUserAccessUserStory(userStoryId);
+            storeImagesInDB(userStoryId, hasImage, files);
+            clearNewUserStoryInputs();
+            lblAddUserStoryMessage.Visible = true;
+            lblAddUserStoryMessage.ForeColor = System.Drawing.Color.Green;
+            lblAddUserStoryMessage.Text = "The user story has been successfully submitted and an email notification has been sent to you. <br/>";
+            wait.Visible = false;
+        }
+        protected void allowUserAccessUserStory(string userStoryId)
+        {
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            //Get the current user's ID:
+            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+            string userId = cmd.ExecuteScalar().ToString();
+            //Note: by adding the user to this table, he/she is given access to the newly-created table.
+            //Add the creator to UsersForProjects table.
+            //Add the current user to the user story:
+            cmd.CommandText = "insert into UsersForUserStories (userId, userStoryId, usersForUserStories_isNotified) values " +
+                    "('" + userId + "', '" + userStoryId + "', '0')";
+            cmd.ExecuteScalar();
+            //Add the list of selected developers to the user story:
+            for (int i = 0; i < usersToAdd.Count; i++)
+            {
+                string developerResponsible_userId = usersToAdd.ElementAt(i);
+                cmd.CommandText = "insert into UsersForUserStories (userId, userStoryId, usersForUserStories_isNotified) values " +
+                    "('" + developerResponsible_userId + "', '" + userStoryId + "', '0')";
+                cmd.ExecuteScalar();
+            }
+            connect.Close();
+        }
+        protected string storeUserStory(int hasImage)
+        {
+            string userStoryId = "";
+            DateTime createdDate = DateTime.Now;
+            string uniqueId = txtUniqueUserStoryID.Text.Replace(" ", "");
+            uniqueId = txtUniqueUserStoryID.Text.Replace("'", "''");
+            string asARole = "";
+            int counter = 0;
+            foreach (ListItem listItem in drpAsRole.Items)
+            {
+                if (listItem.Selected)
+                {
+                    counter++;
+                    var val = listItem.Value;
+                    var txt = listItem.Text;
+                    if(counter == 1)
+                    asARole += val.ToString();
+                    else
+                        asARole = asARole + ", "+ val.ToString();
+                }
+            }
+            string iWantTo = txtIWantTo.Text.Replace("'", "''");
+            string soThat = txtSoThat.Text.Replace("'", "''");
+            string dateIntroduced = calDateIntroduced.SelectedDate.ToString();
+            string dateConsidered = calDateConsidered.SelectedDate.ToString();
+            //string developerResponsible = drpFindUser.SelectedValue;
+            string currentStatus = drpCurrentStatus.SelectedValue;
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            //Get the current user's ID:
+            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+            string createdBy = cmd.ExecuteScalar().ToString();
+            //Store the new user story in the database:
+            cmd.CommandText = "insert into UserStories (projectId, userStory_createdBy, userStory_createdDate, userStory_uniqueId, userStory_asARole, userStory_iWantTo, " +
+                "userStory_soThat, userStory_dateIntroduced, userStory_dateConsideredForImplementation," +
+                " userStory_hasImage, userStory_currentStatus) values " +
+               "('" + projectId + "', '" + createdBy + "', '" + createdDate + "', '" + uniqueId + "', '"+asARole+"', '"+iWantTo+"', '" + soThat + "', '" + dateIntroduced + "'," +
+               " '"+dateConsidered+"',  '"+hasImage+"', '"+ currentStatus + "') ";
+            cmd.ExecuteScalar();
+            //Get the ID of the newly stored User Story from the database:
+            cmd.CommandText = "select [userStoryId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userStoryId ASC), * FROM [UserStories] " +
+                "where projectId = '" + projectId + "' and userStory_createdBy = '" + createdBy + "' and userStory_createdDate = '" + Layouts.getOriginalTimeFormat(createdDate.ToString()) + "' "
+                + " and userStory_asARole like '"+ asARole + "' and userStory_iWantTo like '"+ iWantTo + "' and userStory_soThat like '"+ soThat + "' "
+                + " and userStory_dateIntroduced = '" + Layouts.getOriginalTimeFormat(dateIntroduced.ToString()) + "' "
+                + " and userStory_dateConsideredForImplementation = '" + Layouts.getOriginalTimeFormat(dateConsidered.ToString()) + "' "
+                + " and userStory_hasImage = '"+hasImage+"' and userStory_currentStatus like '"+ currentStatus + "' "
+                + " and userStory_isDeleted = '0' "
+                + " ) as t where rowNum = '1'";
+            userStoryId = cmd.ExecuteScalar().ToString();
+            connect.Close();
+            return userStoryId;
+        }
+        protected void storeImagesInDB(string userStoryId, int hasImage, List<HttpPostedFile> files)
+        {
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            //Check if there is an image:
+            if (hasImage == 1)
+            {
+                for (int i = 0; i < files.Count; i++)
+                {
+                    string imageName = files[i].FileName.ToString().Replace("'", "''");
+                    //Add to Images:
+                    cmd.CommandText = "insert into Images (image_name) values ('" + imageName + "')";
+                    cmd.ExecuteScalar();
+                    //Get the image ID:
+                    cmd.CommandText = "select imageId from Images where image_name like '" + imageName + "' ";
+                    string imageId = cmd.ExecuteScalar().ToString();
+                    //Add in ImagesForUserStories:
+                    cmd.CommandText = "insert into ImagesForUserStories (imageId, userStoryId) values ('" + imageId + "', '" + userStoryId + "')";
+                    cmd.ExecuteScalar();
+                }
+            }
+            connect.Close();
+        }
+        protected void btnUpload_Click(object sender, EventArgs e)
+        {
+            if (Request.Files.Count > 0)
+            {
+                int fileCount = Request.Files.Count;
+                for (int i = 0; i < fileCount; i++)
+                {
+                    HttpPostedFile file = Request.Files[i];
+                    if (checkFile(file))
+                        files.Add(file);
+                }
+                if (fileCount == 1)
+                    fileNames.InnerHtml = "You have successfully uploaded your file!";
+                else if (fileCount > 1)
+                    fileNames.InnerHtml = "You have successfully uploaded your files!";
+                else
+                    fileNames.InnerHtml = "You have not uploaded any files!";
+            }
+        }
+        protected bool checkFile(HttpPostedFile file)
+        {
+            bool correct = true;
+            if (file.ContentLength > 0)
+            {
+                string fileExtension = System.IO.Path.GetExtension(file.FileName);
+                int filesize = FileUpload1.PostedFile.ContentLength;
+                string filename = file.FileName;
+                if (fileExtension.ToLower() != ".jpg" && fileExtension.ToLower() != ".tiff" && fileExtension.ToLower() != ".jpeg" &&
+                    fileExtension.ToLower() != ".png" && fileExtension.ToLower() != ".gif" && fileExtension.ToLower() != ".bmp" &&
+                    fileExtension.ToLower() != ".tif" && fileExtension.ToLower() != ".txt" && fileExtension.ToLower() != ".pdf"
+                    && fileExtension.ToLower() != ".html")
+                {
+                    correct = false;
+                    lblImageError.Visible = true;
+                    lblImageError.Text = "File Error: The supported formats for files are: jpg, jpeg, tif, tiff, png, gif, bmp, " +
+                        "txt, pdf, and HTML.";
+                }
+
+                if (filesize > 5242880)
+                {
+                    correct = false;
+                    lblImageError.Visible = true;
+                    lblImageError.Text = "File Error: The size of any uploaded file needs to be less than 5MB.";
+                }
+                if (string.IsNullOrWhiteSpace(filename))
+                {
+                    correct = false;
+                    lblImageError.Visible = true;
+                    lblImageError.Text = "File Error: The file you are trying to upload must have a name.";
+                }
+            }
+            else if (file.ContentLength == 0 && file == null)
+            {
+                correct = false;
+                lblImageError.Visible = true;
+                lblImageError.Text = "File Error: Please select at least one file to upload.";
+            }
+            return correct;
+        }
+        protected void storeImagesInServer()
+        {
+            //Loop through images and store each one of them:
+            for (int i = 0; i < files.Count; i++)
+            {
+                string path = Server.MapPath("~/images/" + files[i].FileName);
+                string fileExtension = System.IO.Path.GetExtension(files[i].FileName);
+                if (fileExtension.ToLower() == ".jpg" || fileExtension.ToLower() == ".tiff" || fileExtension.ToLower() == ".jpeg" ||
+                    fileExtension.ToLower() == ".png" || fileExtension.ToLower() == ".gif" || fileExtension.ToLower() == ".bmp" ||
+                    fileExtension.ToLower() == ".tif")
+                {
+                    try
+                    {
+                        System.Drawing.Bitmap image = new System.Drawing.Bitmap(files[i].InputStream);
+                        System.Drawing.Bitmap image_copy = new System.Drawing.Bitmap(image);
+                        System.Drawing.Image img = RezizeImage(System.Drawing.Image.FromStream(files[i].InputStream), 500, 500);
+                        img.Save(path, ImageFormat.Jpeg);
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error: " + e.ToString());
+                    }
+                }
+                else
+                {
+                    //If the file is not an image, just save it as it is:
+                    files[i].SaveAs(path);
+                }
+            }
+        }
+        private MemoryStream BytearrayToStream(byte[] arr)
+        {
+            return new MemoryStream(arr, 0, arr.Length);
+        }
+        private System.Drawing.Image RezizeImage(System.Drawing.Image img, int maxWidth, int maxHeight)
+        {
+            if (img.Height < maxHeight && img.Width < maxWidth) return img;
+            using (img)
+            {
+                Double xRatio = (double)img.Width / maxWidth;
+                Double yRatio = (double)img.Height / maxHeight;
+                Double ratio = Math.Max(xRatio, yRatio);
+                int nnx = (int)Math.Floor(img.Width / ratio);
+                int nny = (int)Math.Floor(img.Height / ratio);
+                Bitmap cpy = new Bitmap(nnx, nny, PixelFormat.Format32bppArgb);
+                using (Graphics gr = Graphics.FromImage(cpy))
+                {
+                    gr.Clear(Color.Transparent);
+
+                    // This is said to give best quality when resizing images
+                    gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+
+                    gr.DrawImage(img,
+                        new Rectangle(0, 0, nnx, nny),
+                        new Rectangle(0, 0, img.Width, img.Height),
+                        GraphicsUnit.Pixel);
+                }
+                return cpy;
+            }
+
+        }
+        protected void btnAddUserToList_Click(object sender, EventArgs e)
+        {
+            SqlCommand cmd = connect.CreateCommand();
+            lblListOfUsers.Text = "Added to the list:<br/>";
+            int userIndex = drpFindUser.SelectedIndex;
+            string selectedDeveloper_fullname = drpFindUser.SelectedValue;
+            var digits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+            selectedDeveloper_fullname = selectedDeveloper_fullname.TrimStart(digits);
+            string developerResponsible_userId = searchedUsers[userIndex].ToString();
+            usersToAdd.Add(developerResponsible_userId);
+            connect.Open();
+            for (int i=0; i < usersToAdd.Count; i++)
+            {
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '"+usersToAdd.ElementAt(i)+"' ";
+                string temp_name = cmd.ExecuteScalar().ToString();
+                lblListOfUsers.Text += temp_name + "<br/>";
+            }
+            connect.Close();
+            lblListOfUsers.Visible = true;
+        }
+        protected bool correctInput()
+        {
+            bool correct = true;
+            if(drpAsRole.SelectedIndex == 0)
+            {
+                correct = false;
+                lblAsRoleError.Text = "Invalid input: Please select a role.";
+                lblAsRoleError.Visible = true;
+            }
+            if(string.IsNullOrEmpty(txtIWantTo.Text))
+            {
+                correct = false;
+                lblIWantToError.Visible = true;
+                lblIWantToError.Text = "Invalid input: Please type something for \"I want to...\" ";
+            }
+            if (string .IsNullOrWhiteSpace(txtSoThat.Text))
+            {
+                correct = false;
+                lblSoThatError.Visible = true;
+                lblSoThatError.Text = "Invalid input: Please type something for \"So that ...\" ";
+            }
+            if(calDateIntroduced.SelectedDate.Day < DateTime.Now.Day)
+            {
+                correct = false;
+                lblDateIntroducedError.Visible = true;
+                lblDateIntroducedError.Text = "Invalid input: Please select a date starting from now.";
+            }
+            if(calDateConsidered.SelectedDate.Day < DateTime.Now.Day)
+            {
+                correct = false;
+                lblDateConsideredError.Visible = true;
+                lblDateConsideredError.Text = "Invalid input: Please select a date starting from now.";
+            }
+            if(drpCurrentStatus.SelectedIndex == 0)
+            {
+                correct = false;
+                lblCurrentStatusError.Visible = true;
+                lblCurrentStatusError.Text = "Invalid input: Please select a status for this user story.";
+            }
+
+            return correct;
+        }
+        protected void btnGoBack_Click(object sender, EventArgs e)
+        {
+            addSession();
+            goBack();
+        }
+        protected void btnGoBackToListOfUserStories_Click(object sender, EventArgs e)
+        {
+            showView();
+            createTable();
         }
     }
 }
