@@ -63,7 +63,9 @@
                             </a></li>
                             <%--Alerts end--%>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle " data-toggle="dropdown" href="#">Account</a>
+                                <a class="nav-link dropdown-toggle " data-toggle="dropdown" href="#">
+                                    <asp:Label ID="lblName" runat="server" Text=" "></asp:Label>
+                                </a>
                                 <div class="dropdown-menu">
                                     <%--<a runat="server" class="dropdown-item" href="Accounts/Admin/MyProfile">My Profile</a>--%>
                                     <a runat="server" class="dropdown-item" href="Accounts/Master/Account">Account Settings</a>

@@ -54,8 +54,23 @@
                                 </td>
                                 <td>
                                     <asp:Label ID="lblStartDateError" runat="server" Text="calendar" Visible="false" ForeColor="red"></asp:Label></td>
-
                             </tr>
+                            <tr>
+                                    <td>
+                                        <asp:Label ID="lblDeveloperResponsible" runat="server" Text="Developers" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td>
+                                        <asp:TextBox ID="txtDeveloperResponsible" runat="server" Font-Size="Medium" Width="100%" AutoPostBack="true" OnTextChanged="txtDeveloperResponsible_TextChanged"></asp:TextBox></td>
+                                    <td>
+                                        <asp:Label ID="lblDeveloperResponsibleError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td><asp:Label ID="lblSelectUser" runat="server" Text="Select developer" Width ="100%"></asp:Label></td>
+                                    <td><asp:ListBox ID="drpFindUser" runat="server" Width="100%" AutoPostBack="true" OnSelectedIndexChanged="drpFindUser_SelectedIndexChanged"></asp:ListBox>
+                                        <asp:Button ID="btnAddUserToList" runat="server" Text="Add to list" Width="100px" BackColor="yellow" Font-Bold="true" Font-Size="Medium" OnClick="btnAddUserToList_Click"  />
+                                        <br />
+                                        <asp:Label ID="lblFindUserResult" runat="server" Text="" Visible ="false" Width ="100%"></asp:Label></td>
+                                    <td><asp:Label ID="lblListOfUsers" runat="server" Text="" Visible ="false" Width ="100%"></asp:Label></td>
+                               </tr>
                         </table>
                         <table style="width: 100%">
                             <tr>
@@ -75,6 +90,9 @@
                         <asp:AsyncPostBackTrigger ControlID="calStartDate" EventName="SelectionChanged" />
                         <asp:AsyncPostBackTrigger ControlID="btnSubmit" EventName="Click" />
                         <asp:PostBackTrigger ControlID="btnUpload" />
+                        <asp:AsyncPostBackTrigger ControlID="txtDeveloperResponsible" EventName="TextChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="drpFindUser" EventName="SelectedIndexChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="btnAddUserToList" EventName="Click" />
                     </Triggers>
                 </asp:UpdatePanel>
                 <style>

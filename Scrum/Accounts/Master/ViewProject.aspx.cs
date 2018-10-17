@@ -22,7 +22,6 @@ namespace Scrum.Accounts.Master
         string previousPage = "";
         string projectId = "";
         static ArrayList searchedUsers = new ArrayList();
-        //static ArrayList usersToAdd = new ArrayList();
         static SortedSet<string> usersToAdd = new SortedSet<string>();
         static List<HttpPostedFile> files;
         protected void Page_Load(object sender, EventArgs e)
@@ -30,7 +29,7 @@ namespace Scrum.Accounts.Master
             initialPageAccess();
             CheckErrors check = new CheckErrors();
             projectId = Request.QueryString["id"];
-            if(!check.checkProjectAccess(projectId, loginId))
+            if (!check.checkProjectAccess(projectId, loginId))
                 goBack();
             if (!IsPostBack)
             {
@@ -111,7 +110,7 @@ namespace Scrum.Accounts.Master
         {
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
-            cmd.CommandText = "select project_name from Projects where projectId = '"+projectId+"' ";
+            cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
             string name = cmd.ExecuteScalar().ToString();
             cmd.CommandText = "select project_description from Projects where projectId = '" + projectId + "' ";
             string description = cmd.ExecuteScalar().ToString();
@@ -128,7 +127,7 @@ namespace Scrum.Accounts.Master
             cmd.CommandText = "select project_startedDate from Projects where projectId = '" + projectId + "' ";
             string startDate = cmd.ExecuteScalar().ToString();
             //Convert the createdByUserId to a name:
-            cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '"+createdByUserId+"' ";
+            cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + createdByUserId + "' ";
             string createdBy = cmd.ExecuteScalar().ToString();
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
@@ -177,7 +176,7 @@ namespace Scrum.Accounts.Master
             connect.Open();
             string userStoryId = "", asARole = "", iWant = "", soThat = "", dateIntroduced = "", dateConsidered = "",
                    developersResponsible = "", currentStatus = "";
-            string creatorId = "", db_userStoryId="";
+            string creatorId = "", db_userStoryId = "";
             for (int row = 0; row < grdUserStories.Rows.Count; row++)
             {
                 //Set links to review a user:
@@ -256,7 +255,7 @@ namespace Scrum.Accounts.Master
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
             //count the not-approved users:
-            cmd.CommandText = "select count(*) from [UserStories] where projectId = '"+projectId+"' ";
+            cmd.CommandText = "select count(*) from [UserStories] where projectId = '" + projectId + "' ";
             int count = Convert.ToInt32(cmd.ExecuteScalar());
             connect.Close();
             return count;
@@ -290,11 +289,11 @@ namespace Scrum.Accounts.Master
                 for (int i = 1; i <= countUserStories; i++)
                 {
                     //Get the project ID:
-                    cmd.CommandText = "select [userStoryId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userStoryId ASC), *FROM [UserStories]) as t where rowNum = '" + i + "'";
+                    cmd.CommandText = "select [userStoryId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userStoryId ASC), * FROM [UserStories] where projectId = '" + projectId + "' ) as t where rowNum = '" + i + "'";
                     id = cmd.ExecuteScalar().ToString();
                     cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + id + "' ";
                     userStoryId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_asARole from UserStories where userStoryId = '"+id+"' ";
+                    cmd.CommandText = "select userStory_asARole from UserStories where userStoryId = '" + id + "' ";
                     asARole = cmd.ExecuteScalar().ToString();
                     cmd.CommandText = "select userStory_iWantTo from UserStories where userStoryId = '" + id + "' ";
                     iWant = cmd.ExecuteScalar().ToString();
@@ -305,14 +304,14 @@ namespace Scrum.Accounts.Master
                     cmd.CommandText = "select userStory_dateConsideredForImplementation from UserStories where userStoryId = '" + id + "' ";
                     dateConsidered = cmd.ExecuteScalar().ToString();
                     //Loop through the developers for the selected User Story:
-                    cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '"+id+"' ";
+                    cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '" + id + "' ";
                     int usersForUserStory = Convert.ToInt32(cmd.ExecuteScalar());
-                    for (int j=1; j<= usersForUserStory; j++)
+                    for (int j = 1; j <= usersForUserStory; j++)
                     {
                         cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForUserStoriesId ASC), * FROM [UsersForUserStories] where userStoryId = '" + id + "' ) as t where rowNum = '" + j + "'";
                         string developerId = cmd.ExecuteScalar().ToString();
                         cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + developerId + "' ";
-                        if(j==1)
+                        if (j == 1)
                             developersResponsible = cmd.ExecuteScalar().ToString();
                         else
                             developersResponsible = developersResponsible + ", " + cmd.ExecuteScalar().ToString();
@@ -322,7 +321,7 @@ namespace Scrum.Accounts.Master
                     //Creator's info, which will be hidden:
                     cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + id + "' ";
                     creatorId = cmd.ExecuteScalar().ToString();
-                    dt.Rows.Add(userStoryId, asARole, iWant, soThat, Layouts.getTimeFormat(dateIntroduced), Layouts.getTimeFormat(dateConsidered), developersResponsible, currentStatus,creatorId, id);
+                    dt.Rows.Add(userStoryId, asARole, iWant, soThat, Layouts.getTimeFormat(dateIntroduced), Layouts.getTimeFormat(dateConsidered), developersResponsible, currentStatus, creatorId, id);
                     //Creator ID is not needed here, but it's used to uniquely identify the names in the system in case we have duplicate names.
                 }
                 connect.Close();
@@ -339,7 +338,7 @@ namespace Scrum.Accounts.Master
         }
         protected void calDateIntroduced_SelectionChanged(object sender, EventArgs e)
         {
-            
+
         }
         protected void calDateConsidered_SelectionChanged(object sender, EventArgs e)
         {
@@ -378,14 +377,14 @@ namespace Scrum.Accounts.Master
                 drpFindUser.Items.Clear();
                 lblFindUserResult.Text = "";
                 drpCurrentStatus.SelectedIndex = 0;
-                if(searchedUsers != null)
+                if (searchedUsers != null)
                     searchedUsers.Clear();
                 if (usersToAdd != null)
                     usersToAdd.Clear();
                 if (files != null)
                     files.Clear();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Error: " + e.ToString());
             }
@@ -446,18 +445,18 @@ namespace Scrum.Accounts.Master
                 int temp_roleId = Convert.ToInt32(cmd.ExecuteScalar());
                 int int_loginId = Convert.ToInt32(loginId);
                 int int_roleId = Convert.ToInt32(roleId);
-                cmd.CommandText = "select count(*) from UsersForProjects where projectId = '"+projectId+"' and userId = '"+temp_userId+"'  ";
+                cmd.CommandText = "select count(*) from UsersForProjects where projectId = '" + projectId + "' and userId = '" + temp_userId + "'  ";
                 int memberOfProject = Convert.ToInt32(cmd.ExecuteScalar());
                 if (memberOfProject == 1)//If the user searched for is a member of the current project
                 {
                     //add the searched user if his/her account is active, and the user is not the current user searching:
-                    if (temp_isActive == 1 && int_loginId!= temp_loginId)
+                    if (temp_isActive == 1 && int_loginId != temp_loginId)
                     {
                         searchedUsers.Add(temp_userId);
                         drpFindUser.Items.Add(++counter + " " + temp_user);
                     }
                 }
-                
+
             }
             connect.Close();
         }
@@ -483,10 +482,10 @@ namespace Scrum.Accounts.Master
             string emailTo = cmd.ExecuteScalar().ToString();
             cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + userId + "' ";
             string name = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "select project_name from Projects where projectId = '"+projectId+"' ";
+            cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
             string project_name = cmd.ExecuteScalar().ToString();
             connect.Close();
-            string messageBody = "Hello " + name + ",\nThis email is to notify you that your user story#(" + txtUniqueUserStoryID.Text + ") has been successfully submitted for the project ("+project_name+").\n" +
+            string messageBody = "Hello " + name + ",\nThis email is to notify you that your user story#(" + txtUniqueUserStoryID.Text + ") has been successfully submitted for the project (" + project_name + ").\n" +
                 "\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
             email.sendEmail(emailTo, messageBody);
             //Email every developer who has been added to this user story:
@@ -499,7 +498,7 @@ namespace Scrum.Accounts.Master
                 cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + temp_id + "' ";
                 string temp_name = cmd.ExecuteScalar().ToString();
                 connect.Close();
-                string temp_messageBody = "Hello " + temp_name + ",\nThis email is to notify you that you have been added to the list of developers in user story#(" + txtUniqueUserStoryID.Text + ") for the project ("+project_name+").\n" +
+                string temp_messageBody = "Hello " + temp_name + ",\nThis email is to notify you that you have been added to the list of developers in user story#(" + txtUniqueUserStoryID.Text + ") for the project (" + project_name + ").\n" +
                 "\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
                 email.sendEmail(temp_emailTo, temp_messageBody);
             }
@@ -561,10 +560,10 @@ namespace Scrum.Accounts.Master
                     counter++;
                     var val = listItem.Value;
                     var txt = listItem.Text;
-                    if(counter == 1)
-                    asARole += val.ToString();
+                    if (counter == 1)
+                        asARole += val.ToString();
                     else
-                        asARole = asARole + ", "+ val.ToString();
+                        asARole = asARole + ", " + val.ToString();
                 }
             }
             string iWantTo = txtIWantTo.Text.Replace("'", "''");
@@ -582,16 +581,16 @@ namespace Scrum.Accounts.Master
             cmd.CommandText = "insert into UserStories (projectId, userStory_createdBy, userStory_createdDate, userStory_uniqueId, userStory_asARole, userStory_iWantTo, " +
                 "userStory_soThat, userStory_dateIntroduced, userStory_dateConsideredForImplementation," +
                 " userStory_hasImage, userStory_currentStatus) values " +
-               "('" + projectId + "', '" + createdBy + "', '" + createdDate + "', '" + uniqueId + "', '"+asARole+"', '"+iWantTo+"', '" + soThat + "', '" + dateIntroduced + "'," +
-               " '"+dateConsidered+"',  '"+hasImage+"', '"+ currentStatus + "') ";
+               "('" + projectId + "', '" + createdBy + "', '" + createdDate + "', '" + uniqueId + "', '" + asARole + "', '" + iWantTo + "', '" + soThat + "', '" + dateIntroduced + "'," +
+               " '" + dateConsidered + "',  '" + hasImage + "', '" + currentStatus + "') ";
             cmd.ExecuteScalar();
             //Get the ID of the newly stored User Story from the database:
             cmd.CommandText = "select [userStoryId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userStoryId ASC), * FROM [UserStories] " +
                 "where projectId = '" + projectId + "' and userStory_createdBy = '" + createdBy + "' and userStory_createdDate = '" + Layouts.getOriginalTimeFormat(createdDate.ToString()) + "' "
-                + " and userStory_asARole like '"+ asARole + "' and userStory_iWantTo like '"+ iWantTo + "' and userStory_soThat like '"+ soThat + "' "
+                + " and userStory_asARole like '" + asARole + "' and userStory_iWantTo like '" + iWantTo + "' and userStory_soThat like '" + soThat + "' "
                 + " and userStory_dateIntroduced = '" + Layouts.getOriginalTimeFormat(dateIntroduced.ToString()) + "' "
                 + " and userStory_dateConsideredForImplementation = '" + Layouts.getOriginalTimeFormat(dateConsidered.ToString()) + "' "
-                + " and userStory_hasImage = '"+hasImage+"' and userStory_currentStatus like '"+ currentStatus + "' "
+                + " and userStory_hasImage = '" + hasImage + "' and userStory_currentStatus like '" + currentStatus + "' "
                 + " and userStory_isDeleted = '0' "
                 + " ) as t where rowNum = '1'";
             userStoryId = cmd.ExecuteScalar().ToString();
@@ -753,9 +752,9 @@ namespace Scrum.Accounts.Master
             string developerResponsible_userId = searchedUsers[userIndex].ToString();
             usersToAdd.Add(developerResponsible_userId);
             connect.Open();
-            for (int i=0; i < usersToAdd.Count; i++)
+            for (int i = 0; i < usersToAdd.Count; i++)
             {
-                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '"+usersToAdd.ElementAt(i)+"' ";
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '" + usersToAdd.ElementAt(i) + "' ";
                 string temp_name = cmd.ExecuteScalar().ToString();
                 lblListOfUsers.Text += temp_name + "<br/>";
             }
@@ -765,37 +764,37 @@ namespace Scrum.Accounts.Master
         protected bool correctInput()
         {
             bool correct = true;
-            if(drpAsRole.SelectedIndex == 0)
+            if (drpAsRole.SelectedIndex == 0)
             {
                 correct = false;
                 lblAsRoleError.Text = "Invalid input: Please select a role.";
                 lblAsRoleError.Visible = true;
             }
-            if(string.IsNullOrEmpty(txtIWantTo.Text))
+            if (string.IsNullOrEmpty(txtIWantTo.Text))
             {
                 correct = false;
                 lblIWantToError.Visible = true;
                 lblIWantToError.Text = "Invalid input: Please type something for \"I want to...\" ";
             }
-            if (string .IsNullOrWhiteSpace(txtSoThat.Text))
+            if (string.IsNullOrWhiteSpace(txtSoThat.Text))
             {
                 correct = false;
                 lblSoThatError.Visible = true;
                 lblSoThatError.Text = "Invalid input: Please type something for \"So that ...\" ";
             }
-            if(calDateIntroduced.SelectedDate.Day < DateTime.Now.Day)
+            if (calDateIntroduced.SelectedDate.Day < DateTime.Now.Day)
             {
                 correct = false;
                 lblDateIntroducedError.Visible = true;
                 lblDateIntroducedError.Text = "Invalid input: Please select a date starting from now.";
             }
-            if(calDateConsidered.SelectedDate.Day < DateTime.Now.Day)
+            if (calDateConsidered.SelectedDate.Day < DateTime.Now.Day)
             {
                 correct = false;
                 lblDateConsideredError.Visible = true;
                 lblDateConsideredError.Text = "Invalid input: Please select a date starting from now.";
             }
-            if(drpCurrentStatus.SelectedIndex == 0)
+            if (drpCurrentStatus.SelectedIndex == 0)
             {
                 correct = false;
                 lblCurrentStatusError.Visible = true;
@@ -807,7 +806,8 @@ namespace Scrum.Accounts.Master
         protected void btnGoBack_Click(object sender, EventArgs e)
         {
             addSession();
-            goBack();
+            Response.Redirect("Home");
+            //goBack();
         }
         protected void btnGoBackToListOfUserStories_Click(object sender, EventArgs e)
         {

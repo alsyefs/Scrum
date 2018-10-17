@@ -157,6 +157,78 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblStartDateError;
         
         /// <summary>
+        /// lblDeveloperResponsible control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDeveloperResponsible;
+        
+        /// <summary>
+        /// txtDeveloperResponsible control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtDeveloperResponsible;
+        
+        /// <summary>
+        /// lblDeveloperResponsibleError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDeveloperResponsibleError;
+        
+        /// <summary>
+        /// lblSelectUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSelectUser;
+        
+        /// <summary>
+        /// drpFindUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox drpFindUser;
+        
+        /// <summary>
+        /// btnAddUserToList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnAddUserToList;
+        
+        /// <summary>
+        /// lblFindUserResult control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblFindUserResult;
+        
+        /// <summary>
+        /// lblListOfUsers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblListOfUsers;
+        
+        /// <summary>
         /// btnSubmit control.
         /// </summary>
         /// <remarks>

@@ -9,9 +9,9 @@ namespace Scrum
     public class Configuration
     {
         //The below is Saleh's personal connection string:
-        //static string connectionString = "data source=R14\\SALEH;initial catalog=ScrumDB;MultipleActiveResultSets=True;user id=sa; password=Saleh.Alsyefi1988 ";
+        static string connectionString = "data source=R14\\SALEH;initial catalog=ScrumDB;MultipleActiveResultSets=True;user id=sa; password=Saleh.Alsyefi1988 ";
         //The server's connection string:
-        static string connectionString = "data source=Murcap02;initial catalog=ScrumDB;MultipleActiveResultSets=True; user id=sa; password=Saleh.Alsyefi1988";
+        //static string connectionString = "data source=Murcap02;initial catalog=ScrumDB;MultipleActiveResultSets=True; user id=sa; password=Saleh.Alsyefi1988";
         static string dbId = setDBID();
         static string dbPassword = setDBPassword();
         public string getConnectionString()

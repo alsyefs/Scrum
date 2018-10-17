@@ -36,6 +36,24 @@ namespace Scrum
             if (!correctSession)
                 clearSession();
             lblAlerts.Text = "Alerts (" + countTotalAlerts() + ")";
+            lblName.Text = getName();
+        }
+        protected string getName()
+        {
+            string name = "";
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            cmd.CommandText = "select count(*) from Users where loginId = '" + loginId + "' ";
+            int countLogins = Convert.ToInt32(cmd.ExecuteScalar());
+            if (countLogins > 0)
+            {
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where loginId = '" + loginId + "' ";
+                name = cmd.ExecuteScalar().ToString();
+            }
+            else
+                name = "Account";
+            connect.Close();
+            return name;
         }
         protected string GetIPAddress()
         {

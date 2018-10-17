@@ -148,6 +148,7 @@
     <Content Include="Accounts\Developer\ChangePassword.aspx" />
     <Content Include="Accounts\Developer\ChangeSecurityQuestions.aspx" />
     <Content Include="Accounts\Developer\Contact.aspx" />
+    <Content Include="Accounts\Developer\MyProjects.aspx" />
     <Content Include="Accounts\Master\About.aspx" />
     <Content Include="Accounts\Master\Account.aspx" />
     <Content Include="Accounts\Master\ChangePassword.aspx" />
@@ -156,6 +157,7 @@
     <Content Include="Accounts\Master\CreateProject.aspx" />
     <Content Include="Accounts\Developer\Home.aspx" />
     <Content Include="Accounts\Master\Home.aspx" />
+    <Content Include="Accounts\Master\MyProjects.aspx" />
     <Content Include="Accounts\Master\ViewProject.aspx" />
     <Content Include="ChangePassword.aspx" />
     <Content Include="Contact.aspx" />
@@ -347,6 +349,13 @@
     <Compile Include="Accounts\Developer\Contact.aspx.designer.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Accounts\Developer\MyProjects.aspx.cs">
+      <DependentUpon>MyProjects.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Developer\MyProjects.aspx.designer.cs">
+      <DependentUpon>MyProjects.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Accounts\Master\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -402,6 +411,13 @@
     </Compile>
     <Compile Include="Accounts\Master\Home.aspx.designer.cs">
       <DependentUpon>Home.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Master\MyProjects.aspx.cs">
+      <DependentUpon>MyProjects.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\MyProjects.aspx.designer.cs">
+      <DependentUpon>MyProjects.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Master\ViewProject.aspx.cs">
       <DependentUpon>ViewProject.aspx</DependentUpon>

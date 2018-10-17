@@ -38,7 +38,7 @@
                                         <asp:Button ID="btnAddNewUserStory" runat="server" Text="Add new User Story" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnAddNewUserStory_Click" />
                                     </td>
                                     <td>
-                                        <asp:Button ID="btnGoBack" runat="server" Text="Add new User Story" Width="100%" BackColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnGoBack_Click" />
+                                        <asp:Button ID="btnGoBack" runat="server" Text="Go Back" Width="100%" BackColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnGoBack_Click" />
                                     </td>
                                 </tr>
                             </table>
@@ -69,12 +69,6 @@
                                     <td>
                                         <asp:Label ID="lblAsRole" runat="server" Text="As a (type of user)" Font-Size="Medium" Width="100%"></asp:Label></td>
                                     <td>
-                                        <%--<asp:DropDownList ID="drpAsRole" runat="server" Font-Size="Medium" Width="100%">
-                                            <asp:ListItem>Select Role</asp:ListItem>
-                                            <asp:ListItem>Admin</asp:ListItem>
-                                            <asp:ListItem>Master</asp:ListItem>
-                                            <asp:ListItem>Developer</asp:ListItem>
-                                        </asp:DropDownList>--%>
                                         <asp:ListBox ID="drpAsRole" runat="server" SelectionMode="Multiple" Font-Size="Medium" Width="100%" >
                                             <asp:ListItem>Select Role</asp:ListItem>
                                             <asp:ListItem>Admin</asp:ListItem>
@@ -128,13 +122,13 @@
                                         <asp:Label ID="lblDeveloperResponsibleError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
-                                <td><asp:Label ID="lblSelectUser" runat="server" Text="Select developer" Width ="100%"></asp:Label></td>
-                                <td><asp:ListBox ID="drpFindUser" runat="server" Width="100%" AutoPostBack="true" OnSelectedIndexChanged="drpFindUser_SelectedIndexChanged"></asp:ListBox>
-                                    <asp:Button ID="btnAddUserToList" runat="server" Text="Add to list" Width="100px" BackColor="yellow" Font-Bold="true" Font-Size="Medium" OnClick="btnAddUserToList_Click"  />
-                                    <br />
-                                <asp:Label ID="lblFindUserResult" runat="server" Text="" Visible ="false" Width ="100%"></asp:Label></td>
+                                    <td><asp:Label ID="lblSelectUser" runat="server" Text="Select developer" Width ="100%"></asp:Label></td>
+                                    <td><asp:ListBox ID="drpFindUser" runat="server" Width="100%" AutoPostBack="true" OnSelectedIndexChanged="drpFindUser_SelectedIndexChanged"></asp:ListBox>
+                                        <asp:Button ID="btnAddUserToList" runat="server" Text="Add to list" Width="100px" BackColor="yellow" Font-Bold="true" Font-Size="Medium" OnClick="btnAddUserToList_Click"  />
+                                        <br />
+                                        <asp:Label ID="lblFindUserResult" runat="server" Text="" Visible ="false" Width ="100%"></asp:Label></td>
                                     <td><asp:Label ID="lblListOfUsers" runat="server" Text="" Visible ="false" Width ="100%"></asp:Label></td>
-                            </tr>
+                               </tr>
                                 <tr>
                                     <td>
                                         <asp:Label ID="lblCurrentStatus" runat="server" Text="Current Status" Font-Size="Medium" Width="100%"></asp:Label></td>
@@ -172,8 +166,9 @@
                         <asp:AsyncPostBackTrigger ControlID="calDateConsidered" EventName="SelectionChanged" />
                         <asp:AsyncPostBackTrigger ControlID="txtDeveloperResponsible" EventName="TextChanged" />
                         <asp:AsyncPostBackTrigger ControlID="drpFindUser" EventName="SelectedIndexChanged" />
-                        <asp:PostBackTrigger ControlID="btnUpload" />
                         <asp:AsyncPostBackTrigger ControlID="btnAddUserToList" EventName="Click" />
+                        <asp:PostBackTrigger ControlID="btnUpload" />
+                        
                     </Triggers>
                 </asp:UpdatePanel>
                 <script type="text/javascript">

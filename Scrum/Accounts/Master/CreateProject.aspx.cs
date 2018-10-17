@@ -18,6 +18,8 @@ namespace Scrum.Accounts.Master
         static string conn = "";
         SqlConnection connect = new SqlConnection(conn);
         string username, roleId, loginId, token;
+        static ArrayList searchedUsers = new ArrayList();
+        static SortedSet<string> usersToAdd = new SortedSet<string>();
         static List<HttpPostedFile> files;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -110,6 +112,7 @@ namespace Scrum.Accounts.Master
         }
         protected void allowUserAccessProject(string projectId)
         {
+            DateTime currentTime = DateTime.Now;
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
             //Get the current user's ID:
@@ -118,8 +121,16 @@ namespace Scrum.Accounts.Master
             //Note: by adding the user to this table, he/she is given access to the newly-created table.
             //Add the creator to UsersForProjects table: 
             cmd.CommandText = "insert into UsersForProjects (userId, projectId, usersForProjects_joinedTime) values " +
-                "('" + userId + "', '" + projectId + "', '" + DateTime.Now + "')";
+                "('" + userId + "', '" + projectId + "', '" + currentTime + "')";
             cmd.ExecuteScalar();
+            //Add the list of selected developers to the user story:
+            for (int i = 0; i < usersToAdd.Count; i++)
+            {
+                string developerResponsible_userId = usersToAdd.ElementAt(i);
+                cmd.CommandText = "insert into UsersForProjects (userId, projectId, usersForProjects_joinedTime) values " +
+                    "('" + developerResponsible_userId + "', '" + projectId + "', '"+ currentTime + "')";
+                cmd.ExecuteScalar();
+            }
             connect.Close();
         }
         protected void sendEmail()
@@ -394,6 +405,74 @@ namespace Scrum.Accounts.Master
                 else
                     fileNames.InnerHtml = "You have not uploaded any files!";
             }
+        }
+        protected void btnAddUserToList_Click(object sender, EventArgs e)
+        {
+            SqlCommand cmd = connect.CreateCommand();
+            lblListOfUsers.Text = "Added to the list:<br/>";
+            int userIndex = drpFindUser.SelectedIndex;
+            string selectedDeveloper_fullname = drpFindUser.SelectedValue;
+            var digits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+            selectedDeveloper_fullname = selectedDeveloper_fullname.TrimStart(digits);
+            string developerResponsible_userId = searchedUsers[userIndex].ToString();
+            usersToAdd.Add(developerResponsible_userId);
+            connect.Open();
+            for (int i = 0; i < usersToAdd.Count; i++)
+            {
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '" + usersToAdd.ElementAt(i) + "' ";
+                string temp_name = cmd.ExecuteScalar().ToString();
+                lblListOfUsers.Text += temp_name + "<br/>";
+            }
+            connect.Close();
+            lblListOfUsers.Visible = true;
+        }
+        protected void drpFindUser_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int userIndex = drpFindUser.SelectedIndex;
+            string selectedUser = drpFindUser.SelectedValue;
+            var digits = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ' };
+            string result = selectedUser.TrimStart(digits);
+            lblFindUserResult.Text = "Selected user: " + (userIndex + 1) + " " + result;
+            lblFindUserResult.Visible = true;
+        }
+        protected void txtDeveloperResponsible_TextChanged(object sender, EventArgs e)
+        {
+            drpFindUser.Items.Clear();
+            searchedUsers.Clear();
+            int counter = 0;
+            string searchKeyword = txtDeveloperResponsible.Text.Replace("'", "''");
+            string[] words = searchKeyword.Split(' ');
+            SortedSet<string> set_results = new SortedSet<string>();
+            connect.Open();
+            SqlCommand cmd = connect.CreateCommand();
+            foreach (string word in words)
+            {
+                cmd.CommandText = "select userId from Users where (user_firstname + ' ' + user_lastname) like '%" + word + "%'  ";
+                string temp_Id = cmd.ExecuteScalar().ToString();
+                set_results.Add(temp_Id);
+            }
+            for (int i = 0; i < set_results.Count; i++)
+            {
+                string temp_userId = set_results.ElementAt(i);
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '" + temp_userId + "' ";
+                string temp_user = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select loginId from Users where userId = '" + temp_userId + "' ";
+                int temp_loginId = Convert.ToInt32(cmd.ExecuteScalar());
+                cmd.CommandText = "select login_isActive from Logins where loginId = '" + temp_loginId + "' ";
+                int temp_isActive = Convert.ToInt32(cmd.ExecuteScalar());
+                cmd.CommandText = "select roleId from Logins where loginId = '" + temp_loginId + "' ";
+                int temp_roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                int int_loginId = Convert.ToInt32(loginId);
+                int int_roleId = Convert.ToInt32(roleId);
+                //add the searched user if his/her account is active, and the user is not the current user searching:
+                if (temp_isActive == 1 && int_loginId != temp_loginId)
+                {
+                    searchedUsers.Add(temp_userId);
+                    drpFindUser.Items.Add(++counter + " " + temp_user);
+                }
+
+            }
+            connect.Close();
         }
     }
 }
