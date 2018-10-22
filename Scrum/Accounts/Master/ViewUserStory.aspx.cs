@@ -16,13 +16,14 @@ using System.Web.UI.WebControls;
 
 namespace Scrum.Accounts.Master
 {
-    public partial class ViewProject : System.Web.UI.Page
+    public partial class ViewUserStory : System.Web.UI.Page
     {
         static string conn = "";
         SqlConnection connect = new SqlConnection(conn);
         string username, roleId, loginId, token;
         string previousPage = "";
-        string projectId = "";
+        string userStoryId = "";
+        static string g_projectId = "";
         static ArrayList searchedUsers = new ArrayList();
         static SortedSet<string> usersToAdd = new SortedSet<string>();
         static List<HttpPostedFile> files;
@@ -32,8 +33,8 @@ namespace Scrum.Accounts.Master
             CheckErrors check = new CheckErrors();
             try
             {
-                projectId = Request.QueryString["id"];
-                if (!check.checkProjectAccess(projectId, loginId))
+                userStoryId = Request.QueryString["id"];
+                if (!check.checkUserStoryAccess(userStoryId, loginId))
                     goBack();
             }
             catch (Exception ex)
@@ -44,14 +45,13 @@ namespace Scrum.Accounts.Master
             if (!IsPostBack)
             {
                 files = new List<HttpPostedFile>();
-                getProjectInfo();
+                getUserStoryInfo();
                 showView();
             }
             createTable();
-            checkIfProjectTerminated();
             updateUniqueId();
             //The below to be used whenever needed in the other page. Most likely to be used in ViewUserStory page:
-            Session.Add("projectId", projectId);
+            Session.Add("projectId", g_projectId);
         }
         protected void initialPageAccess()
         {
@@ -106,6 +106,14 @@ namespace Scrum.Accounts.Master
             Session.Add("roleId", roleId);
             Session.Add("loginId", loginId);
             Session.Add("token", token);
+            try
+            {
+                Session.Add("projectId", g_projectId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
         }
         protected void getSession()
         {
@@ -113,46 +121,69 @@ namespace Scrum.Accounts.Master
             roleId = (string)(Session["roleId"]);
             loginId = (string)(Session["loginId"]);
             token = (string)(Session["token"]);
+            try
+            {
+                g_projectId = (string)(Session["projectId"]);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
         }
         protected void goBack()
         {
             addSession();
-            if (!string.IsNullOrWhiteSpace(previousPage)) Response.Redirect(previousPage);
-            else Response.Redirect("Home.aspx");
+            string backLink = "";
+            try
+            {
+                g_projectId = (string)(Session["projectId"]);
+                backLink = "ViewProject.aspx?id=" + g_projectId;
+            }
+            catch (Exception e)
+            {
+                backLink = "Home.aspx";
+                Console.WriteLine("Error: " + e);
+            }
+            Response.Redirect(backLink);
+
         }
-        protected void getProjectInfo()
+        protected void getUserStoryInfo()
         {
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
-            cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
-            string name = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "select project_description from Projects where projectId = '" + projectId + "' ";
-            string description = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "select project_createdBy from Projects where projectId = '" + projectId + "' ";
+            cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + userStoryId + "' ";
             string createdByUserId = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "select project_createdDate from Projects where projectId = '" + projectId + "' ";
-            string createdDate = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "select project_isTerminated from Projects where projectId = '" + projectId + "' ";
-            int isTerminated = Convert.ToInt32(cmd.ExecuteScalar());
-            cmd.CommandText = "select project_isDeleted from Projects where projectId = '" + projectId + "' ";
-            int isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
-            cmd.CommandText = "select project_hasImage from Projects where projectId = '" + projectId + "' ";
-            int hasImage = Convert.ToInt32(cmd.ExecuteScalar());
-            cmd.CommandText = "select project_startedDate from Projects where projectId = '" + projectId + "' ";
-            string startDate = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_uniqueId = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_asARole from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_asARole = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_iWantTo from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_iWant = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_soThat from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_soThat = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_dateIntroduced from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_dateIntroduced = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_dateConsideredForImplementation from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_dateConsideredForImplementation = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select userStory_hasImage from UserStories where userStoryId = '" + userStoryId + "' ";
+            int userStory_hasImage = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select userStory_isDeleted from UserStories where userStoryId = '" + userStoryId + "' ";
+            int userStory_isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select userStory_currentStatus from UserStories where userStoryId = '" + userStoryId + "' ";
+            string userStory_currentStatus = cmd.ExecuteScalar().ToString();
             //Convert the createdByUserId to a name:
             cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + createdByUserId + "' ";
             string createdBy = cmd.ExecuteScalar().ToString();
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
             string imagesHTML = "";
-            if (hasImage == 1)
+            if (userStory_hasImage == 1)
             {
-                cmd.CommandText = "select count(*) from ImagesForProjects where projectId = '" + projectId + "' ";
+                cmd.CommandText = "select count(*) from ImagesForUserStories where userStoryId = '" + userStoryId + "' ";
                 int totalImages = Convert.ToInt32(cmd.ExecuteScalar());
                 for (int i = 1; i <= totalImages; i++)
                 {
-                    cmd.CommandText = "select [imageId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY imageId ASC), * FROM [ImagesForProjects] where projectId = '" + projectId + "') as t where rowNum = '" + i + "'";
+                    cmd.CommandText = "select [imageId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY imageId ASC), * FROM [ImagesForUserStories] where userStoryId = '" + userStoryId + "') as t where rowNum = '" + i + "'";
                     string imageId = cmd.ExecuteScalar().ToString();
                     cmd.CommandText = "select image_name from Images where imageId = '" + imageId + "' ";
                     string image_name = cmd.ExecuteScalar().ToString();
@@ -160,42 +191,49 @@ namespace Scrum.Accounts.Master
                     imagesHTML = imagesHTML + "<a href='../../images/" + image_name + "' target=\"_blank\">" + image_name + "</a> <br />";
                 }
             }
+            cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '" + userStoryId + "' ";
+            int totalUsers = Convert.ToInt32(cmd.ExecuteScalar());
+            string[] userStoryMembers = new string[totalUsers];
+            for (int i = 1; i <= totalUsers; i++)
+            {
+                cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY UsersForUserStoriesId ASC), * FROM [UsersForUserStories] where userStoryId = '" + userStoryId + "') as t where rowNum = '" + i + "'";
+                userStoryMembers[i - 1] = cmd.ExecuteScalar().ToString();
+            }
             //Construct an HTML output to post it:
-            lblProjectInfo.Text = Layouts.projectHeader(projectId, roleId, loginId, userId, name, description,
-                createdByUserId, createdBy, createdDate, startDate, isTerminated, isDeleted, hasImage, imagesHTML);
+            lblUserStoryInfo.Text = Layouts.userStoryHeader(userStoryId, roleId, loginId, userId, userStory_uniqueId, userStory_asARole,
+                createdByUserId, createdBy, userStory_iWant, userStory_soThat, userStory_dateIntroduced, userStory_dateConsideredForImplementation,
+                userStory_hasImage, imagesHTML, userStory_isDeleted, userStory_currentStatus, userStoryMembers);
             connect.Close();
         }
         protected void showView()
         {
             View.Visible = true;
-            AddNewUserStory.Visible = false;
+            AddNewSprintTask.Visible = false;
         }
-        protected void showNewUserStory()
+        protected void showNewSprintTask()
         {
             View.Visible = false;
-            AddNewUserStory.Visible = true;
+            AddNewSprintTask.Visible = true;
         }
-        protected void checkIfProjectTerminated()
+        protected void checkIfUserStoryDeleted()
         {
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
-            //Count the existance of the topic:
-            cmd.CommandText = "select count(*) from Projects where projectId = '" + projectId + "' ";
+            //Count the existance of the user story:
+            cmd.CommandText = "select count(*) from UserStories where userStoryId = '" + userStoryId + "' ";
             int count = Convert.ToInt32(cmd.ExecuteScalar());
             if (count > 0)//if count > 0, then the project ID exists in DB.
             {
-                cmd.CommandText = "select project_createdBy from Projects where projectId = '" + projectId + "' ";
+                cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + userStoryId + "' ";
                 string actual_creatorId = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select project_isDeleted from Projects where projectId = '" + projectId + "' ";
+                cmd.CommandText = "select userStory_isDeleted from UserStories where userStoryId = '" + userStoryId + "' ";
                 int isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
-                cmd.CommandText = "select project_isTerminated from Projects where projectId = '" + projectId + "' ";
-                int isTerminated = Convert.ToInt32(cmd.ExecuteScalar());
-                if (isTerminated == 1 || isDeleted == 1)
+                if (isDeleted == 1)
                 {
                     //Hide the submit buttons:
-                    btnAddNewUserStory.Visible = false;
+                    btnAddNewSprintTask.Visible = false;
                     btnAddUserToList.Visible = false;
-                    btnSaveUserStory.Visible = false;
+                    btnSaveSprintTask.Visible = false;
                     btnUpload.Visible = false;
                 }
             }
@@ -204,179 +242,159 @@ namespace Scrum.Accounts.Master
         protected void rebindValues()
         {
             int int_roleId = Convert.ToInt32(roleId);
-            if (grdUserStories.Rows.Count > 0)
+            if (grdSprintTasks.Rows.Count > 0)
             {
-                //Hide the headers called "User ID" and "User Story ID":
-                grdUserStories.HeaderRow.Cells[8].Visible = false;
-                grdUserStories.HeaderRow.Cells[9].Visible = false;
+                //Hide the headers called "User ID" and "Sprint Task ID":
+                grdSprintTasks.HeaderRow.Cells[8].Visible = false;
+                grdSprintTasks.HeaderRow.Cells[9].Visible = false;
                 //Hide IDs column and content which are located in column index 8:
-                for (int i = 0; i < grdUserStories.Rows.Count; i++)
+                for (int i = 0; i < grdSprintTasks.Rows.Count; i++)
                 {
-                    grdUserStories.Rows[i].Cells[8].Visible = false;
-                    grdUserStories.Rows[i].Cells[9].Visible = false;
+                    grdSprintTasks.Rows[i].Cells[8].Visible = false;
+                    grdSprintTasks.Rows[i].Cells[9].Visible = false;
                 }
-                //if (int_roleId == 3)//3: Developer
-                //{
-                //    //Hide the header for removing the User Story commands:
-                //    grdUserStories.HeaderRow.Cells[10].Visible = false;
-                //    for (int i = 0; i < grdUserStories.Rows.Count; i++)
-                //    {
-                //        grdUserStories.Rows[i].Cells[10].Visible = false;
-                //    }
-                //}
             }
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
-            string userStoryId = "", asARole = "", iWant = "", soThat = "", dateIntroduced = "", dateConsidered = "",
+            string sprintTaskUniqueId = "", userStoryUniqueId = "", taskDescription = "", dateIntroduced = "", dateConsidered = "", dateCompleted = "",
                    developersResponsible = "", currentStatus = "";
-            string creatorId = "", db_userStoryId = "";
-            for (int row = 0; row < grdUserStories.Rows.Count; row++)
+            string creatorId = "", db_sprintTaskId = "";
+            for (int row = 0; row < grdSprintTasks.Rows.Count; row++)
             {
                 //Set links to review a user:
-                userStoryId = grdUserStories.Rows[row].Cells[0].Text;
-                asARole = grdUserStories.Rows[row].Cells[1].Text;
-                iWant = grdUserStories.Rows[row].Cells[2].Text;
-                soThat = grdUserStories.Rows[row].Cells[3].Text;
-                dateIntroduced = grdUserStories.Rows[row].Cells[4].Text;
-                dateConsidered = grdUserStories.Rows[row].Cells[5].Text;
-                developersResponsible = grdUserStories.Rows[row].Cells[6].Text;
-                currentStatus = grdUserStories.Rows[row].Cells[7].Text;
-                creatorId = grdUserStories.Rows[row].Cells[8].Text;
-                db_userStoryId = grdUserStories.Rows[row].Cells[9].Text;
-                string removeUserStoryCommand = grdUserStories.Rows[row].Cells[10].Text;
-                //Loop through the developers for the selected User Story:
-                cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '" + db_userStoryId + "' ";
-                int usersForUserStory = Convert.ToInt32(cmd.ExecuteScalar());
+                sprintTaskUniqueId = grdSprintTasks.Rows[row].Cells[0].Text;
+                userStoryUniqueId = grdSprintTasks.Rows[row].Cells[1].Text;
+                taskDescription = grdSprintTasks.Rows[row].Cells[2].Text;
+                dateIntroduced = grdSprintTasks.Rows[row].Cells[3].Text;
+                dateConsidered = grdSprintTasks.Rows[row].Cells[4].Text;
+                dateCompleted = grdSprintTasks.Rows[row].Cells[5].Text;
+                developersResponsible = grdSprintTasks.Rows[row].Cells[6].Text;
+                currentStatus = grdSprintTasks.Rows[row].Cells[7].Text;
+                creatorId = grdSprintTasks.Rows[row].Cells[8].Text;
+                db_sprintTaskId = grdSprintTasks.Rows[row].Cells[9].Text;
+                string removeSprintTaskCommand = grdSprintTasks.Rows[row].Cells[10].Text;
+                //Loop through the developers for the selected Sprint Tasks:
+                cmd.CommandText = "select count(*) from UsersForSprintTasks where sprintTaskId = '" + db_sprintTaskId + "' ";
+                int usersForSprintTask = Convert.ToInt32(cmd.ExecuteScalar());
                 HyperLink developerResponsibleLink = new HyperLink();
-                for (int j = 1; j <= usersForUserStory; j++)
+                for (int j = 1; j <= usersForSprintTask; j++)
                 {
                     HyperLink participantLink = new HyperLink();
-                    cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForUserStoriesId ASC), * FROM [UsersForUserStories] where userStoryId = '" + db_userStoryId + "' ) as t where rowNum = '" + j + "'";
+                    cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForSprintTasksId ASC), * FROM [UsersForSprintTasks] where sprintTaskId = '" + db_sprintTaskId + "' ) as t where rowNum = '" + j + "'";
                     string developerId = cmd.ExecuteScalar().ToString();
                     cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + developerId + "' ";
                     string developer_name = cmd.ExecuteScalar().ToString();
                     participantLink.Text = developer_name + " ";
                     participantLink.NavigateUrl = "Profile.aspx?id=" + developerId;
-                    grdUserStories.Rows[row].Cells[6].Controls.Add(participantLink);
-                    if (usersForUserStory > 1)
+                    grdSprintTasks.Rows[row].Cells[6].Controls.Add(participantLink);
+                    if (usersForSprintTask > 1)
                     {
                         HyperLink temp = new HyperLink();
                         temp.Text = "<br/>";
-                        grdUserStories.Rows[row].Cells[6].Controls.Add(temp);
+                        grdSprintTasks.Rows[row].Cells[6].Controls.Add(temp);
                     }
                 }
-                //Get the User Story ID:
-                string id = db_userStoryId;
-                string userStoryUrl = "ViewUserStory.aspx?id=" + id;
-                HyperLink idLink = new HyperLink();
-                HyperLink asARoleLink = new HyperLink();
-                HyperLink iWantLink = new HyperLink();
-                HyperLink soThatLink = new HyperLink();
+                //Get the Sprint Task ID:
+                string id = db_sprintTaskId;
+                string sprintTaskUrl = "ViewSprintTask.aspx?id=" + id;
+                HyperLink sprintTaskUIdLink = new HyperLink();
+                HyperLink userStoryUIdLink = new HyperLink();
+                HyperLink taskDescriptionLink = new HyperLink();
                 HyperLink dateIntroducedLink = new HyperLink();
                 HyperLink dateConsideredLink = new HyperLink();
+                HyperLink dateCompletedLink = new HyperLink();
                 HyperLink currentStatusLink = new HyperLink();
-                idLink.Text = userStoryId + " ";
-                asARoleLink.Text = asARole + " ";
-                iWantLink.Text = iWant + " ";
-                soThatLink.Text = soThat + " ";
+                sprintTaskUIdLink.Text = sprintTaskUniqueId + " ";
+                userStoryUIdLink.Text = userStoryUniqueId + " ";
+                taskDescriptionLink.Text = taskDescription + " ";
                 dateIntroducedLink.Text = Layouts.getTimeFormat(dateIntroduced) + " ";
                 dateConsideredLink.Text = Layouts.getTimeFormat(dateConsidered) + " ";
+                dateCompletedLink.Text = Layouts.getTimeFormat(dateCompleted) + " ";
                 currentStatusLink.Text = currentStatus + " ";
-                idLink.NavigateUrl = userStoryUrl;
-                asARoleLink.NavigateUrl = userStoryUrl;
-                iWantLink.NavigateUrl = userStoryUrl;
-                soThatLink.NavigateUrl = userStoryUrl;
-                dateIntroducedLink.NavigateUrl = userStoryUrl;
-                dateConsideredLink.NavigateUrl = userStoryUrl;
-                currentStatusLink.NavigateUrl = userStoryUrl;
-                //User Story remove button:
-                LinkButton removeUserStoryLink = new LinkButton();
-                removeUserStoryLink.Text = removeUserStoryCommand + " ";
-                removeUserStoryLink.Command += new CommandEventHandler(RemoveUserStoryLink_Click);
-                removeUserStoryLink.CommandName = id;
-                removeUserStoryLink.CommandArgument = Convert.ToString(row + 1);
-                removeUserStoryLink.Enabled = true;
-                removeUserStoryLink.CssClass = "removeUserStoryButton";
-                //Check if the user story has been deleted already, if so, disable the button:
-                cmd.CommandText = "select userStory_isDeleted from UserStories where userStoryId = '" + id + "' ";
+                sprintTaskUIdLink.NavigateUrl = sprintTaskUrl;
+                userStoryUIdLink.NavigateUrl = sprintTaskUrl;
+                taskDescriptionLink.NavigateUrl = sprintTaskUrl;
+                dateIntroducedLink.NavigateUrl = sprintTaskUrl;
+                dateConsideredLink.NavigateUrl = sprintTaskUrl;
+                dateCompletedLink.NavigateUrl = sprintTaskUrl;
+                currentStatusLink.NavigateUrl = sprintTaskUrl;
+                //Sprint Task remove button:
+                LinkButton removeSprintTaskLink = new LinkButton();
+                removeSprintTaskLink.Text = removeSprintTaskCommand + " ";
+                removeSprintTaskLink.Command += new CommandEventHandler(RemoveSprintTaskLink_Click);
+                removeSprintTaskLink.CommandName = id;
+                removeSprintTaskLink.CommandArgument = Convert.ToString(row + 1);
+                removeSprintTaskLink.Enabled = true;
+                removeSprintTaskLink.CssClass = "removeUserStoryButton";
+                //Check if the sprint task has been deleted already, if so, disable the button:
+                cmd.CommandText = "select sprintTask_isDeleted from SprintTasks where sprintTaskId = '" + id + "' ";
                 int isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
                 if (isDeleted == 1)
-                    removeUserStoryLink.Enabled = false;
+                    removeSprintTaskLink.Enabled = false;
                 int int_creatorId = Convert.ToInt32(creatorId);
                 cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
                 int int_userId = Convert.ToInt32(cmd.ExecuteScalar());
-                cmd.CommandText = "select count(userStory_editedBy) from UserStories where userStoryId = '" + id + "' ";
+                cmd.CommandText = "select count(sprintTask_editedBy) from SprintTasks where sprintTaskId = '" + id + "' ";
                 int isEditedBySomeone = Convert.ToInt32(cmd.ExecuteScalar());
                 if (isEditedBySomeone > 0)
                 {
-                    cmd.CommandText = "select userStory_editedBy from UserStories where userStoryId = '" + id + "' ";
+                    cmd.CommandText = "select sprintTask_editedBy from SprintTasks where sprintTaskId = '" + id + "' ";
                     int int_editorId = Convert.ToInt32(cmd.ExecuteScalar());
                     if (int_userId != int_creatorId && int_roleId != 2 && int_roleId != 1 && int_userId != int_editorId)
-                        removeUserStoryLink.Enabled = false;
+                        removeSprintTaskLink.Enabled = false;
                 }
                 else
                 {
                     if (int_userId != int_creatorId && int_roleId != 2 && int_roleId != 1)
-                        removeUserStoryLink.Enabled = false;
+                        removeSprintTaskLink.Enabled = false;
                 }
-                if (!removeUserStoryLink.Enabled)
+                if (!removeSprintTaskLink.Enabled)
                 {
-                    removeUserStoryLink.CssClass = "disabledRemoveUserStoryButton";
+                    removeSprintTaskLink.CssClass = "disabledRemoveUserStoryButton";
                 }
-                grdUserStories.Rows[row].Cells[0].Controls.Add(idLink);
-                grdUserStories.Rows[row].Cells[1].Controls.Add(asARoleLink);
-                grdUserStories.Rows[row].Cells[2].Controls.Add(iWantLink);
-                grdUserStories.Rows[row].Cells[3].Controls.Add(soThatLink);
-                grdUserStories.Rows[row].Cells[4].Controls.Add(dateIntroducedLink);
-                grdUserStories.Rows[row].Cells[5].Controls.Add(dateConsideredLink);
-                grdUserStories.Rows[row].Cells[7].Controls.Add(currentStatusLink);
-                grdUserStories.Rows[row].Cells[10].Controls.Add(removeUserStoryLink);
+                grdSprintTasks.Rows[row].Cells[0].Controls.Add(sprintTaskUIdLink);
+                grdSprintTasks.Rows[row].Cells[1].Controls.Add(userStoryUIdLink);
+                grdSprintTasks.Rows[row].Cells[2].Controls.Add(taskDescriptionLink);
+                grdSprintTasks.Rows[row].Cells[3].Controls.Add(dateIntroducedLink);
+                grdSprintTasks.Rows[row].Cells[4].Controls.Add(dateConsideredLink);
+                grdSprintTasks.Rows[row].Cells[5].Controls.Add(dateCompletedLink);
+                grdSprintTasks.Rows[row].Cells[7].Controls.Add(currentStatusLink);
+                grdSprintTasks.Rows[row].Cells[10].Controls.Add(removeSprintTaskLink);
             }
             connect.Close();
         }
-        protected void RemoveUserStoryLink_Click(object sender, CommandEventArgs e)
+        protected void RemoveSprintTaskLink_Click(object sender, CommandEventArgs e)
         {
-            string userStoryId = e.CommandName;
-            string userStoryUniqueId = e.CommandArgument.ToString();
-            lblRemoveUserStoryMessage.Text = "Are you sure you want to remove the user story# " + userStoryUniqueId + "?";
-            lblUserStoryId.Text = userStoryId;
-            divRemoveUserStory.Visible = true;
+            string sprintTaskId = e.CommandName;
+            string sprintTaskUniqueId = e.CommandArgument.ToString();
+            lblRemoveSprintTaskMessage.Text = "Are you sure you want to remove the sprint task# " + sprintTaskUniqueId + "?";
+            lblSprintTaskId.Text = sprintTaskId;
+            divRemoveSprintTask.Visible = true;
         }
-        protected void btnConfirmRemoveUserStory_Click(object sender, EventArgs e)
+        protected void btnConfirmRemoveSprintTask_Click(object sender, EventArgs e)
         {
-            string userStoryIdToRemove = lblUserStoryId.Text;
-            //Delete the selected user story:
+            string sprintTaskIdToRemove = lblSprintTaskId.Text;
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
-            cmd.CommandText = "update UserStories set userStory_isDeleted = 1 where userStoryId = '" + userStoryIdToRemove + "'  ";
+            //delete the selected sprint task:
+            cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1 where sprintTaskId = '" + sprintTaskIdToRemove + "'  ";
             cmd.ExecuteScalar();
-            //Update all sprint tasks related to the deleted user story:
-            cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1 where userStoryId = '" + userStoryIdToRemove + "'  ";
+            //Update all test cases related to the deleted sprint task:
+            cmd.CommandText = "update TestCases set testCase_isDeleted = 1 where sprintTaskId = '" + sprintTaskIdToRemove + "'  ";
             cmd.ExecuteScalar();
-            //Update all test cases related to the deleted sprint tasks of the selected user story:
-            cmd.CommandText = "select count(*) from SprintTasks where userStoryId = '" + userStoryIdToRemove + "' ";
-            int totalTestCases = Convert.ToInt32(cmd.ExecuteScalar());
-            for (int i = 1; i <= totalTestCases; i++)
-            {
-                cmd.CommandText = "select [sprintTaskId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY sprintTaskId ASC), * FROM [SprintTasks] where userStoryId = '" + userStoryIdToRemove + "' ) as t where rowNum = '" + i + "'";
-                string temp_sprintTaskId = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "update TestCases set testCase_isDeleted = 1 where sprintTaskId = '" + temp_sprintTaskId + "'  ";
-                cmd.ExecuteScalar();
-            }
             connect.Close();
-            divRemoveUserStory.Visible = false;
+            divRemoveSprintTask.Visible = false;
             Page.Response.Redirect(Page.Request.Url.ToString(), true);
         }
-        protected void btnCancelRemoveUserStory_Click(object sender, EventArgs e)
+        protected void btnCancelRemoveSprintTask_Click(object sender, EventArgs e)
         {
-            divRemoveUserStory.Visible = false;
+            divRemoveSprintTask.Visible = false;
         }
         protected int getTotalUserStories()
         {
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
-            //count the not-approved users:
-            cmd.CommandText = "select count(*) from [UserStories] where projectId = '" + projectId + "' ";
+            cmd.CommandText = "select count(*) from [SprintTasks] where userStoryId = '" + userStoryId + "' ";
             int count = Convert.ToInt32(cmd.ExecuteScalar());
             connect.Close();
             return count;
@@ -392,45 +410,45 @@ namespace Scrum.Accounts.Master
             {
                 lblMessage.Visible = false;
                 DataTable dt = new DataTable();
+                dt.Columns.Add("Sprint task ID", typeof(string));
                 dt.Columns.Add("User story ID", typeof(string));
-                dt.Columns.Add("As a (type of user)", typeof(string));
-                dt.Columns.Add("I want to (some goal)", typeof(string));
-                dt.Columns.Add("So that (reason)", typeof(string));
+                dt.Columns.Add("Task description", typeof(string));
                 dt.Columns.Add("Date introduced", typeof(string));
                 dt.Columns.Add("Date considered for implementation", typeof(string));
+                dt.Columns.Add("Date completed", typeof(string));
                 dt.Columns.Add("Developers responsible for", typeof(string));
                 dt.Columns.Add("Current status", typeof(string));
                 dt.Columns.Add("Creator User ID", typeof(string));
-                dt.Columns.Add("DB User Story ID", typeof(string));
+                dt.Columns.Add("DB Sprint Task ID", typeof(string));
                 dt.Columns.Add("Remove User Story", typeof(string));
-                string id = "", userStoryId = "", asARole = "", iWant = "", soThat = "", dateIntroduced = "", dateConsidered = "",
+                string id = "", sprintTask_uniqueId = "", userStoryUniqueId = "", taskDescription = "", dateIntroduced = "", dateConsidered = "", dateCompleted = "",
                     developersResponsible = "", currentStatus = "";
-                string creatorId = "", removeUserStoryCommand = " Remove ";
+                string creatorId = "", removeSprintTaskCommand = " Remove ";
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
                 for (int i = 1; i <= countUserStories; i++)
                 {
                     //Get the project ID:
-                    cmd.CommandText = "select [userStoryId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userStoryId ASC), * FROM [UserStories] where projectId = '" + projectId + "' ) as t where rowNum = '" + i + "'";
+                    cmd.CommandText = "select [sprintTaskId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY sprintTaskId ASC), * FROM [SprintTasks] where userStoryId = '" + userStoryId + "' ) as t where rowNum = '" + i + "'";
                     id = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + id + "' ";
-                    userStoryId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_asARole from UserStories where userStoryId = '" + id + "' ";
-                    asARole = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_iWantTo from UserStories where userStoryId = '" + id + "' ";
-                    iWant = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_soThat from UserStories where userStoryId = '" + id + "' ";
-                    soThat = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_dateIntroduced from UserStories where userStoryId = '" + id + "' ";
+                    cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + userStoryId + "' ";
+                    userStoryUniqueId = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "select sprintTask_uniqueId from SprintTasks where sprintTaskId = '" + id + "' ";
+                    sprintTask_uniqueId = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "select sprintTask_taskDescription from SprintTasks where sprintTaskId = '" + id + "' ";
+                    taskDescription = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "select sprintTask_dateIntroduced from SprintTasks where sprintTaskId = '" + id + "' ";
                     dateIntroduced = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select userStory_dateConsideredForImplementation from UserStories where userStoryId = '" + id + "' ";
+                    cmd.CommandText = "select sprintTask_dateConsideredForImplementation from SprintTasks where sprintTaskId = '" + id + "' ";
                     dateConsidered = cmd.ExecuteScalar().ToString();
-                    //Loop through the developers for the selected User Story:
-                    cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '" + id + "' ";
-                    int usersForUserStory = Convert.ToInt32(cmd.ExecuteScalar());
-                    for (int j = 1; j <= usersForUserStory; j++)
+                    cmd.CommandText = "select sprintTask_dateCompleted from SprintTasks where sprintTaskId = '" + id + "' ";
+                    dateCompleted = cmd.ExecuteScalar().ToString();
+                    //Loop through the developers for the selected Sprint Task:
+                    cmd.CommandText = "select count(*) from UsersForSprintTasks where sprintTaskId = '" + id + "' ";
+                    int usersForSprintTask = Convert.ToInt32(cmd.ExecuteScalar());
+                    for (int j = 1; j <= usersForSprintTask; j++)
                     {
-                        cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForUserStoriesId ASC), * FROM [UsersForUserStories] where userStoryId = '" + id + "' ) as t where rowNum = '" + j + "'";
+                        cmd.CommandText = "select [userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForSprintTasksId ASC), * FROM [UsersForSprintTasks] where sprintTaskId = '" + id + "' ) as t where rowNum = '" + j + "'";
                         string developerId = cmd.ExecuteScalar().ToString();
                         cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + developerId + "' ";
                         if (j == 1)
@@ -438,24 +456,24 @@ namespace Scrum.Accounts.Master
                         else
                             developersResponsible = developersResponsible + ", " + cmd.ExecuteScalar().ToString();
                     }
-                    cmd.CommandText = "select userStory_currentStatus from UserStories where userStoryId = '" + id + "' ";
+                    cmd.CommandText = "select sprintTask_currentStatus from SprintTasks where sprintTaskId = '" + id + "' ";
                     currentStatus = cmd.ExecuteScalar().ToString();
                     //Creator's info, which will be hidden:
-                    cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + id + "' ";
+                    cmd.CommandText = "select sprintTask_createdBy from SprintTasks where sprintTaskId = '" + id + "' ";
                     creatorId = cmd.ExecuteScalar().ToString();
-                    dt.Rows.Add(userStoryId, asARole, iWant, soThat, Layouts.getTimeFormat(dateIntroduced), Layouts.getTimeFormat(dateConsidered), developersResponsible, currentStatus, creatorId, id, removeUserStoryCommand);
+                    dt.Rows.Add(sprintTask_uniqueId, userStoryUniqueId, taskDescription, Layouts.getTimeFormat(dateIntroduced), Layouts.getTimeFormat(dateConsidered), Layouts.getTimeFormat(dateCompleted), developersResponsible, currentStatus, creatorId, id, removeSprintTaskCommand);
                     //Creator ID is not needed here, but it's used to uniquely identify the names in the system in case we have duplicate names.
                 }
                 connect.Close();
-                grdUserStories.DataSource = dt;
-                grdUserStories.DataBind();
+                grdSprintTasks.DataSource = dt;
+                grdSprintTasks.DataBind();
                 rebindValues();
             }
         }
-        protected void grdUserStories_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        protected void grdSprintTasks_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
-            grdUserStories.PageIndex = e.NewPageIndex;
-            grdUserStories.DataBind();
+            grdSprintTasks.PageIndex = e.NewPageIndex;
+            grdSprintTasks.DataBind();
             rebindValues();
         }
         protected void calDateIntroduced_SelectionChanged(object sender, EventArgs e)
@@ -474,13 +492,28 @@ namespace Scrum.Accounts.Master
                 e.Cell.ForeColor = System.Drawing.Color.Gray;
             }
         }
-        protected void btnAddNewUserStory_Click(object sender, EventArgs e)
+        protected void btnAddNewSprintTask_Click(object sender, EventArgs e)
         {
-            showNewUserStory();
-            //count the number of the current stories, then add one to the total
-            //So the new user story Unique ID will the resulting number:
+            showNewSprintTask();
+            //count the number of the current sprint tasks, then add one to the total
+            //So the new sprint task Unique ID will the resulting number:
             updateUniqueId();
-            clearNewUserStoryInputs();
+            string userStoryUID = "";
+            try
+            {
+                SqlCommand cmd = connect.CreateCommand();
+                connect.Open();
+                cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + userStoryId + "' ";
+                userStoryUID = cmd.ExecuteScalar().ToString();
+                connect.Close();
+            }
+            catch (Exception ex)
+            {
+                connect.Close();
+                Console.WriteLine("Error: "+ex);
+            }
+            txtUniqueUserStoryID.Text = userStoryUID;
+            clearNewSprintTaskInputs();
             hideErrorLabels();
         }
         protected void updateUniqueId()
@@ -490,7 +523,8 @@ namespace Scrum.Accounts.Master
             {
                 SqlCommand cmd = connect.CreateCommand();
                 connect.Open();
-                cmd.CommandText = "select top(1) userStory_uniqueId from UserStories where projectId = '" + projectId + "' order by userStoryId desc ";
+
+                cmd.CommandText = "select top(1) sprintTask_uniqueId from SprintTasks where userStoryId = '" + userStoryId + "' order by sprintTaskId desc ";
                 newId = cmd.ExecuteScalar().ToString();
                 connect.Close();
             }
@@ -521,16 +555,13 @@ namespace Scrum.Accounts.Master
                 newId = "1";
                 Console.WriteLine("Error: " + e);
             }
-            txtUniqueUserStoryID.Text = newId;
+            txtUniqueSprintTaskID.Text = newId;
         }
-        protected void clearNewUserStoryInputs()
+        protected void clearNewSprintTaskInputs()
         {
             try
             {
-                drpAsRole.SelectedIndex = 0;
-                txtIWantTo.Text = "";
-                txtSoThat.Text = "";
-                //calDateConsidered.SelectedDate = DateTime.Now;
+                txtTaskDescription.Text = "";
                 calDateIntroduced.SelectedDates.Clear();
                 calDateConsidered.SelectedDates.Clear();
                 calDateIntroduced.SelectedDate = DateTime.Now;
@@ -552,21 +583,20 @@ namespace Scrum.Accounts.Master
         }
         protected void hideErrorLabels()
         {
-            lblAsRoleError.Visible = false;
-            lblIWantToError.Visible = false;
-            lblSoThatError.Visible = false;
+            lblTaskDescriptionError.Visible = false;
+            lblUniqueSprintTaskIDError.Visible = false;
+            lblUniqueUserStoryIDError.Visible = false;
             lblDateConsideredError.Visible = false;
             lblDateIntroducedError.Visible = false;
             lblDeveloperResponsibleError.Visible = false;
             lblCurrentStatusError.Visible = false;
             lblFindUserResult.Visible = false;
-            lblAddUserStoryMessage.Visible = false;
+            lblAddSprintTaskMessage.Visible = false;
             lblListOfUsers.Visible = false;
             fileNames.InnerHtml = "";
             //Hide the calendar for Date Introduced:
             lblDateIntroduced.Visible = false;
             calDateIntroduced.Visible = false;
-
         }
         protected void drpFindUser_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -587,6 +617,8 @@ namespace Scrum.Accounts.Master
             SortedSet<string> set_results = new SortedSet<string>();
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
+            cmd.CommandText = "select projectId from UserStories where userStoryId = '" + userStoryId + "' ";
+            string projectId = cmd.ExecuteScalar().ToString();
             foreach (string word in words)
             {
                 cmd.CommandText = "select userId from Users where (user_firstname + ' ' + user_lastname) like '%" + word + "%'  ";
@@ -621,7 +653,7 @@ namespace Scrum.Accounts.Master
             }
             connect.Close();
         }
-        protected void btnSaveUserStory_Click(object sender, EventArgs e)
+        protected void btnSaveSprintTask_Click(object sender, EventArgs e)
         {
             hideErrorLabels();
             if (correctInput())
@@ -629,7 +661,7 @@ namespace Scrum.Accounts.Master
                 //storeInDB();
                 addNewEntry();
                 sendEmail();
-                clearNewUserStoryInputs();
+                clearNewSprintTaskInputs();
             }
         }
         protected void sendEmail()
@@ -643,11 +675,13 @@ namespace Scrum.Accounts.Master
             string emailTo = cmd.ExecuteScalar().ToString();
             cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + userId + "' ";
             string name = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select projectId from UserStories where userStoryId = '" + userStoryId + "' ";
+            string projectId = cmd.ExecuteScalar().ToString();
             cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
             string project_name = cmd.ExecuteScalar().ToString();
             connect.Close();
-            string messageBody = "Hello " + name + ",\nThis email is to notify you that your user story#(" + txtUniqueUserStoryID.Text + ") has been successfully submitted for the project (" + project_name + ").\n" +
-                "\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
+            string messageBody = "Hello " + name + ",\nThis email is to notify you that your sprint task#(" + txtUniqueSprintTaskID.Text + ") has been successfully submitted for the project (" + project_name + ") under the user story#(" + txtUniqueUserStoryID.Text + ").\n" +
+                "\n\nBest regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
             email.sendEmail(emailTo, messageBody);
             //Email every developer who has been added to this user story:
             for (int i = 0; i < usersToAdd.Count; i++)
@@ -659,8 +693,8 @@ namespace Scrum.Accounts.Master
                 cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + temp_id + "' ";
                 string temp_name = cmd.ExecuteScalar().ToString();
                 connect.Close();
-                string temp_messageBody = "Hello " + temp_name + ",\nThis email is to notify you that you have been added to the list of developers in user story#(" + txtUniqueUserStoryID.Text + ") for the project (" + project_name + ").\n" +
-                "\n\nBest regards,\nScrum Support\nScrum.UWL@gmail.com";
+                string temp_messageBody = "Hello " + temp_name + ",\nThis email is to notify you that you have been added to the list of developers in sprint task#(" + txtUniqueSprintTaskID.Text + ") for the project (" + project_name + ") under the user story#(" + txtUniqueUserStoryID.Text + ").\n" +
+                "\n\nBest regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
                 email.sendEmail(temp_emailTo, temp_messageBody);
             }
         }
@@ -672,17 +706,17 @@ namespace Scrum.Accounts.Master
                 storeImagesInServer();
                 hasImage = 1;
             }
-            //Store new topic as neither approved nor denied and return its ID:
-            string userStoryId = storeUserStory(hasImage);
+            //Store new sprint task as neither approved nor denied and return its ID:
+            string sprintTaskId = storeSprintTask(hasImage);
             //Allow the creator of topic to access it when it's approved and add the new tags to the topic:
-            allowUserAccessUserStory(userStoryId);
-            storeImagesInDB(userStoryId, hasImage, files);
-            lblAddUserStoryMessage.Visible = true;
-            lblAddUserStoryMessage.ForeColor = System.Drawing.Color.Green;
-            lblAddUserStoryMessage.Text = "The user story has been successfully submitted and an email notification has been sent to you. <br/>";
+            allowUserAccessSprintTask(sprintTaskId);
+            storeImagesInDB(sprintTaskId, hasImage, files);
+            lblAddSprintTaskMessage.Visible = true;
+            lblAddSprintTaskMessage.ForeColor = System.Drawing.Color.Green;
+            lblAddSprintTaskMessage.Text = "The sprint task has been successfully submitted and an email notification has been sent to you. <br/>";
             wait.Visible = false;
         }
-        protected void allowUserAccessUserStory(string userStoryId)
+        protected void allowUserAccessSprintTask(string sprintTaskId)
         {
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
@@ -690,47 +724,32 @@ namespace Scrum.Accounts.Master
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
             //Note: by adding the user to this table, he/she is given access to the newly-created table.
-            //Add the creator to UsersForProjects table.
-            //Add the current user to the user story:
-            cmd.CommandText = "insert into UsersForUserStories (userId, userStoryId, usersForUserStories_isNotified) values " +
-                    "('" + userId + "', '" + userStoryId + "', '0')";
+            //Add the creator to UsersForSprintTasks table.
+            //Add the current user to the sprint task:
+            cmd.CommandText = "insert into UsersForSprintTasks (userId, sprintTaskId, usersForSprintTasks_isNotified) values " +
+                    "('" + userId + "', '" + sprintTaskId + "', '0')";
             cmd.ExecuteScalar();
-            //Add the list of selected developers to the user story:
+            //Add the list of selected developers to the sprint task:
             for (int i = 0; i < usersToAdd.Count; i++)
             {
                 string developerResponsible_userId = usersToAdd.ElementAt(i);
-                cmd.CommandText = "insert into UsersForUserStories (userId, userStoryId, usersForUserStories_isNotified) values " +
-                    "('" + developerResponsible_userId + "', '" + userStoryId + "', '0')";
+                cmd.CommandText = "insert into UsersForSprintTasks (userId, sprintTaskId, usersForSprintTasks_isNotified) values " +
+                    "('" + developerResponsible_userId + "', '" + sprintTaskId + "', '0')";
                 cmd.ExecuteScalar();
             }
             connect.Close();
         }
-        protected string storeUserStory(int hasImage)
+        protected string storeSprintTask(int hasImage)
         {
-            string userStoryId = "";
+            string sprintTaskId = "";
             DateTime createdDate = DateTime.Now;
-            string uniqueId = txtUniqueUserStoryID.Text.Replace(" ", "");
-            uniqueId = txtUniqueUserStoryID.Text.Replace("'", "''");
-            string asARole = "";
-            int counter = 0;
-            foreach (ListItem listItem in drpAsRole.Items)
-            {
-                if (listItem.Selected)
-                {
-                    counter++;
-                    var val = listItem.Value;
-                    var txt = listItem.Text;
-                    if (counter == 1)
-                        asARole += val.ToString();
-                    else
-                        asARole = asARole + ", " + val.ToString();
-                }
-            }
-            string iWantTo = txtIWantTo.Text.Replace("'", "''");
-            string soThat = txtSoThat.Text.Replace("'", "''");
+            string sprintTaskUId = txtUniqueSprintTaskID.Text.Replace(" ", "");
+            sprintTaskUId = txtUniqueSprintTaskID.Text.Replace("'", "''");
+            string userStoryUId = txtUniqueUserStoryID.Text.Replace(" ", "");
+            userStoryUId = txtUniqueUserStoryID.Text.Replace("'", "''");
+            string taskDescription = txtTaskDescription.Text.Replace("'", "''");
             string dateIntroduced = calDateIntroduced.SelectedDate.ToString();
             string dateConsidered = calDateConsidered.SelectedDate.ToString();
-            //string developerResponsible = drpFindUser.SelectedValue;
             string currentStatus = drpCurrentStatus.SelectedValue;
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
@@ -738,26 +757,25 @@ namespace Scrum.Accounts.Master
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string createdBy = cmd.ExecuteScalar().ToString();
             //Store the new user story in the database:
-            cmd.CommandText = "insert into UserStories (projectId, userStory_createdBy, userStory_createdDate, userStory_uniqueId, userStory_asARole, userStory_iWantTo, " +
-                "userStory_soThat, userStory_dateIntroduced, userStory_dateConsideredForImplementation," +
-                " userStory_hasImage, userStory_currentStatus) values " +
-               "('" + projectId + "', '" + createdBy + "', '" + createdDate + "', '" + uniqueId + "', '" + asARole + "', '" + iWantTo + "', '" + soThat + "', '" + dateIntroduced + "'," +
-               " '" + dateConsidered + "',  '" + hasImage + "', '" + currentStatus + "') ";
+            cmd.CommandText = "insert into SprintTasks (userStoryId, sprintTask_createdBy, sprintTask_createdDate, sprintTask_uniqueId, sprintTask_taskDescription, sprintTask_dateIntroduced, " +
+                "sprintTask_dateConsideredForImplementation, sprintTask_hasImage, sprintTask_currentStatus) values " +
+               "('" + userStoryId + "', '" + createdBy + "', '" + createdDate + "', '" + sprintTaskUId + "', '" + taskDescription + "', '" + dateIntroduced + "', '" + dateConsidered + "', " +
+               " '" + hasImage + "',  '" + currentStatus + "') ";
             cmd.ExecuteScalar();
-            //Get the ID of the newly stored User Story from the database:
-            cmd.CommandText = "select [userStoryId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userStoryId ASC), * FROM [UserStories] " +
-                "where projectId = '" + projectId + "' and userStory_createdBy = '" + createdBy + "' and userStory_createdDate = '" + Layouts.getOriginalTimeFormat(createdDate.ToString()) + "' "
-                + " and userStory_asARole like '" + asARole + "' and userStory_iWantTo like '" + iWantTo + "' and userStory_soThat like '" + soThat + "' "
-                + " and userStory_dateIntroduced = '" + Layouts.getOriginalTimeFormat(dateIntroduced.ToString()) + "' "
-                + " and userStory_dateConsideredForImplementation = '" + Layouts.getOriginalTimeFormat(dateConsidered.ToString()) + "' "
-                + " and userStory_hasImage = '" + hasImage + "' and userStory_currentStatus like '" + currentStatus + "' "
-                + " and userStory_isDeleted = '0' "
+            //Get the ID of the newly stored Sprint task from the database:
+            cmd.CommandText = "select [sprintTaskId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY sprintTaskId ASC), * FROM [SprintTasks] " +
+                "where userStoryId = '" + userStoryId + "' and sprintTask_createdBy = '" + createdBy + "' and sprintTask_createdDate = '" + Layouts.getOriginalTimeFormat(createdDate.ToString()) + "' "
+                + " and sprintTask_uniqueId like '" + sprintTaskUId + "'  "
+                + " and sprintTask_dateIntroduced = '" + Layouts.getOriginalTimeFormat(dateIntroduced.ToString()) + "' "
+                + " and sprintTask_dateConsideredForImplementation = '" + Layouts.getOriginalTimeFormat(dateConsidered.ToString()) + "' "
+                + " and sprintTask_hasImage = '" + hasImage + "' and sprintTask_currentStatus like '" + currentStatus + "' "
+                + " and sprintTask_isDeleted = '0' "
                 + " ) as t where rowNum = '1'";
-            userStoryId = cmd.ExecuteScalar().ToString();
+            sprintTaskId = cmd.ExecuteScalar().ToString();
             connect.Close();
-            return userStoryId;
+            return sprintTaskId;
         }
-        protected void storeImagesInDB(string userStoryId, int hasImage, List<HttpPostedFile> files)
+        protected void storeImagesInDB(string sprintTaskId, int hasImage, List<HttpPostedFile> files)
         {
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
@@ -774,7 +792,7 @@ namespace Scrum.Accounts.Master
                     cmd.CommandText = "select imageId from Images where image_name like '" + imageName + "' ";
                     string imageId = cmd.ExecuteScalar().ToString();
                     //Add in ImagesForUserStories:
-                    cmd.CommandText = "insert into ImagesForUserStories (imageId, userStoryId) values ('" + imageId + "', '" + userStoryId + "')";
+                    cmd.CommandText = "insert into ImagesForSprintTasks (imageId, sprintTaskId) values ('" + imageId + "', '" + sprintTaskId + "')";
                     cmd.ExecuteScalar();
                 }
             }
@@ -924,23 +942,11 @@ namespace Scrum.Accounts.Master
         protected bool correctInput()
         {
             bool correct = true;
-            if (drpAsRole.SelectedIndex == 0)
+            if (string.IsNullOrWhiteSpace(txtTaskDescription.Text))
             {
                 correct = false;
-                lblAsRoleError.Text = "Invalid input: Please select a role.";
-                lblAsRoleError.Visible = true;
-            }
-            if (string.IsNullOrEmpty(txtIWantTo.Text))
-            {
-                correct = false;
-                lblIWantToError.Visible = true;
-                lblIWantToError.Text = "Invalid input: Please type something for \"I want to...\" ";
-            }
-            if (string.IsNullOrWhiteSpace(txtSoThat.Text))
-            {
-                correct = false;
-                lblSoThatError.Visible = true;
-                lblSoThatError.Text = "Invalid input: Please type something for \"So that ...\" ";
+                lblTaskDescriptionError.Text = "Invalid input: Please type something for \"Task description\" .";
+                lblTaskDescriptionError.Visible = true;
             }
             int differenceInDays = (calDateIntroduced.SelectedDate - DateTime.Now).Days;
             if (differenceInDays < 0)
@@ -960,7 +966,7 @@ namespace Scrum.Accounts.Master
             {
                 correct = false;
                 lblCurrentStatusError.Visible = true;
-                lblCurrentStatusError.Text = "Invalid input: Please select a status for this user story.";
+                lblCurrentStatusError.Text = "Invalid input: Please select a status for this sprint task.";
             }
 
             return correct;
@@ -968,10 +974,10 @@ namespace Scrum.Accounts.Master
         protected void btnGoBack_Click(object sender, EventArgs e)
         {
             addSession();
-            Response.Redirect("Home");
-            //goBack();
+            //Response.Redirect("Home");
+            goBack();
         }
-        protected void btnGoBackToListOfUserStories_Click(object sender, EventArgs e)
+        protected void btnGoBackToListOfSprintTasks_Click(object sender, EventArgs e)
         {
             showView();
             createTable();
@@ -980,49 +986,15 @@ namespace Scrum.Accounts.Master
         {
 
         }
-        [WebMethod]
-        [ScriptMethod()]
-        public static void terminateProject_Click(string projectId, string entry_creatorId)
-        {
-
-            Configuration config = new Configuration();
-            SqlConnection connect = new SqlConnection(config.getConnectionString());
-            bool projectIdExists = isProjectCorrect(projectId, entry_creatorId);
-            if (projectIdExists)
-            {
-                connect.Open();
-                SqlCommand cmd = connect.CreateCommand();
-                //update the DB and set project_isTerminated = true:
-                cmd.CommandText = "update Projects set project_isTerminated = 1 where projectId = '" + projectId + "' ";
-                cmd.ExecuteScalar();
-                //Email the topic creator about the topic being deleted:
-                cmd.CommandText = "select project_createdBy from Projects where projectId = '" + projectId + "' ";
-                string creatorId = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
-                string project_name = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select user_firstname from Users where userId = '" + creatorId + "' ";
-                string name = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select user_lastname from Users where userId = '" + creatorId + "' ";
-                name = name + " " + cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select user_email from Users where userId = '" + creatorId + "' ";
-                string emailTo = cmd.ExecuteScalar().ToString();
-                connect.Close();
-                string emailBody = "Hello " + name + ",\n\n" +
-                    "This email is to inform you that your project with the name (" + project_name + ") has been terminated. If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
-                    "Best regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
-                Email email = new Email();
-                email.sendEmail(emailTo, emailBody);
-            }
-        }
-        protected static bool isProjectCorrect(string projectId, string creatorId)
+        protected static bool isUserStoryCorrect(string userStoryId, string creatorId)
         {
             bool correct = true;
             CheckErrors errors = new CheckErrors();
             //check if id contains a special character:
-            if (!errors.isDigit(projectId))
+            if (!errors.isDigit(userStoryId))
                 correct = false;
             //check if id contains an id that does not exist in DB:
-            else if (errors.ContainsSpecialChars(projectId))
+            else if (errors.ContainsSpecialChars(userStoryId))
                 correct = false;
             if (correct)
             {
@@ -1030,43 +1002,45 @@ namespace Scrum.Accounts.Master
                 SqlConnection connect = new SqlConnection(config.getConnectionString());
                 SqlCommand cmd = connect.CreateCommand();
                 connect.Open();
-                //Count the existance of the topic:
-                cmd.CommandText = "select count(*) from Projects where projectId = '" + projectId + "' ";
+                //Count the existance of the user story:
+                cmd.CommandText = "select count(*) from UserStories where userStoryId = '" + userStoryId + "' ";
                 int count = Convert.ToInt32(cmd.ExecuteScalar());
-                if (count > 0)//if count > 0, then the project ID exists in DB.
+                if (count > 0)//if count > 0, then the User Story ID exists in DB.
                 {
-                    cmd.CommandText = "select project_createdBy from Projects where projectId = '" + projectId + "' ";
+                    cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + userStoryId + "' ";
                     string actual_creatorId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select project_isDeleted from Projects where projectId = '" + projectId + "' ";
+                    cmd.CommandText = "select userStory_isDeleted from UserStories where userStoryId = '" + userStoryId + "' ";
                     int isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
-                    cmd.CommandText = "select project_isTerminated from Projects where projectId = '" + projectId + "' ";
-                    int isTerminated = Convert.ToInt32(cmd.ExecuteScalar());
                     if (isDeleted == 1)
                         correct = false;
                 }
                 else
-                    correct = false; // means that the project ID does not exists in DB.
+                    correct = false; // means that the user story ID does not exists in DB.
                 connect.Close();
             }
             return correct;
         }
         [WebMethod]
         [ScriptMethod()]
-        public static void removeProject_Click(string projectId, string entry_creatorId)
+        public static void removeUserStory_Click(string userStoryId, string entry_creatorId)
         {
             Configuration config = new Configuration();
             SqlConnection connect = new SqlConnection(config.getConnectionString());
-            bool projectIdExists = isProjectCorrect(projectId, entry_creatorId);
-            if (projectIdExists)
+            bool userStoryIdExists = isUserStoryCorrect(userStoryId, entry_creatorId);
+            if (userStoryIdExists)
             {
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
                 //update the DB and set isDeleted = true:
-                cmd.CommandText = "update Projects set project_isDeleted = 1 where projectId = '" + projectId + "' ";
+                cmd.CommandText = "update UserStories set userStory_isDeleted = 1 where userStoryId = '" + userStoryId + "' ";
                 cmd.ExecuteScalar();
                 //Email the project creator about the project being deleted:
-                cmd.CommandText = "select project_createdBy from Projects where projectId = '" + projectId + "' ";
+                cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + userStoryId + "' ";
                 string creatorId = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + userStoryId + "' ";
+                string userStoryUID = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select projectId from UserStories where userStoryId = '" + userStoryId + "' ";
+                string projectId = cmd.ExecuteScalar().ToString();
                 cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
                 string project_name = cmd.ExecuteScalar().ToString();
                 cmd.CommandText = "select user_firstname from Users where userId = '" + creatorId + "' ";
@@ -1077,7 +1051,7 @@ namespace Scrum.Accounts.Master
                 string emailTo = cmd.ExecuteScalar().ToString();
                 connect.Close();
                 string emailBody = "Hello " + name + ",\n\n" +
-                    "This email is to inform you that your project with the name (" + project_name + ") has been deleted. If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
+                    "This email is to inform you that your user story#(" + userStoryUID + ") in the project (" + project_name + ") has been deleted. If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
                     "Best regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
                 Email email = new Email();
                 email.sendEmail(emailTo, emailBody);

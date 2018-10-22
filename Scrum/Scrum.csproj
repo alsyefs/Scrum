@@ -156,9 +156,14 @@
     <Content Include="Accounts\Master\Contact.aspx" />
     <Content Include="Accounts\Master\CreateProject.aspx" />
     <Content Include="Accounts\Developer\Home.aspx" />
+    <Content Include="Accounts\Master\EditProject.aspx" />
+    <Content Include="Accounts\Master\EditUserStory.aspx" />
     <Content Include="Accounts\Master\Home.aspx" />
     <Content Include="Accounts\Master\MyProjects.aspx" />
     <Content Include="Accounts\Master\ViewProject.aspx" />
+    <Content Include="Accounts\Master\ViewSprintTask.aspx" />
+    <Content Include="Accounts\Master\ViewTestCase.aspx" />
+    <Content Include="Accounts\Master\ViewUserStory.aspx" />
     <Content Include="ChangePassword.aspx" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
@@ -405,6 +410,20 @@
     <Compile Include="Accounts\Developer\Home.aspx.designer.cs">
       <DependentUpon>Home.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Accounts\Master\EditProject.aspx.cs">
+      <DependentUpon>EditProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\EditProject.aspx.designer.cs">
+      <DependentUpon>EditProject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Master\EditUserStory.aspx.cs">
+      <DependentUpon>EditUserStory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\EditUserStory.aspx.designer.cs">
+      <DependentUpon>EditUserStory.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Accounts\Master\Home.aspx.cs">
       <DependentUpon>Home.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -426,7 +445,27 @@
     <Compile Include="Accounts\Master\ViewProject.aspx.designer.cs">
       <DependentUpon>ViewProject.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Accounts\Process.cs" />
+    <Compile Include="Accounts\Master\ViewSprintTask.aspx.cs">
+      <DependentUpon>ViewSprintTask.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\ViewSprintTask.aspx.designer.cs">
+      <DependentUpon>ViewSprintTask.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Master\ViewTestCase.aspx.cs">
+      <DependentUpon>ViewTestCase.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\ViewTestCase.aspx.designer.cs">
+      <DependentUpon>ViewTestCase.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Master\ViewUserStory.aspx.cs">
+      <DependentUpon>ViewUserStory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\ViewUserStory.aspx.designer.cs">
+      <DependentUpon>ViewUserStory.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Admin.Master.cs">
       <DependentUpon>Admin.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

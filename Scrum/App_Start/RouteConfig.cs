@@ -11,7 +11,10 @@ namespace Scrum
         public static void RegisterRoutes(RouteCollection routes)
         {
             var settings = new FriendlyUrlSettings();
-            settings.AutoRedirectMode = RedirectMode.Permanent;
+            //The below is the original:
+            //settings.AutoRedirectMode = RedirectMode.Permanent;
+            //The below line is new to allow ajax calls:
+            settings.AutoRedirectMode = RedirectMode.Off;
             routes.EnableFriendlyUrls(settings);
         }
     }

@@ -163,7 +163,14 @@ iframe {
     text-align: center;
     font-weight: 600;
 }
-
+#edit_button {
+    background-color: yellow;
+    max-width: 280px;
+    border-radius: 5px;
+    border: 1px solid #000000;
+    text-align: center;
+    font-weight: 600;
+}
 #unlock_button {
     background-color: green;
     max-width: 280px;
@@ -256,4 +263,65 @@ iframe {
     outline: none;
     border-color: #9ecaed;
     box-shadow: 0 0 10px #9ecaed;
+}
+.mainPopup {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: rgb(0, 0, 0); /*This is a fallback color in case  the browser doesn't render the below.*/
+    background: rgba(0, 0, 0, 0.8);
+}
+.internalPopup {
+    width: 30%;
+    margin: auto;
+    margin-top: 15%;
+    margin-left: 25%;
+    margin-right: 15%;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 0;
+    background-color: antiquewhite;
+    display: compact;
+    border-radius: 11px;
+    border: 1px solid #000000;
+    border: solid;
+}
+.confirmRemove {
+    background-color:green;
+}
+.cancelRemove {
+    background-color: red;
+}
+.removeUserStoryButton {
+    background-color: red;
+    border: solid 1px;
+    color: black;
+    padding: 1px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: medium;
+    cursor: context-menu;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.disabledRemoveUserStoryButton {
+    background-color: gray;
+    border: solid 1px;
+    color: black;
+    padding: 1px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: medium;
+    cursor: not-allowed;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.userStoryHeaderTable table, 
+.userStoryHeaderTable td, 
+.userStoryHeaderTable th {
+    border: 1px solid black;
 }

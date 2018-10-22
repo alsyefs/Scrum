@@ -10,7 +10,7 @@
 namespace Scrum.Accounts.Master {
     
     
-    public partial class ViewProject {
+    public partial class ViewSprintTask {
         
         /// <summary>
         /// upContent control.
@@ -469,6 +469,6 @@ namespace Scrum.Accounts.Master {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCancelRemoveSprintTask;
+        protected global::System.Web.UI.WebControls.Button btnCancelRemoveUserStory;
     }
 }

@@ -57,10 +57,120 @@ namespace Scrum
             }
             else
             {
-                
                 //The prject ID was not a set of digits.
                 correct = !correct;
             }
+            return correct;
+        }
+        public bool checkUserStoryAccess(string id, string loginId)
+        {
+            bool correct = true;
+            if (isDigit(id))
+            {
+                Configuration config = new Configuration();
+                SqlConnection connect = new SqlConnection(config.getConnectionString());
+                SqlCommand cmd = connect.CreateCommand();
+                connect.Open();
+                //Check if the User Story exists:
+                cmd.CommandText = "select count(userStoryId) from UserStories where userStoryId = '" + id + "' ";
+                int userStoryExists = Convert.ToInt32(cmd.ExecuteScalar());
+                if (userStoryExists > 0)
+                {
+                    //Check if the user with the login ID has access to the User Story:
+                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (userExists > 0)
+                    {
+                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                        string userId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select count(userId) from UsersForUserStories where userStoryId = '" + id + "' and userId = '" + userId + "'  ";
+                        int userHasAccessToUserStory = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userHasAccessToUserStory == 0)//The user doesn't have access to the selected user story.
+                            correct = !correct;
+                    }
+                    else//That user doesn't exist in the database.
+                        correct = !correct;
+                }
+                else//The user story doesn't exist in the database.
+                    correct = !correct;
+                connect.Close();
+            }
+            else//The user story ID was not a set of digits.
+                correct = !correct;
+            return correct;
+        }
+        public bool checkSprintTaskAccess(string id, string loginId)
+        {
+            bool correct = true;
+            if (isDigit(id))
+            {
+                Configuration config = new Configuration();
+                SqlConnection connect = new SqlConnection(config.getConnectionString());
+                SqlCommand cmd = connect.CreateCommand();
+                connect.Open();
+                //Check if the Sprint Task exists:
+                cmd.CommandText = "select count(sprintTaskId) from SprintTasks where sprintTaskId = '" + id + "' ";
+                int sprintTaskExists = Convert.ToInt32(cmd.ExecuteScalar());
+                if (sprintTaskExists > 0)
+                {
+                    //Check if the user with the login ID has access to the Sprint Task:
+                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (userExists > 0)
+                    {
+                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                        string userId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select count(userId) from UsersForSprintTasks where sprintTaskId = '" + id + "' and userId = '" + userId + "'  ";
+                        int userHasAccessToSprintTask = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userHasAccessToSprintTask == 0)//The user doesn't have access to the selected sprint task.
+                            correct = !correct;
+                    }
+                    else//That user doesn't exist in the database.
+                        correct = !correct;
+                }
+                else//The sprint task doesn't exist in the database.
+                    correct = !correct;
+                connect.Close();
+            }
+            else//The sprint task ID was not a set of digits.
+                correct = !correct;
+            return correct;
+        }
+        public bool checkTestCaseAccess(string id, string loginId)
+        {
+            bool correct = true;
+            if (isDigit(id))
+            {
+                Configuration config = new Configuration();
+                SqlConnection connect = new SqlConnection(config.getConnectionString());
+                SqlCommand cmd = connect.CreateCommand();
+                connect.Open();
+                //Check if the Test Case exists:
+                cmd.CommandText = "select count(testCaseId) from TestCases where testCaseId = '" + id + "' ";
+                int testCaseExists = Convert.ToInt32(cmd.ExecuteScalar());
+                if (testCaseExists > 0)
+                {
+                    //Check if the user with the login ID has access to the Test Case:
+                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (userExists > 0)
+                    {
+                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                        string userId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select count(userId) from UsersForTestCases where testCaseId = '" + id + "' and userId = '" + userId + "'  ";
+                        int userHasAccessToTestCase = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userHasAccessToTestCase == 0)//The user doesn't have access to the selected test case.
+                            correct = !correct;
+                    }
+                    else//That user doesn't exist in the database.
+                        correct = !correct;
+                }
+                else//The test case doesn't exist in the database.
+                    correct = !correct;
+                connect.Close();
+            }
+            else//The test case ID was not a set of digits.
+                correct = !correct;
             return correct;
         }
         public bool isDigit(string value)

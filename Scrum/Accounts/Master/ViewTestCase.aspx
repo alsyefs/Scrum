@@ -1,7 +1,7 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeBehind="ViewProject.aspx.cs" Inherits="Scrum.Accounts.Master.ViewProject" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeBehind="ViewTestCase.aspx.cs" Inherits="Scrum.Accounts.Master.ViewTestCase" %>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    <%--body start:--%>
+     <%--body start:--%>
     <div class="container">
         <br />
         <h2><%: Title %></h2>
@@ -35,7 +35,7 @@
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
-                                        <asp:Button ID="btnAddNewUserStory" runat="server" Text="Add User Story" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnAddNewUserStory_Click" />
+                                        <asp:Button ID="btnAddNewUserStory" runat="server" Text="Add new User Story" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnAddNewUserStory_Click" />
                                     </td>
                                     <td>
                                         <asp:Button ID="btnGoBack" runat="server" Text="Go Back" Width="100%" BackColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnGoBack_Click" />

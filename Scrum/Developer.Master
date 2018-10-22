@@ -47,7 +47,7 @@
                 </button>
                 <asp:ContentPlaceHolder ID="default" runat="server">
                     <%--Header start --%>
-                    <a class="navbar-brand" runat="server" href="Accounts/Developer/Home">Scrum</a>
+                    <a class="navbar-brand" runat="server" href="Accounts/Developer/Home">Scrum Tool</a>
                     <div class="navbar-collapse collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav mr-auto">
                             <li class="nav-item"><a runat="server" href="Accounts/Developer/MyProjects" class="nav-link">My Projects</a></li>
@@ -81,7 +81,7 @@
             </asp:ContentPlaceHolder>
             <hr />
             <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - Scrum</p>
+                <p>&copy; <%: DateTime.Now.Year %> - Scrum Tool</p>
             </footer>
         </div>
     </form>

@@ -13,25 +13,143 @@ using System.Web.UI.WebControls;
 
 namespace Scrum.Accounts.Master
 {
-    public partial class CreateProject : System.Web.UI.Page
+    public partial class EditProject : System.Web.UI.Page
     {
         static string conn = "";
         SqlConnection connect = new SqlConnection(conn);
         string username, roleId, loginId, token;
+        string previousPage = "";
+        string projectId = "";
         static ArrayList searchedUsers = new ArrayList();
         static SortedSet<string> usersToAdd = new SortedSet<string>();
         static List<HttpPostedFile> files;
         protected void Page_Load(object sender, EventArgs e)
         {
-            initialPageAccess();
+            initialAccess();
+            CheckErrors check = new CheckErrors();
+            try
+            {
+                projectId = Request.QueryString["projectId"];
+                if (!check.checkProjectAccess(projectId, loginId))
+                    goBack();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex);
+                goBack();
+            }
+            //Check if the user editing is the master of this project or an admin:
+            if (!isAccessAllowed())
+                goBack();
             if (!IsPostBack)
             {
                 files = new List<HttpPostedFile>();
-                calStartDate.SelectedDate = DateTime.Today;
+                //calStartDate.SelectedDate = DateTime.Today;
                 fileNames.InnerHtml = " ";
+                try
+                {
+                    fillInputs();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: "+ex);
+                }
             }
         }
-        protected void initialPageAccess()
+        protected void fillInputs()
+        {
+            usersToAdd.Clear();
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select project_name from Projects where projectId = '"+projectId+"' ";
+            string project_name = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_description from Projects where projectId = '" + projectId + "' ";
+            string project_description = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_startedDate from Projects where projectId = '" + projectId + "' ";
+            string project_startedDate = cmd.ExecuteScalar().ToString();
+            cmd.CommandText = "select project_hasImage from Projects where projectId = '" + projectId + "' ";
+            int hasImage = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select count(*) from UsersForProjects where projectId = '" + projectId + "' ";
+            int countUsersForProject = Convert.ToInt32(cmd.ExecuteScalar());
+            for (int i=1; i<= countUsersForProject; i++)
+            {
+                //Add the user IDs of the project users:
+                cmd.CommandText = "select[userId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY UsersForProjectsId ASC), * FROM [UsersForProjects] where projectId = '" + projectId + "' ) as t where rowNum = '" + i+"'";
+                string temp_userId = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select loginId from Users where userId = '" + temp_userId + "' ";
+                int temp_loginId = Convert.ToInt32(cmd.ExecuteScalar());
+                int int_loginId = Convert.ToInt32(loginId);
+                //If the user in the list is not me, add him/her to the set:
+                if (int_loginId != temp_loginId)
+                {
+                    usersToAdd.Add(temp_userId);
+                }
+            }
+            //The second is to guarantee that the sorted set has been filled without duplicates, then we fill the below list:
+            for (int i=0; i< usersToAdd.Count; i++)
+            {
+                string temp_userId = usersToAdd.ElementAt(i);
+                cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + temp_userId + "'  ";
+                string temp_user_name = cmd.ExecuteScalar().ToString();
+                drpProjectUsers.Items.Add(temp_user_name);
+            }
+            if(hasImage == 1)
+            {
+                //Add the images to a listbox:
+                //Allow the master to remove the images one by one, or by selecting them all at once then clicking remove:
+            }
+            connect.Close();
+            txtTitle.Text = project_name;
+            txtDescription.Text = project_description;
+            calStartDate.SelectedDate = Convert.ToDateTime(project_startedDate);
+            
+        }
+        protected void drpProjectUsers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+        protected void btnRemoveProjectUser_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                for (int i = drpProjectUsers.Items.Count; i >= 0; i--)
+                {
+                    int indexToRemove = drpProjectUsers.SelectedIndex;
+                    if (indexToRemove > -1)
+                    {
+                        drpProjectUsers.Items.RemoveAt(indexToRemove);
+                        usersToAdd.Remove(usersToAdd.ElementAt(indexToRemove));
+                    }
+                }
+            }catch(Exception ex){
+                Console.WriteLine("Error: " + ex);
+            }
+
+        }
+        protected bool isAccessAllowed()
+        {
+            bool allowed = true;
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select userId from Users where loginId = '"+loginId+"' ";
+            int userId = Convert.ToInt32(cmd.ExecuteScalar());
+            cmd.CommandText = "select project_createdBy from Projects where projectId = '"+projectId+"' ";
+            int creatorId = Convert.ToInt32(cmd.ExecuteScalar());
+            int int_roleId = Convert.ToInt32(roleId);
+            //If the user trying to edit is not the creator and not an admin:
+            if (userId != creatorId && int_roleId != 1)
+                allowed = false;
+            connect.Close();
+            return allowed;
+        }
+        protected void goBack()
+        {
+            addSession();
+            //if (!string.IsNullOrWhiteSpace(previousPage)) Response.Redirect(previousPage);
+            //else Response.Redirect("Home.aspx");
+            Response.Redirect("ViewProject.aspx?id="+projectId);
+        }
+        protected void initialAccess()
         {
             Configuration config = new Configuration();
             conn = config.getConnectionString();
@@ -41,6 +159,7 @@ namespace Scrum.Accounts.Master
             string current_page = "", previous_page = "";
             if (HttpContext.Current.Request.Url.AbsoluteUri != null) current_page = HttpContext.Current.Request.Url.AbsoluteUri;
             if (Request.UrlReferrer != null) previous_page = Request.UrlReferrer.ToString();
+            previousPage = previous_page;
             //Get current time:
             DateTime currentTime = DateTime.Now;
             //Get user's IP:
@@ -118,6 +237,9 @@ namespace Scrum.Accounts.Master
             //Get the current user's ID:
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
+            //Delete all the users assigned for this project:
+            cmd.CommandText = "delete from UsersForProjects where projectId = '"+projectId+"' ";
+            cmd.ExecuteScalar();
             //Note: by adding the user to this table, he/she is given access to the newly-created table.
             //Add the creator to UsersForProjects table: 
             cmd.CommandText = "insert into UsersForProjects (userId, projectId, usersForProjects_joinedTime) values " +
@@ -128,15 +250,13 @@ namespace Scrum.Accounts.Master
             {
                 string developerResponsible_userId = usersToAdd.ElementAt(i);
                 cmd.CommandText = "insert into UsersForProjects (userId, projectId, usersForProjects_joinedTime) values " +
-                    "('" + developerResponsible_userId + "', '" + projectId + "', '"+ currentTime + "')";
+                    "('" + developerResponsible_userId + "', '" + projectId + "', '" + currentTime + "')";
                 cmd.ExecuteScalar();
             }
             connect.Close();
         }
         protected void sendEmail()
         {
-            //Process process = new Process();
-            //process.sendEmail(loginId, txtTitle.Text, txtDescription.Text);
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
@@ -146,7 +266,7 @@ namespace Scrum.Accounts.Master
             cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId like '" + userId + "' ";
             string name = cmd.ExecuteScalar().ToString();
             connect.Close();
-            string messageBody = "Hello " + name + ",\nThis email is to notify you that your project (" + txtTitle.Text + ") has been successfully submitted.\n" +
+            string messageBody = "Hello " + name + ",\nThis email is to notify you that your project (" + txtTitle.Text + ") has been successfully updated.\n" +
                 "The below is the description you typed: \n\n\"" + txtDescription.Text + "\"\n\nBest regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
             Email email = new Email();
             email.sendEmail(emailTo, messageBody);
@@ -154,26 +274,26 @@ namespace Scrum.Accounts.Master
         protected void addNewEntry()
         {
             int hasImage = 0;
-            if (files.Count > 0)
-            {
-                storeImagesInServer();
-                hasImage = 1;
-            }
+            //if (files.Count > 0)
+            //{
+            //    storeImagesInServer();
+            //    hasImage = 1;
+            //}
             //Store new topic as neither approved nor denied and return its ID:
             string projectId = storeProject(hasImage);
             //Allow the creator of topic to access it when it's approved and add the new tags to the topic:
             allowUserAccessProject(projectId);
-            storeImagesInDB(projectId, hasImage, files);
+            //storeImagesInDB(projectId, hasImage, files);
             lblError.Visible = true;
             lblError.ForeColor = System.Drawing.Color.Green;
-            lblError.Text = "The project has been successfully submitted and an email notification has been sent to you. <br/>";
+            lblError.Text = "The project has been successfully updated and an email notification has been sent to you. <br/>";
             wait.Visible = false;
             try
             {
-                if(files != null)
+                if (files != null)
                     files.Clear();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("Error: " + e.ToString());
             }
@@ -281,7 +401,7 @@ namespace Scrum.Accounts.Master
         }
         protected string storeProject(int hasImage)
         {
-            string projectId = "";
+            string projectId = this.projectId;
             DateTime entryTime = DateTime.Now;
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
@@ -295,16 +415,8 @@ namespace Scrum.Accounts.Master
             //Get the current user's ID:
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "insert into Projects (project_name, project_description, project_createdBy, project_createdDate, project_isTerminated, project_isDeleted, project_startedDate, project_hasImage) values " +
-                "('" + project_name + "', '" + description + "', '" + userId + "', '" + entryTime + "', 0, 0, '" + calStartDate.SelectedDate + "', '" + hasImage + "') ";
+            cmd.CommandText = "update Projects set project_name = '"+ project_name + "', project_description='"+ description + "' where projectId = '"+projectId+"' ";
             cmd.ExecuteScalar();
-            cmd.CommandText = "select [projectId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY projectId ASC), * FROM [Projects] " +
-                "where project_createdBy = '" + userId + "' and project_name like '" + project_name + "' and project_createdDate = '" + Layouts.getOriginalTimeFormat(entryTime.ToString()) + "' "
-                + " and project_startedDate = '" + Layouts.getOriginalTimeFormat(calStartDate.SelectedDate.ToString()) + "' "
-                + " and project_hasImage = '" + hasImage +
-                "' and project_isDeleted = '0' and project_isTerminated = '0' " +
-                " ) as t where rowNum = '1'";
-            projectId = cmd.ExecuteScalar().ToString();
             connect.Close();
             return projectId;
         }
@@ -325,13 +437,13 @@ namespace Scrum.Accounts.Master
                 lblDescriptionError.Visible = true;
                 lblDescriptionError.Text = "Input Error: Please type something for the description.";
             }
-            //Check for the correct start date and ensure that it's in the future:
-            if (calStartDate.SelectedDate.Day < DateTime.Now.Day)
-            {
-                correct = false;
-                lblStartDateError.Visible = true;
-                lblStartDateError.Text = "Input Error: Please select a current or future start date.";
-            }
+            ////Check for the correct start date and ensure that it's in the future:
+            //if (calStartDate.SelectedDate.Day < DateTime.Now.Day)
+            //{
+            //    correct = false;
+            //    lblStartDateError.Visible = true;
+            //    lblStartDateError.Text = "Input Error: Please select a current or future start date.";
+            //}
             return correct;
         }
         protected void hideErrorLabels()
@@ -345,7 +457,8 @@ namespace Scrum.Accounts.Master
         protected void btnCancel_Click(object sender, EventArgs e)
         {
             addSession();
-            Response.Redirect("Home");
+            goBack();
+            //Response.Redirect("Home");
         }
         protected bool checkFile(HttpPostedFile file)
         {
@@ -379,7 +492,7 @@ namespace Scrum.Accounts.Master
                     lblImageError.Text = "File Error: The file you are trying to upload must have a name.";
                 }
             }
-            else if(file.ContentLength == 0 && file == null)
+            else if (file.ContentLength == 0 && file == null)
             {
                 correct = false;
                 lblImageError.Visible = true;
@@ -417,11 +530,15 @@ namespace Scrum.Accounts.Master
             string developerResponsible_userId = searchedUsers[userIndex].ToString();
             usersToAdd.Add(developerResponsible_userId);
             connect.Open();
+            //This is to clear the list of users, and then fill it later from a set to avoid duplicates:
+            drpProjectUsers.Items.Clear();
             for (int i = 0; i < usersToAdd.Count; i++)
             {
                 cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from users where userId = '" + usersToAdd.ElementAt(i) + "' ";
                 string temp_name = cmd.ExecuteScalar().ToString();
                 lblListOfUsers.Text += temp_name + "<br/>";
+                //Fill the list
+                drpProjectUsers.Items.Add(temp_name);
             }
             connect.Close();
             lblListOfUsers.Visible = true;

@@ -10,7 +10,7 @@
 namespace Scrum.Accounts.Master {
     
     
-    public partial class ViewProject {
+    public partial class ViewUserStory {
         
         /// <summary>
         /// upContent control.
@@ -40,13 +40,13 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl View;
         
         /// <summary>
-        /// lblProjectInfo control.
+        /// lblUserStoryInfo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblProjectInfo;
+        protected global::System.Web.UI.WebControls.Label lblUserStoryInfo;
         
         /// <summary>
         /// lblMessage control.
@@ -58,22 +58,22 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblMessage;
         
         /// <summary>
-        /// grdUserStories control.
+        /// grdSprintTasks control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView grdUserStories;
+        protected global::System.Web.UI.WebControls.GridView grdSprintTasks;
         
         /// <summary>
-        /// btnAddNewUserStory control.
+        /// btnAddNewSprintTask control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddNewUserStory;
+        protected global::System.Web.UI.WebControls.Button btnAddNewSprintTask;
         
         /// <summary>
         /// btnGoBack control.
@@ -85,13 +85,40 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Button btnGoBack;
         
         /// <summary>
-        /// AddNewUserStory control.
+        /// AddNewSprintTask control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AddNewUserStory;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AddNewSprintTask;
+        
+        /// <summary>
+        /// lblUniqueSprintTaskID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblUniqueSprintTaskID;
+        
+        /// <summary>
+        /// txtUniqueSprintTaskID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtUniqueSprintTaskID;
+        
+        /// <summary>
+        /// lblUniqueSprintTaskIDError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblUniqueSprintTaskIDError;
         
         /// <summary>
         /// lblUniqueUserStoryID control.
@@ -166,85 +193,31 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblImageError;
         
         /// <summary>
-        /// lblAsRole control.
+        /// lblTaskDescription control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAsRole;
+        protected global::System.Web.UI.WebControls.Label lblTaskDescription;
         
         /// <summary>
-        /// drpAsRole control.
+        /// txtTaskDescription control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ListBox drpAsRole;
+        protected global::System.Web.UI.WebControls.TextBox txtTaskDescription;
         
         /// <summary>
-        /// lblAsRoleError control.
+        /// lblTaskDescriptionError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAsRoleError;
-        
-        /// <summary>
-        /// lblIWantTo control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblIWantTo;
-        
-        /// <summary>
-        /// txtIWantTo control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtIWantTo;
-        
-        /// <summary>
-        /// lblIWantToError control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblIWantToError;
-        
-        /// <summary>
-        /// lblSoThat control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblSoThat;
-        
-        /// <summary>
-        /// txtSoThat control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSoThat;
-        
-        /// <summary>
-        /// lblSoThatError control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblSoThatError;
+        protected global::System.Web.UI.WebControls.Label lblTaskDescriptionError;
         
         /// <summary>
         /// lblDateIntroduced control.
@@ -400,70 +373,70 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblCurrentStatusError;
         
         /// <summary>
-        /// btnSaveUserStory control.
+        /// btnSaveSprintTask control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSaveUserStory;
+        protected global::System.Web.UI.WebControls.Button btnSaveSprintTask;
         
         /// <summary>
-        /// btnGoBackToListOfUserStories control.
+        /// btnGoBackToListOfSprintTasks control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGoBackToListOfUserStories;
+        protected global::System.Web.UI.WebControls.Button btnGoBackToListOfSprintTasks;
         
         /// <summary>
-        /// lblAddUserStoryMessage control.
+        /// lblAddSprintTaskMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAddUserStoryMessage;
+        protected global::System.Web.UI.WebControls.Label lblAddSprintTaskMessage;
         
         /// <summary>
-        /// divRemoveUserStory control.
+        /// divRemoveSprintTask control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divRemoveUserStory;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divRemoveSprintTask;
         
         /// <summary>
-        /// lblRemoveUserStoryMessage control.
+        /// lblRemoveSprintTaskMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblRemoveUserStoryMessage;
+        protected global::System.Web.UI.WebControls.Label lblRemoveSprintTaskMessage;
         
         /// <summary>
-        /// lblUserStoryId control.
+        /// lblSprintTaskId control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUserStoryId;
+        protected global::System.Web.UI.WebControls.Label lblSprintTaskId;
         
         /// <summary>
-        /// btnConfirmRemoveUserStory control.
+        /// btnConfirmRemoveSprintTask control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnConfirmRemoveUserStory;
+        protected global::System.Web.UI.WebControls.Button btnConfirmRemoveSprintTask;
         
         /// <summary>
-        /// btnCancelRemoveUserStory control.
+        /// btnCancelRemoveSprintTask control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.

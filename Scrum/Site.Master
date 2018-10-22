@@ -38,35 +38,12 @@
                 <%--Site Scripts--%>
             </Scripts>
         </asp:ScriptManager>
-
-        <%--<div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" runat="server" href="~/">Scrum</a>
-                </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/About">About</a></li>
-                        <li><a runat="server" href="~/Contact">Contact</a></li>
-                    </ul>
-                    <ul class="nav navbar-nav navbar-right ">
-                            <li class="nav-item"><a runat="server" href="~/Login" id="loginLink" class="nav-link">Login</a></li>
-                            <li class="nav-item"><a runat="server" href="~/Register" id="registerLink" class="nav-link">Register</a></li>
-                        </ul>
-                </div>
-            </div>
-        </div>--%>
          <nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
             <div class="container">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 </button>
                 <asp:ContentPlaceHolder ID="default" runat="server">
-                    <a class="navbar-brand" runat="server" href="/">Scrum</a>
+                    <a class="navbar-brand" runat="server" href="/">Scrum Tool</a>
                     <div class="navbar-collapse collapse" id="navbarSupportedContent">
                         <ul class="nav navbar-nav mr-auto">
 
@@ -86,7 +63,7 @@
             </asp:ContentPlaceHolder>
             <hr />
             <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - Scrum</p>
+                <p>&copy; <%: DateTime.Now.Year %> - Scrum Tool</p>
             </footer>
         </div>
 
