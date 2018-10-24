@@ -96,7 +96,7 @@ namespace Scrum
             string editLink = "";
             //Check if the user viewing the project is the creator, or if the current user viewing is an admin:
             int int_roleId = Convert.ToInt32(roleId);
-            if (createdByUserId.Equals(userId) || int_roleId == 1)
+            if (createdByUserId.Equals(userId) || int_roleId == 1 || int_roleId == 2)
             {
                 deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeUserStory('" + userStoryId + "', '" + createdByUserId + "')\">Remove User Story </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editUserStory('" + userStoryId + "')\" >Edit User Story </button>";
@@ -156,7 +156,7 @@ namespace Scrum
             string editLink = "";
             //Check if the user viewing the sprint task is the creator, or if the current user viewing is an admin:
             int int_roleId = Convert.ToInt32(roleId);
-            if (sprintTask_createdBy.Equals(userId) || int_roleId == 1)
+            if (sprintTask_createdBy.Equals(userId) || int_roleId == 1 || int_roleId == 2)
             {
                 deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeSprintTask('" + sprintTaskId + "', '" + sprintTask_createdBy + "')\">Remove Sprint Task </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editSprintTask('" + sprintTaskId + "')\" >Edit Sprint Task </button>";
