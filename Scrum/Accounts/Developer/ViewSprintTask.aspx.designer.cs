@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Scrum.Accounts.Master {
+namespace Scrum.Accounts.Developer {
     
     
     public partial class ViewSprintTask {

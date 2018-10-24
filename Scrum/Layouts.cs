@@ -112,7 +112,7 @@ namespace Scrum
             
             string messageContent = "<div class=\"userStoryHeaderTable\"><table style=\"border: 1px solid black;\" >" +
                 "<tr><th>User story ID</th><th>As a (type of user)</th> <th>I want to (some goal)</th> <th>So that (reason)</th> <th>Date introduced</th> <th>Date considered for implementation</th> <th>Developers responsible for</th> <th>Current status</th> </tr>" +
-                "<tr> <td>"+ userStory_uniqueId + "</td> <td>"+userStory_asARole+"</td> <td>"+userStory_iWant+"</td> <td>"+userStory_soThat+"</td> <td>"+userStory_dateIntroduced+"</td> <td>"+userStory_dateConsideredForImplementation+"</td> <td>"+ usersForUserStory + "</td> <td>"+userStory_currentStatus+"</td> </tr>" +
+                "<tr> <td>"+ userStory_uniqueId + "</td> <td>"+userStory_asARole+"</td> <td>"+userStory_iWant+"</td> <td>"+userStory_soThat+"</td> <td>"+getTimeFormat(userStory_dateIntroduced) +"</td> <td>"+getTimeFormat(userStory_dateConsideredForImplementation) +"</td> <td>"+ usersForUserStory + "</td> <td>"+userStory_currentStatus+"</td> </tr>" +
                 "</table></div>";
             string header =
                 "<div id=\"header\" >" +
@@ -138,6 +138,66 @@ namespace Scrum
                 cmd.CommandText = "select (user_firstname +' '+ user_lastname) from Users where userId = '" + userStoryMembers[i] + "' ";
                 string temp_name = cmd.ExecuteScalar().ToString();
                 members += "<a href=\"Profile.aspx?id=" + userStoryMembers[i] + "\">" + temp_name + " </a><br/>";
+            }
+            connect.Close();
+            return members;
+        }
+        public static string sprintTaskHeader(string sprintTaskId, string roleId, string loginId, string userId, string userStoryId, string sprintTask_createdBy,
+            string sprintTask_createdDate, string createdBy, string sprintTask_uniqueId, string sprintTask_taskDescription, string sprintTask_dateIntroduced, string sprintTask_dateConsideredForImplementation,
+            int sprintTask_isDeleted, string imagesHTML, int sprintTask_hasImage, string sprintTask_currentStatus, string[] sprintTaskMembers, string userStoryUId,
+            string sprintTask_dateCompleted, string sprintTask_editedBy, string sprintTask_editedDate, string sprintTask_previousVersion)
+        {
+            sprintTask_dateCompleted = (string.IsNullOrWhiteSpace(sprintTask_dateCompleted)) ? "Not completed" : getTimeFormat(sprintTask_dateCompleted);
+            sprintTask_editedBy = (string.IsNullOrWhiteSpace(sprintTask_editedBy)) ? "Not edited" : sprintTask_editedBy;
+            sprintTask_editedDate = (string.IsNullOrWhiteSpace(sprintTask_editedDate)) ? "Not edited" : getTimeFormat(sprintTask_editedDate);
+            sprintTask_previousVersion = (string.IsNullOrWhiteSpace(sprintTask_previousVersion)) ? "No previous version" : sprintTask_previousVersion;
+            string deleteCommand = "";
+            string profileLink = "Created by " + createdBy + " ";
+            string editLink = "";
+            //Check if the user viewing the sprint task is the creator, or if the current user viewing is an admin:
+            int int_roleId = Convert.ToInt32(roleId);
+            if (sprintTask_createdBy.Equals(userId) || int_roleId == 1)
+            {
+                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeSprintTask('" + sprintTaskId + "', '" + sprintTask_createdBy + "')\">Remove Sprint Task </button>";
+                editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editSprintTask('" + sprintTaskId + "')\" >Edit Sprint Task </button>";
+
+            }
+            profileLink = " Created by <a href=\"Profile.aspx?id=" + sprintTask_createdBy + "\">" + createdBy + " </a>";
+            if (sprintTask_isDeleted == 1)
+            {
+                deleteCommand = "";
+                editLink = "";
+            }
+            string usersForSprintTask = getSprintTaskMembers(sprintTaskId, sprintTaskMembers);
+
+            string messageContent = "<div class=\"userStoryHeaderTable\"><table style=\"border: 1px solid black;\" >" +
+                "<tr><th>Sprint Task ID</th><th>User story ID</th> <th>Task description</th> <th>Date introduced</th> <th>Date considered for implementation</th> <th>Date completed</th> <th>Developers responsible for</th> <th>Current status</th> </tr>" +
+                "<tr> <td>" + sprintTask_uniqueId + "</td> <td>" + userStoryUId + "</td> <td>" + sprintTask_taskDescription + "</td> <td>" + getTimeFormat(sprintTask_dateIntroduced) + "</td> <td>" + getTimeFormat(sprintTask_dateConsideredForImplementation) + "</td> <td>" + sprintTask_dateCompleted + "</td> <td>" + usersForSprintTask  + "</td> <td>" + sprintTask_currentStatus + "</td> </tr>" +
+                "</table></div>";
+            string header =
+                "<div id=\"header\" >" +
+                "<div id=\"messageHead\" >" +
+                " Sprint Task ID:\"" + sprintTask_uniqueId + "\"" +
+                profileLink + " on (" + getTimeFormat(sprintTask_dateIntroduced) + "), start date is on (" + getTimeFormat(sprintTask_dateConsideredForImplementation) + ")</div>" +
+                "<div id=\"messageDescription\"><br/>" + messageContent + "<br /><hr>" +
+                imagesHTML + "<br/></div>" +
+                deleteCommand +
+                editLink +
+                "</div>";
+            return header;
+        }
+        protected static string getSprintTaskMembers(string sprintTaskId, string[] sprintTaskMembers)
+        {
+            string members = "";
+            Configuration config = new Configuration();
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            for (int i = 0; i < sprintTaskMembers.Length; i++)
+            {
+                cmd.CommandText = "select (user_firstname +' '+ user_lastname) from Users where userId = '" + sprintTaskMembers[i] + "' ";
+                string temp_name = cmd.ExecuteScalar().ToString();
+                members += "<a href=\"Profile.aspx?id=" + sprintTaskMembers[i] + "\">" + temp_name + " </a><br/>";
             }
             connect.Close();
             return members;

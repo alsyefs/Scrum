@@ -14,7 +14,7 @@ using System.Web.Services;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace Scrum.Accounts.Master
+namespace Scrum.Accounts.Developer
 {
     public partial class ViewSprintTask : System.Web.UI.Page
     {
@@ -76,7 +76,7 @@ namespace Scrum.Accounts.Master
             if (!correctSession)
                 clearSession();
             int int_roleId = Convert.ToInt32(roleId);
-            if (int_roleId != 2)//2 = Master role.
+            if (int_roleId != 3)//3 = Developer role.
                 clearSession();
         }
         protected string GetIPAddress()

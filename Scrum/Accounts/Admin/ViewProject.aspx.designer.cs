@@ -7,10 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Scrum.Accounts.Master {
+namespace Scrum.Accounts.Admin {
     
     
-    public partial class ViewSprintTask {
+    public partial class ViewProject {
         
         /// <summary>
         /// upContent control.
@@ -40,13 +40,13 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl View;
         
         /// <summary>
-        /// lblSprintTaskInfo control.
+        /// lblProjectInfo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblSprintTaskInfo;
+        protected global::System.Web.UI.WebControls.Label lblProjectInfo;
         
         /// <summary>
         /// lblMessage control.
@@ -58,22 +58,22 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblMessage;
         
         /// <summary>
-        /// grdTestCases control.
+        /// grdUserStories control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView grdTestCases;
+        protected global::System.Web.UI.WebControls.GridView grdUserStories;
         
         /// <summary>
-        /// btnAddNewTestCase control.
+        /// btnAddNewUserStory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddNewTestCase;
+        protected global::System.Web.UI.WebControls.Button btnAddNewUserStory;
         
         /// <summary>
         /// btnGoBack control.
@@ -85,40 +85,13 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Button btnGoBack;
         
         /// <summary>
-        /// AddNewTestCase control.
+        /// AddNewUserStory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AddNewTestCase;
-        
-        /// <summary>
-        /// lblUniqueTestCaseID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUniqueTestCaseID;
-        
-        /// <summary>
-        /// txtUniqueTestCaseID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUniqueTestCaseID;
-        
-        /// <summary>
-        /// lblUniqueTestCaseIDError control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUniqueTestCaseIDError;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl AddNewUserStory;
         
         /// <summary>
         /// lblUniqueUserStoryID control.
@@ -146,33 +119,6 @@ namespace Scrum.Accounts.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblUniqueUserStoryIDError;
-        
-        /// <summary>
-        /// lblUniqueSprintTaskID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUniqueSprintTaskID;
-        
-        /// <summary>
-        /// txtUniqueSprintTaskID control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUniqueSprintTaskID;
-        
-        /// <summary>
-        /// lblUniqueSprintTaskIDError control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblUniqueSprintTaskIDError;
         
         /// <summary>
         /// lblFileUpload control.
@@ -220,130 +166,211 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblImageError;
         
         /// <summary>
-        /// lblTestCaseScenario control.
+        /// lblAsRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTestCaseScenario;
+        protected global::System.Web.UI.WebControls.Label lblAsRole;
         
         /// <summary>
-        /// txtTestCaseScenario control.
+        /// drpAsRole control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTestCaseScenario;
+        protected global::System.Web.UI.WebControls.ListBox drpAsRole;
         
         /// <summary>
-        /// lblTestCaseScenarioError control.
+        /// lblAsRoleError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTestCaseScenarioError;
+        protected global::System.Web.UI.WebControls.Label lblAsRoleError;
         
         /// <summary>
-        /// lblInputParameters control.
+        /// lblIWantTo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblInputParameters;
+        protected global::System.Web.UI.WebControls.Label lblIWantTo;
         
         /// <summary>
-        /// txtInputParameters control.
+        /// txtIWantTo control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtInputParameters;
+        protected global::System.Web.UI.WebControls.TextBox txtIWantTo;
         
         /// <summary>
-        /// btnAddParameter control.
+        /// lblIWantToError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnAddParameter;
+        protected global::System.Web.UI.WebControls.Label lblIWantToError;
         
         /// <summary>
-        /// lblInputParametersError control.
+        /// lblSoThat control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblInputParametersError;
+        protected global::System.Web.UI.WebControls.Label lblSoThat;
         
         /// <summary>
-        /// lblInputParametersList control.
+        /// txtSoThat control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblInputParametersList;
+        protected global::System.Web.UI.WebControls.TextBox txtSoThat;
         
         /// <summary>
-        /// drpInputParametersList control.
+        /// lblSoThatError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ListBox drpInputParametersList;
+        protected global::System.Web.UI.WebControls.Label lblSoThatError;
         
         /// <summary>
-        /// btnRemoveParameter control.
+        /// lblDateIntroduced control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnRemoveParameter;
+        protected global::System.Web.UI.WebControls.Label lblDateIntroduced;
         
         /// <summary>
-        /// lblInputParametersListError control.
+        /// calDateIntroduced control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblInputParametersListError;
+        protected global::System.Web.UI.WebControls.Calendar calDateIntroduced;
         
         /// <summary>
-        /// lblExpectedOutput control.
+        /// lblDateIntroducedError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblExpectedOutput;
+        protected global::System.Web.UI.WebControls.Label lblDateIntroducedError;
         
         /// <summary>
-        /// txtExpectedOutput control.
+        /// lblDateConsidered control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtExpectedOutput;
+        protected global::System.Web.UI.WebControls.Label lblDateConsidered;
         
         /// <summary>
-        /// lblExpectedOutputError control.
+        /// calDateConsidered control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblExpectedOutputError;
+        protected global::System.Web.UI.WebControls.Calendar calDateConsidered;
+        
+        /// <summary>
+        /// lblDateConsideredError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDateConsideredError;
+        
+        /// <summary>
+        /// lblDeveloperResponsible control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDeveloperResponsible;
+        
+        /// <summary>
+        /// txtDeveloperResponsible control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtDeveloperResponsible;
+        
+        /// <summary>
+        /// lblDeveloperResponsibleError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDeveloperResponsibleError;
+        
+        /// <summary>
+        /// lblSelectUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSelectUser;
+        
+        /// <summary>
+        /// drpFindUser control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox drpFindUser;
+        
+        /// <summary>
+        /// btnAddUserToList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnAddUserToList;
+        
+        /// <summary>
+        /// lblFindUserResult control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblFindUserResult;
+        
+        /// <summary>
+        /// lblListOfUsers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblListOfUsers;
         
         /// <summary>
         /// lblCurrentStatus control.
@@ -373,75 +400,75 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.WebControls.Label lblCurrentStatusError;
         
         /// <summary>
-        /// btnSaveTestCase control.
+        /// btnSaveUserStory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSaveTestCase;
+        protected global::System.Web.UI.WebControls.Button btnSaveUserStory;
         
         /// <summary>
-        /// btnGoBackToListOfTestCases control.
+        /// btnGoBackToListOfUserStories control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGoBackToListOfTestCases;
+        protected global::System.Web.UI.WebControls.Button btnGoBackToListOfUserStories;
         
         /// <summary>
-        /// lblAddTestCaseMessage control.
+        /// lblAddUserStoryMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblAddTestCaseMessage;
+        protected global::System.Web.UI.WebControls.Label lblAddUserStoryMessage;
         
         /// <summary>
-        /// divRemoveTestCase control.
+        /// divRemoveUserStory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divRemoveTestCase;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divRemoveUserStory;
         
         /// <summary>
-        /// lblRemoveTestCaseMessage control.
+        /// lblRemoveUserStoryMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblRemoveTestCaseMessage;
+        protected global::System.Web.UI.WebControls.Label lblRemoveUserStoryMessage;
         
         /// <summary>
-        /// lblTestCaseId control.
+        /// lblUserStoryId control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTestCaseId;
+        protected global::System.Web.UI.WebControls.Label lblUserStoryId;
         
         /// <summary>
-        /// btnConfirmRemoveTestCase control.
+        /// btnConfirmRemoveUserStory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnConfirmRemoveTestCase;
+        protected global::System.Web.UI.WebControls.Button btnConfirmRemoveUserStory;
         
         /// <summary>
-        /// btnCancelRemoveTestCase control.
+        /// btnCancelRemoveUserStory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnCancelRemoveTestCase;
+        protected global::System.Web.UI.WebControls.Button btnCancelRemoveUserStory;
     }
 }

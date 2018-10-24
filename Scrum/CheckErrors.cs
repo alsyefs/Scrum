@@ -23,29 +23,34 @@ namespace Scrum
                 int projectExists = Convert.ToInt32(cmd.ExecuteScalar());
                 if (projectExists > 0)
                 {
-                    //Check if the user with the login ID has access to the project:
-                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
-                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
-                    if (userExists > 0)
+                    cmd.CommandText = "select roleId from Logins where loginId = '"+loginId+"' ";
+                    int roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (roleId != 1)
                     {
-                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
-                        string userId = cmd.ExecuteScalar().ToString();
-                        cmd.CommandText = "select count(userId) from UsersForProjects where projectId = '" + id + "' and userId = '" + userId + "'  ";
-                        int userHasAccessToProject = Convert.ToInt32(cmd.ExecuteScalar());
-                        if (userHasAccessToProject > 0)
+                        //Check if the user with the login ID has access to the project:
+                        cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                        int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userExists > 0)
                         {
-                            //The user has access to the selected project. Good for you :D
+                            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                            string userId = cmd.ExecuteScalar().ToString();
+                            cmd.CommandText = "select count(userId) from UsersForProjects where projectId = '" + id + "' and userId = '" + userId + "'  ";
+                            int userHasAccessToProject = Convert.ToInt32(cmd.ExecuteScalar());
+                            if (userHasAccessToProject > 0)
+                            {
+                                //The user has access to the selected project. Good for you :D
+                            }
+                            else
+                            {
+                                //The user doesn't have access to the selected project.
+                                correct = !correct;
+                            }
                         }
                         else
                         {
-                            //The user doesn't have access to the selected project.
+                            //That user doesn't exist in the database.
                             correct = !correct;
                         }
-                    }
-                    else
-                    {
-                        //That user doesn't exist in the database.
-                        correct = !correct;
                     }
                 }
                 else
@@ -76,20 +81,24 @@ namespace Scrum
                 int userStoryExists = Convert.ToInt32(cmd.ExecuteScalar());
                 if (userStoryExists > 0)
                 {
-                    //Check if the user with the login ID has access to the User Story:
-                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
-                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
-                    if (userExists > 0)
-                    {
-                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
-                        string userId = cmd.ExecuteScalar().ToString();
-                        cmd.CommandText = "select count(userId) from UsersForUserStories where userStoryId = '" + id + "' and userId = '" + userId + "'  ";
-                        int userHasAccessToUserStory = Convert.ToInt32(cmd.ExecuteScalar());
-                        if (userHasAccessToUserStory == 0)//The user doesn't have access to the selected user story.
+                    cmd.CommandText = "select roleId from Logins where loginId = '" + loginId + "' ";
+                    int roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (roleId != 1)
+                    {//Check if the user with the login ID has access to the User Story:
+                        cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                        int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userExists > 0)
+                        {
+                            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                            string userId = cmd.ExecuteScalar().ToString();
+                            cmd.CommandText = "select count(userId) from UsersForUserStories where userStoryId = '" + id + "' and userId = '" + userId + "'  ";
+                            int userHasAccessToUserStory = Convert.ToInt32(cmd.ExecuteScalar());
+                            if (userHasAccessToUserStory == 0)//The user doesn't have access to the selected user story.
+                                correct = !correct;
+                        }
+                        else//That user doesn't exist in the database.
                             correct = !correct;
                     }
-                    else//That user doesn't exist in the database.
-                        correct = !correct;
                 }
                 else//The user story doesn't exist in the database.
                     correct = !correct;
@@ -113,20 +122,25 @@ namespace Scrum
                 int sprintTaskExists = Convert.ToInt32(cmd.ExecuteScalar());
                 if (sprintTaskExists > 0)
                 {
-                    //Check if the user with the login ID has access to the Sprint Task:
-                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
-                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
-                    if (userExists > 0)
+                    cmd.CommandText = "select roleId from Logins where loginId = '" + loginId + "' ";
+                    int roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (roleId != 1)
                     {
-                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
-                        string userId = cmd.ExecuteScalar().ToString();
-                        cmd.CommandText = "select count(userId) from UsersForSprintTasks where sprintTaskId = '" + id + "' and userId = '" + userId + "'  ";
-                        int userHasAccessToSprintTask = Convert.ToInt32(cmd.ExecuteScalar());
-                        if (userHasAccessToSprintTask == 0)//The user doesn't have access to the selected sprint task.
+                        //Check if the user with the login ID has access to the Sprint Task:
+                        cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                        int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userExists > 0)
+                        {
+                            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                            string userId = cmd.ExecuteScalar().ToString();
+                            cmd.CommandText = "select count(userId) from UsersForSprintTasks where sprintTaskId = '" + id + "' and userId = '" + userId + "'  ";
+                            int userHasAccessToSprintTask = Convert.ToInt32(cmd.ExecuteScalar());
+                            if (userHasAccessToSprintTask == 0)//The user doesn't have access to the selected sprint task.
+                                correct = !correct;
+                        }
+                        else//That user doesn't exist in the database.
                             correct = !correct;
                     }
-                    else//That user doesn't exist in the database.
-                        correct = !correct;
                 }
                 else//The sprint task doesn't exist in the database.
                     correct = !correct;
@@ -150,20 +164,25 @@ namespace Scrum
                 int testCaseExists = Convert.ToInt32(cmd.ExecuteScalar());
                 if (testCaseExists > 0)
                 {
-                    //Check if the user with the login ID has access to the Test Case:
-                    cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
-                    int userExists = Convert.ToInt32(cmd.ExecuteScalar());
-                    if (userExists > 0)
+                    cmd.CommandText = "select roleId from Logins where loginId = '" + loginId + "' ";
+                    int roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (roleId != 1)
                     {
-                        cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
-                        string userId = cmd.ExecuteScalar().ToString();
-                        cmd.CommandText = "select count(userId) from UsersForTestCases where testCaseId = '" + id + "' and userId = '" + userId + "'  ";
-                        int userHasAccessToTestCase = Convert.ToInt32(cmd.ExecuteScalar());
-                        if (userHasAccessToTestCase == 0)//The user doesn't have access to the selected test case.
+                        //Check if the user with the login ID has access to the Test Case:
+                        cmd.CommandText = "select count(userId) from Users where loginId = '" + loginId + "' ";
+                        int userExists = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (userExists > 0)
+                        {
+                            cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
+                            string userId = cmd.ExecuteScalar().ToString();
+                            cmd.CommandText = "select count(userId) from UsersForTestCases where testCaseId = '" + id + "' and userId = '" + userId + "'  ";
+                            int userHasAccessToTestCase = Convert.ToInt32(cmd.ExecuteScalar());
+                            if (userHasAccessToTestCase == 0)//The user doesn't have access to the selected test case.
+                                correct = !correct;
+                        }
+                        else//That user doesn't exist in the database.
                             correct = !correct;
                     }
-                    else//That user doesn't exist in the database.
-                        correct = !correct;
                 }
                 else//The test case doesn't exist in the database.
                     correct = !correct;

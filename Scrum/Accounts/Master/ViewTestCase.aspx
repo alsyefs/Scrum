@@ -138,6 +138,8 @@
                                             <asp:ListItem>Not started</asp:ListItem>
                                             <asp:ListItem>In progress</asp:ListItem>
                                             <asp:ListItem>Completed</asp:ListItem>
+                                            <asp:ListItem>In current sprint</asp:ListItem>
+                                            <asp:ListItem>revised</asp:ListItem>
                                         </asp:DropDownList></td>
                                     <td>
                                         <asp:Label ID="lblCurrentStatusError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>

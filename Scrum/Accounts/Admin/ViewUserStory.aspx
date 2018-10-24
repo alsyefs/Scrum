@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeBehind="ViewSprintTask.aspx.cs" Inherits="Scrum.Accounts.Master.ViewSprintTask" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Admin.Master" AutoEventWireup="true" CodeBehind="ViewUserStory.aspx.cs" Inherits="Scrum.Accounts.Admin.ViewUserStory" %>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <%--body start:--%>
@@ -14,11 +14,11 @@
                         <div id="wait" runat="server" class="modal" style="width: 200px; height: 20px; margin: 100px auto 0 auto; display: none; background-color: #fff; z-index: 1001; text-align: center;">PLEASE WAIT...</div>
                         <div runat="server" id="View">
                             <%--Message to be displayed if there is nothing to show:--%>
-                            <asp:Label ID="lblSprintTaskInfo" runat="server" Text=" " Font-Size="Medium" Font-Bold="true"></asp:Label>
+                            <asp:Label ID="lblUserStoryInfo" runat="server" Text=" " Font-Size="Medium" Font-Bold="true"></asp:Label>
                             <br />
                             <asp:Label ID="lblMessage" runat="server" Text="There are no sprint tasks to display!" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
                             <div id="table">
-                                <asp:GridView ID="grdTestCases" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="20" AllowPaging="True" OnPageIndexChanging="grdTestCases_PageIndexChanging">
+                                <asp:GridView ID="grdSprintTasks" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="20" AllowPaging="True" OnPageIndexChanging="grdSprintTasks_PageIndexChanging">
                                     <AlternatingRowStyle BackColor="White" />
                                     <FooterStyle BackColor="#CCCC99" />
                                     <HeaderStyle BackColor="#6B696B" Font-Bold="True" ForeColor="White" />
@@ -35,7 +35,7 @@
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
-                                        <asp:Button ID="btnAddNewTestCase" runat="server" Text="Add Test Case" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnAddNewTestCase_Click" />
+                                        <asp:Button ID="btnAddNewSprintTask" runat="server" Text="Add Sprint Task" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnAddNewSprintTask_Click" />
                                     </td>
                                     <td>
                                         <asp:Button ID="btnGoBack" runat="server" Text="Go Back" Width="100%" BackColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnGoBack_Click" />
@@ -43,27 +43,17 @@
                                 </tr>
                             </table>
                         </div>
-                        <div runat="server" id="AddNewTestCase">
+                        <div runat="server" id="AddNewSprintTask">
                             <table style="width: 100%;">
-                                <%--<tr>
-                                    <td><asp:Label ID="lblTestCaseID" runat="server" Text="Test Case Unique ID" Visible="false" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:TextBox ID="txtTestCaseID" runat="server" Font-Size="Medium" Width="100%" Visible="false" Enabled="false"></asp:TextBox></td>
-                                    <td><asp:Label ID="lblTestCaseIDError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
-                                </tr>--%>
                                 <tr>
-                                    <td><asp:Label ID="lblUniqueTestCaseID" runat="server" Text="Test Case Unique ID" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:TextBox ID="txtUniqueTestCaseID" runat="server" Font-Size="Medium" Width="100%" Enabled="false"></asp:TextBox></td>
-                                    <td><asp:Label ID="lblUniqueTestCaseIDError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                    <td><asp:Label ID="lblUniqueSprintTaskID" runat="server" Text="Sprint Task Unique ID" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td><asp:TextBox ID="txtUniqueSprintTaskID" runat="server" Font-Size="Medium" Width="100%" Enabled="false"></asp:TextBox></td>
+                                    <td><asp:Label ID="lblUniqueSprintTaskIDError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
                                     <td><asp:Label ID="lblUniqueUserStoryID" runat="server" Text="User Story Unique ID" Font-Size="Medium" Width="100%"></asp:Label></td>
                                     <td><asp:TextBox ID="txtUniqueUserStoryID" runat="server" Font-Size="Medium" Width="100%" Enabled="false"></asp:TextBox></td>
                                     <td><asp:Label ID="lblUniqueUserStoryIDError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
-                                </tr>
-                                <tr>
-                                    <td><asp:Label ID="lblUniqueSprintTaskID" runat="server" Text="Sprint Task Unique ID" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:TextBox ID="txtUniqueSprintTaskID" runat="server" Font-Size="Medium" Width="100%" Enabled="false"></asp:TextBox></td>
-                                    <td><asp:Label ID="lblUniqueSprintTaskIDError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -79,114 +69,124 @@
                                         <asp:Label ID="lblImageError" runat="server" Text="Image" Visible="false" ForeColor="red"></asp:Label></td>
                                 </tr>
                                 <tr>
-                                    <td><asp:Label ID="lblTestCaseScenario" runat="server" Text="Test Case Scneario" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:TextBox ID="txtTestCaseScenario" runat="server" Width="100%" TextMode="MultiLine" CssClass="content"></asp:TextBox></td>
-                                    <td><asp:Label ID="lblTestCaseScenarioError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                    <td><asp:Label ID="lblTaskDescription" runat="server" Text="Task Description" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td><asp:TextBox ID="txtTaskDescription" runat="server" Width="100%" TextMode="MultiLine" CssClass="content"></asp:TextBox></td>
+                                    <td><asp:Label ID="lblTaskDescriptionError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
-                                    <td><asp:Label ID="lblInputParameters" runat="server" Text="Input Parameter" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:TextBox ID="txtInputParameters" runat="server" Width="100%" CssClass="content"></asp:TextBox>
-                                        <asp:Button ID="btnAddParameter" runat="server" Text="Add Parameter" Width="140px" BackColor="yellow" Font-Bold="true" Font-Size="Medium" OnClick="btnAddParameter_Click" />
-                                    </td>
-                                    <td><asp:Label ID="lblInputParametersError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                    <td><asp:Label ID="lblDateIntroduced" runat="server" Text="Date introduced" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td><asp:Calendar ID="calDateIntroduced" runat="server" Font-Size="Medium" Width="100%" OnSelectionChanged="calDateIntroduced_SelectionChanged" OnDayRender="dayRender"></asp:Calendar></td>
+                                    <td><asp:Label ID="lblDateIntroducedError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
-                                    <td><asp:Label ID="lblInputParametersList" runat="server" Text="Task Description" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:ListBox ID="drpInputParametersList" runat="server" Font-Size="Medium" Width="100%"></asp:ListBox>
-                                        <asp:Button ID="btnRemoveParameter" runat="server" Text="Remove Parameter" Width="200px" ForeColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnRemoveParameter_Click" />
-                                    </td>
-                                    <td><asp:Label ID="lblInputParametersListError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                    <td><asp:Label ID="lblDateConsidered" runat="server" Text="Date considered for implementation" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td><asp:Calendar ID="calDateConsidered" runat="server" Font-Size="Medium" Width="100%" OnSelectionChanged="calDateConsidered_SelectionChanged" OnDayRender="dayRender"></asp:Calendar></td>
+                                    <td><asp:Label ID="lblDateConsideredError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
-                                    <td><asp:Label ID="lblExpectedOutput" runat="server" Text="Expected Output" Font-Size="Medium" Width="100%"></asp:Label></td>
-                                    <td><asp:TextBox ID="txtExpectedOutput" runat="server" Width="100%" TextMode="MultiLine" CssClass="content"></asp:TextBox></td>
-                                    <td><asp:Label ID="lblExpectedOutputError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                    <td><asp:Label ID="lblDeveloperResponsible" runat="server" Text="Developers responsible for" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td><asp:TextBox ID="txtDeveloperResponsible" runat="server" Font-Size="Medium" Width="100%" AutoPostBack="true" OnTextChanged="txtDeveloperResponsible_TextChanged"></asp:TextBox></td>
+                                    <td><asp:Label ID="lblDeveloperResponsibleError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                                </tr>
+                                <tr>
+                                    <td><asp:Label ID="lblSelectUser" runat="server" Text="Select developer" Width="100%"></asp:Label></td>
+                                    <td><asp:ListBox ID="drpFindUser" runat="server" Width="100%" AutoPostBack="true" OnSelectedIndexChanged="drpFindUser_SelectedIndexChanged"></asp:ListBox>
+                                        <asp:Button ID="btnAddUserToList" runat="server" Text="Add to list" Width="100px" BackColor="yellow" Font-Bold="true" Font-Size="Medium" OnClick="btnAddUserToList_Click" />
+                                        <br />
+                                        <asp:Label ID="lblFindUserResult" runat="server" Text="" Visible="false" Width="100%"></asp:Label></td>
+                                    <td><asp:Label ID="lblListOfUsers" runat="server" Text="" Visible="false" Width="100%"></asp:Label></td>
                                 </tr>
                                 <tr><td><asp:Label ID="lblCurrentStatus" runat="server" Text="Current Status" Font-Size="Medium" Width="100%"></asp:Label></td>
                                     <td>
                                         <asp:DropDownList ID="drpCurrentStatus" runat="server" Font-Size="Medium" Width="100%">
                                             <asp:ListItem>Select a status</asp:ListItem>
                                             <asp:ListItem>Not started</asp:ListItem>
-                                            <asp:ListItem>Test failed</asp:ListItem>
-                                            <asp:ListItem>Test passed</asp:ListItem>
-                                            <asp:ListItem>Test needs revision</asp:ListItem>
+                                            <asp:ListItem>In progress</asp:ListItem>
+                                            <asp:ListItem>Completed</asp:ListItem>
+                                            <asp:ListItem>In current sprint</asp:ListItem>
+                                            <asp:ListItem>revised</asp:ListItem>
                                         </asp:DropDownList></td>
                                     <td><asp:Label ID="lblCurrentStatusError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                             </table>
                             <table style="width: 100%;">
                                 <tr>
-                                    <td><asp:Button ID="btnSaveTestCase" runat="server" Text="Save new Test Case" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnSaveTestCase_Click" OnClientClick="pleaseWait();" />
+                                    <td><asp:Button ID="btnSaveSprintTask" runat="server" Text="Save new Sprint Task" Width="100%" BackColor="Green" Font-Bold="true" Font-Size="Medium" OnClick="btnSaveSprintTask_Click" OnClientClick="pleaseWait();" />
                                     </td>
-                                    <td><asp:Button ID="btnGoBackToListOfTestCases" runat="server" Text="Go Back" Width="100%" BackColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnGoBackToListOfTestCases_Click" />
+                                    <td><asp:Button ID="btnGoBackToListOfSprintTasks" runat="server" Text="Go Back" Width="100%" BackColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnGoBackToListOfSprintTasks_Click" />
                                     </td>
                                 </tr>
                             </table>
                             <br />
-                            <asp:Label ID="lblAddTestCaseMessage" runat="server" Text=" " Visible="false" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
+                            <asp:Label ID="lblAddSprintTaskMessage" runat="server" Text=" " Visible="false" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                         </div>
-                        <div runat="server" id="divRemoveTestCase" class="mainPopup" visible="false">
+                        <div runat="server" id="divRemoveSprintTask" class="mainPopup" visible="false">
                             <div runat="server" class="internalPopup">
-                                <asp:Label ID="lblRemoveTestCaseMessage" runat="server" Text="" Width="100%"></asp:Label>
-                                <asp:Label ID="lblTestCaseId" Visible="false" runat="server" Text="" Width="100%"></asp:Label>
+                                <asp:Label ID="lblRemoveSprintTaskMessage" runat="server" Text="" Width="100%"></asp:Label>
+                                <asp:Label ID="lblSprintTaskId" Visible="false" runat="server" Text="" Width="100%"></asp:Label>
                                 <br />
                                 <br />
                                 <table>
                                     <tr>
                                         <td>
-                                            <asp:Button ID="btnConfirmRemoveTestCase" runat="server" Text="Remove" CssClass="confirmRemove" Font-Bold="True" Font-Size="Medium" Width="140px" OnClick="btnConfirmRemoveTestCase_Click" /></td>
+                                            <asp:Button ID="btnConfirmRemoveSprintTask" runat="server" Text="Remove" CssClass="confirmRemove" Font-Bold="True" Font-Size="Medium" Width="140px" OnClick="btnConfirmRemoveSprintTask_Click" /></td>
                                         <td style="width: 140px;"></td>
                                         <td>
-                                            <asp:Button ID="btnCancelRemoveTestCase" runat="server" Text="Cancel" CssClass="cancelRemove" Font-Bold="True" Font-Size="Medium" Width="140px" OnClick="btnCancelRemoveTestCase_Click" /></td>
+                                            <asp:Button ID="btnCancelRemoveSprintTask" runat="server" Text="Cancel" CssClass="cancelRemove" Font-Bold="True" Font-Size="Medium" Width="140px" OnClick="btnCancelRemoveSprintTask_Click" /></td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
                     </ContentTemplate>
                     <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="btnAddNewTestCase" EventName="Click" />
-                        <asp:AsyncPostBackTrigger ControlID="btnAddParameter" EventName="Click" />
-                        <asp:AsyncPostBackTrigger ControlID="btnRemoveParameter" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btnAddNewSprintTask" EventName="Click" />
                         <asp:AsyncPostBackTrigger ControlID="btnGoBack" EventName="Click" />
-                        <asp:AsyncPostBackTrigger ControlID="btnSaveTestCase" EventName="Click" />
-                        <asp:AsyncPostBackTrigger ControlID="btnGoBackToListOfTestCases" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btnSaveSprintTask" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btnGoBackToListOfSprintTasks" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="calDateIntroduced" EventName="SelectionChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="calDateConsidered" EventName="SelectionChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="txtDeveloperResponsible" EventName="TextChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="drpFindUser" EventName="SelectedIndexChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="btnAddUserToList" EventName="Click" />
                         <asp:PostBackTrigger ControlID="btnUpload" />
-                        <asp:AsyncPostBackTrigger ControlID="btnConfirmRemoveTestCase" EventName="Click" />
-                        <asp:AsyncPostBackTrigger ControlID="btnCancelRemoveTestCase" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btnConfirmRemoveSprintTask" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btnCancelRemoveSprintTask" EventName="Click" />
                     </Triggers>
                 </asp:UpdatePanel>
                 <script type="text/javascript">
                     function onInputChange(e) {
+                        console.log('started onChange');
                         var res = "";
                         for (var i = 0; i < $('#<%= FileUpload1.ClientID %>').get(0).files.length; i++) {
                             res += $('#<%= FileUpload1.ClientID %>').get(0).files[i].name + "<br />";
                             console.log('iterating: ' + i + ' ' + res);
                         }
                         $('#fileNames').html(res);
+                        console.log('finished onChange.' + ' file names: ' + res);
                     }
                     function pleaseWait() {
                         $(".modal").show();
                         return true;
                     }
-                    function removeSprintTask(sprintTaskId, creatorId) {
+                    function removeUserStory(userStoryId, creatorId) {
                         pleaseWait();
-                        if (confirm('Are sure you want to remove the selected sprint task?'))
-                            removeSprintTaskConfirmed(sprintTaskId, creatorId);
+                        if (confirm('Are sure you want to remove the selected user story?'))
+                            removeUserStoryConfirmed(userStoryId, creatorId);
                         else {
                             $(".modal").hide();
                         }
                     }
-                    function removeSprintTaskConfirmed(sprintTaskId, creatorId) {
-                        var sprintTaskID = parseInt(sprintTaskId);
+                    function removeUserStoryConfirmed(userStoryId, creatorId) {
+                        var userStoryID = parseInt(userStoryId);
                         var creatorID = parseInt(creatorId);
                         var obj = {
-                            sprintTaskId: sprintTaskID,
+                            userStoryId: userStoryID,
                             entry_creatorId: creatorID
                         };
                         var param = JSON.stringify(obj);  // stringify the parameter
                         $.ajax({
                             method: "POST",
-                            url: '<%= ResolveUrl("ViewSprintTask.aspx/removeSprintTask_Click") %>',
+                            url: '<%= ResolveUrl("ViewUserStory.aspx/removeUserStory_Click") %>',
                             data: param,
                             contentType: "application/json; charset=utf-8",
                             dataType: "json",
@@ -200,8 +200,8 @@
                             }
                         });
                     }
-                    function editSprintTask(sprintTaskId) {
-                        window.location.href = "EditSprintTask.aspx?sprintTaskId=" + sprintTaskId;
+                    function editUserStory(userStoryId) {
+                        window.location.href = "EditUserStory.aspx?userStoryId=" + userStoryId;
                     }
                 </script>
                 <%--Content end--%>

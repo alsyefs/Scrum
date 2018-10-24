@@ -139,16 +139,23 @@
     <Content Include="Accounts\Admin\ChangeSecurityQuestions.aspx" />
     <Content Include="Accounts\Admin\ChangePassword.aspx" />
     <Content Include="Accounts\Admin\Contact.aspx" />
+    <Content Include="Accounts\Admin\EditProject.aspx" />
     <Content Include="Accounts\Admin\Home.aspx" />
     <Content Include="Accounts\Admin\Notifications.aspx" />
     <Content Include="Accounts\Admin\ReviewUser.aspx" />
     <Content Include="Accounts\Admin\ReviewUsers.aspx" />
+    <Content Include="Accounts\Admin\ViewProject.aspx" />
+    <Content Include="Accounts\Admin\ViewSprintTask.aspx" />
+    <Content Include="Accounts\Admin\ViewUserStory.aspx" />
     <Content Include="Accounts\Developer\About.aspx" />
     <Content Include="Accounts\Developer\Account.aspx" />
     <Content Include="Accounts\Developer\ChangePassword.aspx" />
     <Content Include="Accounts\Developer\ChangeSecurityQuestions.aspx" />
     <Content Include="Accounts\Developer\Contact.aspx" />
     <Content Include="Accounts\Developer\MyProjects.aspx" />
+    <Content Include="Accounts\Developer\ViewProject.aspx" />
+    <Content Include="Accounts\Developer\ViewSprintTask.aspx" />
+    <Content Include="Accounts\Developer\ViewUserStory.aspx" />
     <Content Include="Accounts\Master\About.aspx" />
     <Content Include="Accounts\Master\Account.aspx" />
     <Content Include="Accounts\Master\ChangePassword.aspx" />
@@ -291,6 +298,13 @@
     <Compile Include="Accounts\Admin\Contact.aspx.designer.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Accounts\Admin\EditProject.aspx.cs">
+      <DependentUpon>EditProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\EditProject.aspx.designer.cs">
+      <DependentUpon>EditProject.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Accounts\Admin\Home.aspx.cs">
       <DependentUpon>Home.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -318,6 +332,27 @@
     </Compile>
     <Compile Include="Accounts\Admin\ReviewUsers.aspx.designer.cs">
       <DependentUpon>ReviewUsers.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ViewProject.aspx.cs">
+      <DependentUpon>ViewProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ViewProject.aspx.designer.cs">
+      <DependentUpon>ViewProject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ViewSprintTask.aspx.cs">
+      <DependentUpon>ViewSprintTask.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ViewSprintTask.aspx.designer.cs">
+      <DependentUpon>ViewSprintTask.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Admin\ViewUserStory.aspx.cs">
+      <DependentUpon>ViewUserStory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\ViewUserStory.aspx.designer.cs">
+      <DependentUpon>ViewUserStory.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Developer\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
@@ -360,6 +395,27 @@
     </Compile>
     <Compile Include="Accounts\Developer\MyProjects.aspx.designer.cs">
       <DependentUpon>MyProjects.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Developer\ViewProject.aspx.cs">
+      <DependentUpon>ViewProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Developer\ViewProject.aspx.designer.cs">
+      <DependentUpon>ViewProject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Developer\ViewSprintTask.aspx.cs">
+      <DependentUpon>ViewSprintTask.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Developer\ViewSprintTask.aspx.designer.cs">
+      <DependentUpon>ViewSprintTask.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Developer\ViewUserStory.aspx.cs">
+      <DependentUpon>ViewUserStory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Developer\ViewUserStory.aspx.designer.cs">
+      <DependentUpon>ViewUserStory.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Master\About.aspx.cs">
       <DependentUpon>About.aspx</DependentUpon>
