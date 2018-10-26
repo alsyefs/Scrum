@@ -369,7 +369,7 @@ namespace Scrum.Accounts.Developer
         {
             string sprintTaskId = e.CommandName;
             string sprintTaskUniqueId = e.CommandArgument.ToString();
-            lblRemoveSprintTaskMessage.Text = "Are you sure you want to remove the sprint task# " + sprintTaskUniqueId + "?";
+            lblRemoveSprintTaskMessage.Text = "Are you sure you want to archive the sprint task# " + sprintTaskUniqueId + "?";
             lblSprintTaskId.Text = sprintTaskId;
             divRemoveSprintTask.Visible = true;
         }
@@ -422,10 +422,10 @@ namespace Scrum.Accounts.Developer
                 dt.Columns.Add("Current status", typeof(string));
                 dt.Columns.Add("Creator User ID", typeof(string));
                 dt.Columns.Add("DB Sprint Task ID", typeof(string));
-                dt.Columns.Add("Remove User Story", typeof(string));
+                dt.Columns.Add("Archive Sprint Task", typeof(string));
                 string id = "", sprintTask_uniqueId = "", userStoryUniqueId = "", taskDescription = "", dateIntroduced = "", dateConsidered = "", dateCompleted = "",
                     developersResponsible = "", currentStatus = "";
-                string creatorId = "", removeSprintTaskCommand = " Remove ";
+                string creatorId = "", removeSprintTaskCommand = " Archive ";
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
                 for (int i = 1; i <= countUserStories; i++)
@@ -649,8 +649,8 @@ namespace Scrum.Accounts.Developer
                 int memberOfProject = Convert.ToInt32(cmd.ExecuteScalar());
                 if (memberOfProject == 1)//If the user searched for is a member of the current project
                 {
-                    //add the searched user if his/her account is active, and the user is not the current user searching:
-                    if (temp_isActive == 1 && int_loginId != temp_loginId)
+                    //add the searched user if his/her account is active //, and the user is not the current user searching:
+                    if (temp_isActive == 1)// && int_loginId != temp_loginId)
                     {
                         searchedUsers.Add(temp_userId);
                         drpFindUser.Items.Add(++counter + " " + temp_user);
@@ -663,6 +663,10 @@ namespace Scrum.Accounts.Developer
         protected void btnSaveSprintTask_Click(object sender, EventArgs e)
         {
             hideErrorLabels();
+            if (!string.IsNullOrWhiteSpace(lblListOfUsers.Text))
+            {
+                lblListOfUsers.Visible = true;
+            }
             if (correctInput())
             {
                 //storeInDB();
@@ -731,11 +735,11 @@ namespace Scrum.Accounts.Developer
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
             //Note: by adding the user to this table, he/she is given access to the newly-created table.
-            //Add the creator to UsersForSprintTasks table.
-            //Add the current user to the sprint task:
-            cmd.CommandText = "insert into UsersForSprintTasks (userId, sprintTaskId, usersForSprintTasks_isNotified) values " +
-                    "('" + userId + "', '" + sprintTaskId + "', '0')";
-            cmd.ExecuteScalar();
+            ////Add the creator to UsersForSprintTasks table.
+            ////Add the current user to the sprint task:
+            //cmd.CommandText = "insert into UsersForSprintTasks (userId, sprintTaskId, usersForSprintTasks_isNotified) values " +
+            //        "('" + userId + "', '" + sprintTaskId + "', '0')";
+            //cmd.ExecuteScalar();
             //Add the list of selected developers to the sprint task:
             for (int i = 0; i < usersToAdd.Count; i++)
             {
@@ -955,19 +959,63 @@ namespace Scrum.Accounts.Developer
                 lblTaskDescriptionError.Text = "Invalid input: Please type something for \"Task description\" .";
                 lblTaskDescriptionError.Visible = true;
             }
-            int differenceInDays = (calDateIntroduced.SelectedDate - DateTime.Now).Days;
-            if (differenceInDays < 0)
-            {
-                correct = false;
-                lblDateIntroducedError.Visible = true;
-                lblDateIntroducedError.Text = "Invalid input: Please select a date starting from now.";
-            }
-            differenceInDays = (calDateConsidered.SelectedDate - DateTime.Now).Days;
-            if (differenceInDays < 0)
+            //Check the start date of the project:
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select project_startedDate from Projects where projectId = '" + g_projectId + "' ";
+            DateTime project_startedDate = DateTime.Parse(cmd.ExecuteScalar().ToString());
+            cmd.CommandText = "select userStory_dateIntroduced from UserStories where userStoryId = '" + userStoryId + "' ";
+            DateTime userStory_dateIntroduced = DateTime.Parse(cmd.ExecuteScalar().ToString());
+            cmd.CommandText = "select userStory_dateConsideredForImplementation from UserStories where userStoryId = '" + userStoryId + "' ";
+            DateTime userStory_dateConsideredForImplementation = DateTime.Parse(cmd.ExecuteScalar().ToString());
+            connect.Close();
+            int differenceInDaysFromNow = (calDateIntroduced.SelectedDate - DateTime.Now).Days;
+            int differenceFromProjectStartDateToDateIntroduced = (calDateIntroduced.SelectedDate - project_startedDate).Days;
+            int differenceFromProjectStartDateToDateConsidered = (calDateConsidered.SelectedDate - project_startedDate).Days;
+            int differenceFromUserStoryDateConsideredToSprintTaskDateConsidered = (calDateConsidered.SelectedDate - userStory_dateConsideredForImplementation).Days;
+            int differenceFromUserStoryDateIntroducedDateToSprintTaskDateIntroduced = (calDateIntroduced.SelectedDate - userStory_dateIntroduced).Days;
+            if (differenceFromProjectStartDateToDateConsidered < 0)
             {
                 correct = false;
                 lblDateConsideredError.Visible = true;
-                lblDateConsideredError.Text = "Invalid input: Please select a date starting from now.";
+                lblDateConsideredError.Text = "Invalid input: Please select a date starting after the project's start date (" + Layouts.getTimeFormat(project_startedDate.ToString()) + ").";
+            }
+            if (differenceFromProjectStartDateToDateIntroduced < 0)
+            {
+                correct = false;
+                lblDateConsideredError.Visible = true;
+                lblDateConsideredError.Text = "Please wait until the project's start date (" + Layouts.getTimeFormat(project_startedDate.ToString()) + ").";
+            }
+            if (differenceFromProjectStartDateToDateIntroduced > 0 && differenceFromProjectStartDateToDateConsidered > 0)
+            {
+                if (differenceFromUserStoryDateConsideredToSprintTaskDateConsidered < 0)
+                {
+                    correct = false;
+                    lblDateConsideredError.Visible = true;
+                    lblDateConsideredError.Text = "Invalid input: Please select a date starting after the user story's considered date (" + Layouts.getTimeFormat(userStory_dateConsideredForImplementation.ToString()) + ").";
+                }
+                if (differenceFromUserStoryDateIntroducedDateToSprintTaskDateIntroduced < 0)
+                {
+                    correct = false;
+                    lblDateConsideredError.Visible = true;
+                    lblDateConsideredError.Text = "Please wait until the user story's start date (" + Layouts.getTimeFormat(userStory_dateIntroduced.ToString()) + ").";
+                }
+                if (differenceFromUserStoryDateConsideredToSprintTaskDateConsidered > 0 && differenceFromUserStoryDateIntroducedDateToSprintTaskDateIntroduced > 0)
+                {
+                    if (differenceInDaysFromNow < 0)
+                    {
+                        correct = false;
+                        lblDateIntroducedError.Visible = true;
+                        lblDateIntroducedError.Text = "Invalid input: Please select a date starting from now.";
+                    }
+                    differenceInDaysFromNow = (calDateConsidered.SelectedDate - DateTime.Now).Days;
+                    if (differenceInDaysFromNow < 0)
+                    {
+                        correct = false;
+                        lblDateConsideredError.Visible = true;
+                        lblDateConsideredError.Text = "Invalid input: Please select a date starting from now.";
+                    }
+                }
             }
             if (drpCurrentStatus.SelectedIndex == 0)
             {
@@ -975,7 +1023,12 @@ namespace Scrum.Accounts.Developer
                 lblCurrentStatusError.Visible = true;
                 lblCurrentStatusError.Text = "Invalid input: Please select a status for this sprint task.";
             }
-
+            if (usersToAdd.Count == 0)
+            {
+                correct = false;
+                lblDeveloperResponsibleError.Visible = true;
+                lblDeveloperResponsibleError.Text = "Invalid input: Please add at least one developer.";
+            }
             return correct;
         }
         protected void btnGoBack_Click(object sender, EventArgs e)

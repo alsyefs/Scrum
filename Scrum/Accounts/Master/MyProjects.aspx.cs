@@ -89,32 +89,39 @@ namespace Scrum.Accounts.Master
                 grdProjects.Rows[i].Cells[3].Visible = false;
             }
             connect.Open();
-            SqlCommand cmd = connect.CreateCommand();
-            string project_name = "", createdBy = "", createdOn = "", creatorId = "";
-            for (int row = 0; row < grdProjects.Rows.Count; row++)
+            try
             {
-                //Set links to review a user:
-                project_name = grdProjects.Rows[row].Cells[0].Text;
-                createdBy = grdProjects.Rows[row].Cells[1].Text;
-                createdOn = grdProjects.Rows[row].Cells[2].Text;
-                creatorId = grdProjects.Rows[row].Cells[3].Text;
-                //Get the Project ID:
-                cmd.CommandText = "select [projectId] from [Projects] where project_name like '" + project_name + "' and " +
-                    "project_createdDate = '" + Layouts.getOriginalTimeFormat(createdOn) + "' and project_createdBy = '" + creatorId + "' ";
-                string id = cmd.ExecuteScalar().ToString();
-                //string linkToReviewUser = "ReviewUser.aspx?id=" + id;
-                HyperLink projectLink = new HyperLink();
-                HyperLink userLink = new HyperLink();
-                HyperLink dateLink = new HyperLink();
-                projectLink.Text = project_name + " ";
-                userLink.Text = createdBy + " ";
-                dateLink.Text = Layouts.getTimeFormat(createdOn) + " ";
-                projectLink.NavigateUrl = "ViewProject.aspx?id=" + id;
-                userLink.NavigateUrl = "Profile.aspx?id=" + creatorId;
-                dateLink.NavigateUrl = "ViewProject.aspx?id=" + id;
-                grdProjects.Rows[row].Cells[0].Controls.Add(projectLink);
-                grdProjects.Rows[row].Cells[1].Controls.Add(userLink);
-                grdProjects.Rows[row].Cells[2].Controls.Add(dateLink);
+                SqlCommand cmd = connect.CreateCommand();
+                string project_name = "", createdBy = "", createdOn = "", creatorId = "";
+                for (int row = 0; row < grdProjects.Rows.Count; row++)
+                {
+                    //Set links to review a user:
+                    project_name = grdProjects.Rows[row].Cells[0].Text;
+                    createdBy = grdProjects.Rows[row].Cells[1].Text;
+                    createdOn = grdProjects.Rows[row].Cells[2].Text;
+                    creatorId = grdProjects.Rows[row].Cells[3].Text;
+                    //Get the Project ID:
+                    cmd.CommandText = "select [projectId] from [Projects] where project_name like '" + project_name + "' and " +
+                        "project_createdDate = '" + Layouts.getOriginalTimeFormat(createdOn) + "' and project_createdBy = '" + creatorId + "' ";
+                    string id = cmd.ExecuteScalar().ToString();
+                    //string linkToReviewUser = "ReviewUser.aspx?id=" + id;
+                    HyperLink projectLink = new HyperLink();
+                    HyperLink userLink = new HyperLink();
+                    HyperLink dateLink = new HyperLink();
+                    projectLink.Text = project_name + " ";
+                    userLink.Text = createdBy + " ";
+                    dateLink.Text = Layouts.getTimeFormat(createdOn) + " ";
+                    projectLink.NavigateUrl = "ViewProject.aspx?id=" + id;
+                    userLink.NavigateUrl = "Profile.aspx?id=" + creatorId;
+                    dateLink.NavigateUrl = "ViewProject.aspx?id=" + id;
+                    grdProjects.Rows[row].Cells[0].Controls.Add(projectLink);
+                    grdProjects.Rows[row].Cells[1].Controls.Add(userLink);
+                    grdProjects.Rows[row].Cells[2].Controls.Add(dateLink);
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error: "+e.ToString());
             }
             connect.Close();
         }

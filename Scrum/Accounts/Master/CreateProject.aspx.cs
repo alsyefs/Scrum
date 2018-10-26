@@ -326,7 +326,8 @@ namespace Scrum.Accounts.Master
                 lblDescriptionError.Text = "Input Error: Please type something for the description.";
             }
             //Check for the correct start date and ensure that it's in the future:
-            if (calStartDate.SelectedDate.Day < DateTime.Now.Day)
+            int differenceInDays = (calStartDate.SelectedDate - DateTime.Now).Days;
+            if (differenceInDays < 0)
             {
                 correct = false;
                 lblStartDateError.Visible = true;

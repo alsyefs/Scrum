@@ -98,7 +98,7 @@ namespace Scrum
             int int_roleId = Convert.ToInt32(roleId);
             if (createdByUserId.Equals(userId) || int_roleId == 1 || int_roleId == 2)
             {
-                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeUserStory('" + userStoryId + "', '" + createdByUserId + "')\">Remove User Story </button>";
+                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeUserStory('" + userStoryId + "', '" + createdByUserId + "')\">Archive User Story </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editUserStory('" + userStoryId + "')\" >Edit User Story </button>";
 
             }
@@ -158,7 +158,7 @@ namespace Scrum
             int int_roleId = Convert.ToInt32(roleId);
             if (sprintTask_createdBy.Equals(userId) || int_roleId == 1 || int_roleId == 2)
             {
-                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeSprintTask('" + sprintTaskId + "', '" + sprintTask_createdBy + "')\">Remove Sprint Task </button>";
+                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeSprintTask('" + sprintTaskId + "', '" + sprintTask_createdBy + "')\">Archive Sprint Task </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editSprintTask('" + sprintTaskId + "')\" >Edit Sprint Task </button>";
 
             }
@@ -222,7 +222,7 @@ namespace Scrum
                     //Get AM/PM:
                     string dayOrNight = "AM";
                     int int_hours = Convert.ToInt32(hours);
-                    if (int_hours > 12)
+                    if (int_hours >= 12)
                         dayOrNight = "PM";
                     //Change the hour format to 12-hour-format:
                     if (int_hours == 0)

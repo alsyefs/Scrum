@@ -91,7 +91,7 @@
                                     <td><asp:Label ID="lblInputParametersError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
                                 </tr>
                                 <tr>
-                                    <td><asp:Label ID="lblInputParametersList" runat="server" Text="Task Description" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                    <td><asp:Label ID="lblInputParametersList" runat="server" Text="Added parameters" Font-Size="Medium" Width="100%"></asp:Label></td>
                                     <td><asp:ListBox ID="drpInputParametersList" runat="server" Font-Size="Medium" Width="100%"></asp:ListBox>
                                         <asp:Button ID="btnRemoveParameter" runat="server" Text="Remove Parameter" Width="200px" ForeColor="red" Font-Bold="true" Font-Size="Medium" OnClick="btnRemoveParameter_Click" />
                                     </td>

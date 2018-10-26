@@ -47,7 +47,7 @@
                             <table style="width: 100%;">
                                 <tr>
                                     <td>
-                                        <asp:Label ID="lblUniqueUserStoryID" runat="server" Text="I want to (some goal)" Font-Size="Medium" Width="100%"></asp:Label></td>
+                                        <asp:Label ID="lblUniqueUserStoryID" runat="server" Text="User story unique ID" Font-Size="Medium" Width="100%"></asp:Label></td>
                                     <td>
                                         <asp:TextBox ID="txtUniqueUserStoryID" runat="server" Font-Size="Medium" Width="100%" Enabled="false"></asp:TextBox></td>
                                     <td>
@@ -138,8 +138,6 @@
                                             <asp:ListItem>Not started</asp:ListItem>
                                             <asp:ListItem>In progress</asp:ListItem>
                                             <asp:ListItem>Completed</asp:ListItem>
-                                            <asp:ListItem>In current sprint</asp:ListItem>
-                                            <asp:ListItem>revised</asp:ListItem>
                                         </asp:DropDownList></td>
                                     <td>
                                         <asp:Label ID="lblCurrentStatusError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>

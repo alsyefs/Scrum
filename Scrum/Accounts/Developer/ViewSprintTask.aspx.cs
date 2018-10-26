@@ -340,7 +340,7 @@ namespace Scrum.Accounts.Developer
                 currentStatusLink.Text = currentStatus + " ";
 
                 testCaseUIdLink.NavigateUrl = testCaseUrl;
-                userStoryUIdLink.NavigateUrl = testCaseUrl;
+                userStoryUIdLink.NavigateUrl = "ViewUserStory.aspx?id=" + g_userStoryId;
                 sprintTaskUIdLink.NavigateUrl = testCaseUrl;
                 testCaseScenarioLink.NavigateUrl = testCaseUrl;
                 parametersLink.NavigateUrl = testCaseUrl;
@@ -395,7 +395,7 @@ namespace Scrum.Accounts.Developer
         {
             string testCaseId = e.CommandName;
             string testCaseUniqueId = e.CommandArgument.ToString();
-            lblRemoveTestCaseMessage.Text = "Are you sure you want to remove the test case# " + testCaseUniqueId + "?";
+            lblRemoveTestCaseMessage.Text = "Are you sure you want to archive the test case# " + testCaseUniqueId + "?";
             lblTestCaseId.Text = testCaseId;
             divRemoveTestCase.Visible = true;
         }
@@ -444,9 +444,9 @@ namespace Scrum.Accounts.Developer
                 dt.Columns.Add("Current status", typeof(string));
                 dt.Columns.Add("Creator User ID", typeof(string));
                 dt.Columns.Add("DB Test Case ID", typeof(string));
-                dt.Columns.Add("Remove User Story", typeof(string));
+                dt.Columns.Add("Archive Test Case", typeof(string));
                 string testCase_uniqueId = "", userStoryUniqueId = "", sprintTask_uniqueId = "", testCaseScenario = "", inputParameters = "", expectedOutput = "", currentStatus = "";
-                string testCase_creatorId = "", testCaseId = "", removeTestCaseCommand = " Remove ";
+                string testCase_creatorId = "", testCaseId = "", removeTestCaseCommand = " Archive ";
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
                 for (int i = 1; i <= countTestCases; i++)
@@ -481,7 +481,7 @@ namespace Scrum.Accounts.Developer
                         else
                             inputParameters = inputParameters + ", " + parameter_name;
                     }
-                    dt.Rows.Add(testCase_uniqueId, sprintTask_uniqueId, userStoryUniqueId, testCaseScenario, inputParameters, expectedOutput, currentStatus, testCase_creatorId, testCaseId, removeTestCaseCommand);
+                    dt.Rows.Add(testCase_uniqueId, userStoryUniqueId, sprintTask_uniqueId, testCaseScenario, inputParameters, expectedOutput, currentStatus, testCase_creatorId, testCaseId, removeTestCaseCommand);
                     //Creator ID is not needed here, but it's used to uniquely identify the names in the system in case we have duplicate names.
                 }
                 connect.Close();
