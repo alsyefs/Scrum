@@ -50,7 +50,6 @@ namespace Scrum.Accounts.Master
                 showView();
             }
             createTable();
-            updateUniqueId();
             //The below to be used whenever needed in the other page:
             Session.Add("projectId", g_projectId);
             Session.Add("userStoryId", g_userStoryId);
@@ -611,6 +610,7 @@ namespace Scrum.Accounts.Master
                 sendEmail();
                 clearNewTestCaseInputs();
             }
+            updateUniqueId();
         }
         protected void sendEmail()
         {

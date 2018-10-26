@@ -49,7 +49,6 @@ namespace Scrum.Accounts.Admin
                 showView();
             }
             createTable();
-            updateUniqueId();
             //The below to be used whenever needed in the other page. Most likely to be used in ViewUserStory page:
             Session.Add("projectId", g_projectId);
             Session.Add("userStoryId", userStoryId);
@@ -575,6 +574,7 @@ namespace Scrum.Accounts.Admin
                 txtDeveloperResponsible.Text = "";
                 drpFindUser.Items.Clear();
                 lblFindUserResult.Text = "";
+                lblListOfUsers.Text = "";
                 drpCurrentStatus.SelectedIndex = 0;
                 if (searchedUsers != null)
                     searchedUsers.Clear();
@@ -674,6 +674,7 @@ namespace Scrum.Accounts.Admin
                 sendEmail();
                 clearNewSprintTaskInputs();
             }
+            updateUniqueId();
         }
         protected void sendEmail()
         {

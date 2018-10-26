@@ -49,7 +49,6 @@ namespace Scrum.Accounts.Admin
             }
             createTable();
             checkIfProjectTerminated();
-            updateUniqueId();
             //The below to be used whenever needed in the other page. Most likely to be used in ViewUserStory page:
             Session.Add("projectId", projectId);
         }
@@ -537,6 +536,7 @@ namespace Scrum.Accounts.Admin
                 txtDeveloperResponsible.Text = "";
                 drpFindUser.Items.Clear();
                 lblFindUserResult.Text = "";
+                lblListOfUsers.Text = "";
                 drpCurrentStatus.SelectedIndex = 0;
                 if (searchedUsers != null)
                     searchedUsers.Clear();
@@ -635,6 +635,9 @@ namespace Scrum.Accounts.Admin
                 sendEmail();
                 clearNewUserStoryInputs();
             }
+            //count the number of the current stories, then add one to the total
+            //So the new user story Unique ID will the resulting number:
+            updateUniqueId();
         }
         protected void sendEmail()
         {
