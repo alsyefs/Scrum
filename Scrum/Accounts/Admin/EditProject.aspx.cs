@@ -102,7 +102,8 @@ namespace Scrum.Accounts.Admin
             txtTitle.Text = project_name;
             txtDescription.Text = project_description;
             calStartDate.SelectedDate = Convert.ToDateTime(project_startedDate);
-            
+            calStartDate.TodaysDate = Convert.ToDateTime(project_startedDate);
+            hideOrShowCalendar();
         }
         protected void drpProjectUsers_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -110,6 +111,8 @@ namespace Scrum.Accounts.Admin
         }
         protected void btnRemoveProjectUser_Click(object sender, EventArgs e)
         {
+            lblRemoveUserError.Visible = false;
+            lblRemoveUserError.Text = "";
             try
             {
                 for (int i = drpProjectUsers.Items.Count; i >= 0; i--)
@@ -117,11 +120,45 @@ namespace Scrum.Accounts.Admin
                     int indexToRemove = drpProjectUsers.SelectedIndex;
                     if (indexToRemove > -1)
                     {
-                        drpProjectUsers.Items.RemoveAt(indexToRemove);
-                        usersToAdd.Remove(usersToAdd.ElementAt(indexToRemove));
+                        //Check if the selected developer is involved in something in the project:
+                        SqlCommand cmd = connect.CreateCommand();
+                        connect.Open();
+                        cmd.CommandText = "select count(*) from Projects " +
+                            "inner join userstories on UserStories.projectId = Projects.projectId " +
+                            "inner join UsersForUserStories on UserStories.userStoryId = UsersForUserStories.userStoryId " +
+                            "where userId = '" + usersToAdd.ElementAt(indexToRemove) + "' and UserStories.projectId = '" + projectId + "' ";
+                        int totalUserStories = Convert.ToInt32(cmd.ExecuteScalar());
+                        cmd.CommandText = "select count(*) " +
+                            "from UserStories " +
+                            "inner join SprintTasks on SprintTasks.userStoryId = UserStories.userStoryId " +
+                            "inner join UsersForSprintTasks on SprintTasks.sprintTaskId = UsersForSprintTasks.sprintTaskId " +
+                            "where userId = '" + usersToAdd.ElementAt(indexToRemove) + "' and UserStories.projectId = '" + projectId + "' ";
+                        int totalSprintTasks = Convert.ToInt32(cmd.ExecuteScalar());
+                        cmd.CommandText = "select count(*) from SprintTasks " +
+                            "inner join UserStories on SprintTasks.userStoryId = UserStories.userStoryId " +
+                            "inner join TestCases on TestCases.sprintTaskId = SprintTasks.sprintTaskId " +
+                            "inner join UsersForTestCases on TestCases.testCaseId = UsersForTestCases.testCaseId " +
+                            "where userId = '" + usersToAdd.ElementAt(indexToRemove) + "' and UserStories.projectId = '" + projectId + "' ";
+                        int totalTestCases = Convert.ToInt32(cmd.ExecuteScalar());
+                        connect.Close();
+                        //If he/she is not involved in anything, allow the deletion:
+                        if (totalUserStories == 0 && totalSprintTasks == 0 && totalTestCases == 0)
+                        {
+                            drpProjectUsers.Items.RemoveAt(indexToRemove);
+                            usersToAdd.Remove(usersToAdd.ElementAt(indexToRemove));
+                        }
+                        else
+                        {
+                            string name = drpProjectUsers.SelectedItem.ToString();
+                            lblRemoveUserError.Visible = true;
+                            lblRemoveUserError.Text = name + " is invloved in \"" + totalUserStories + "\" user stories, \"" + totalSprintTasks + "\" sprint tasks," +
+                                " and \"" + totalTestCases + "\" test cases.<br/>";
+                        }
                     }
                 }
-            }catch(Exception ex){
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Error: " + ex);
             }
 
@@ -415,10 +452,22 @@ namespace Scrum.Accounts.Admin
             //Get the current user's ID:
             cmd.CommandText = "select userId from Users where loginId = '" + loginId + "' ";
             string userId = cmd.ExecuteScalar().ToString();
-            cmd.CommandText = "update Projects set project_name = '"+ project_name + "', project_description='"+ description + "' where projectId = '"+projectId+"' ";
+            string startDate = calStartDate.SelectedDate.ToString();
+            cmd.CommandText = "update Projects set project_name = '" + project_name + "', project_description='" + description + "' ," +
+                "project_startedDate = '" + startDate + "' where projectId = '" + projectId + "' ";
             cmd.ExecuteScalar();
             connect.Close();
             return projectId;
+        }
+        protected void hideOrShowCalendar()
+        {
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select count(*) from UserStories where projectId = '" + projectId + "' ";
+            int countUserStoriesForProject = Convert.ToInt32(cmd.ExecuteScalar());
+            connect.Close();
+            calStartDate.Visible = (countUserStoriesForProject > 0) ? false : true;
+            lblStartDate.Visible = (calStartDate.Visible) ? true : false;
         }
         protected Boolean checkInput()
         {
@@ -437,13 +486,17 @@ namespace Scrum.Accounts.Admin
                 lblDescriptionError.Visible = true;
                 lblDescriptionError.Text = "Input Error: Please type something for the description.";
             }
-            ////Check for the correct start date and ensure that it's in the future:
-            //if (calStartDate.SelectedDate.Day < DateTime.Now.Day)
-            //{
-            //    correct = false;
-            //    lblStartDateError.Visible = true;
-            //    lblStartDateError.Text = "Input Error: Please select a current or future start date.";
-            //}
+            if (calStartDate.Visible)
+            {
+                //Check for the correct start date and ensure that it's in the future:
+                int differenceInDays = (calStartDate.SelectedDate - DateTime.Now).Days;
+                if (differenceInDays < 0)
+                {
+                    correct = false;
+                    lblStartDateError.Visible = true;
+                    lblStartDateError.Text = "Input Error: Please select a current or future start date.";
+                }
+            }
             return correct;
         }
         protected void hideErrorLabels()

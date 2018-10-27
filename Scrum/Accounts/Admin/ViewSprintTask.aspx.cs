@@ -49,7 +49,10 @@ namespace Scrum.Accounts.Admin
                 getSprintTaskInfo();
                 showView();
             }
-            createTable();
+            if (!AddNewTestCase.Visible)
+            {
+                createTable();
+            }
             //The below to be used whenever needed in the other page:
             Session.Add("projectId", g_projectId);
             Session.Add("userStoryId", g_userStoryId);
@@ -571,6 +574,8 @@ namespace Scrum.Accounts.Admin
                 Console.WriteLine("Error: " + e);
             }
             txtUniqueTestCaseID.Text = newId;
+            drpCurrentStatus.SelectedIndex = 1;
+            drpCurrentStatus.Enabled = false;
         }
         protected void clearNewTestCaseInputs()
         {
@@ -988,7 +993,10 @@ namespace Scrum.Accounts.Admin
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
                 //update the DB and set isDeleted = true:
-                cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1 where sprintTaskId = '" + sprintTaskId + "' ";
+                cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1, sprintTask_currentStatus = 'Archived' where sprintTaskId = '" + sprintTaskId + "' ";
+                cmd.ExecuteScalar();
+                //Update all test cases related to the deleted sprint task:
+                cmd.CommandText = "update TestCases set testCase_isDeleted = 1, testCase_currentStatus = 'Archived'  where sprintTaskId = '" + sprintTaskId + "'  ";
                 cmd.ExecuteScalar();
                 //Email the Sprint task creator about the project being deleted:
                 cmd.CommandText = "select sprintTask_createdBy from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
@@ -1011,7 +1019,7 @@ namespace Scrum.Accounts.Admin
                 string emailTo = cmd.ExecuteScalar().ToString();
                 connect.Close();
                 string emailBody = "Hello " + name + ",\n\n" +
-                    "This email is to inform you that your sprint task#("+sprintTaskUID+") for user story#(" + userStoryUID + ") in the project (" + project_name + ") has been deleted. If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
+                    "This email is to inform you that your sprint task#(" + sprintTaskUID + ") for user story#(" + userStoryUID + ") in the project (" + project_name + ") has been deleted. If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
                     "Best regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
                 Email email = new Email();
                 email.sendEmail(emailTo, emailBody);

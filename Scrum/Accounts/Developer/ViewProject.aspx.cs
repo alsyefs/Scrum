@@ -47,8 +47,11 @@ namespace Scrum.Accounts.Developer
                 getProjectInfo();
                 showView();
             }
-            createTable();
-            checkIfProjectTerminated();
+            if (!AddNewUserStory.Visible)
+            {
+                createTable();
+                checkIfProjectTerminated();
+            }
             //The below to be used whenever needed in the other page. Most likely to be used in ViewUserStory page:
             Session.Add("projectId", projectId);
         }
@@ -521,6 +524,8 @@ namespace Scrum.Accounts.Developer
                 Console.WriteLine("Error: " + e);
             }
             txtUniqueUserStoryID.Text = newId;
+            drpCurrentStatus.Enabled = false;
+            drpCurrentStatus.SelectedIndex = 1;
         }
         protected void clearNewUserStoryInputs()
         {

@@ -48,7 +48,10 @@ namespace Scrum.Accounts.Developer
                 getUserStoryInfo();
                 showView();
             }
-            createTable();
+            if (!AddNewSprintTask.Visible)
+            {
+                createTable();
+            }
             //The below to be used whenever needed in the other page. Most likely to be used in ViewUserStory page:
             Session.Add("projectId", g_projectId);
             Session.Add("userStoryId", userStoryId);
@@ -562,6 +565,8 @@ namespace Scrum.Accounts.Developer
                 Console.WriteLine("Error: " + e);
             }
             txtUniqueSprintTaskID.Text = newId;
+            drpCurrentStatus.SelectedIndex = 1;
+            drpCurrentStatus.Enabled = false;
         }
         protected void clearNewSprintTaskInputs()
         {
@@ -1093,8 +1098,21 @@ namespace Scrum.Accounts.Developer
                 connect.Open();
                 SqlCommand cmd = connect.CreateCommand();
                 //update the DB and set isDeleted = true:
-                cmd.CommandText = "update UserStories set userStory_isDeleted = 1 where userStoryId = '" + userStoryId + "' ";
+                cmd.CommandText = "update UserStories set userStory_isDeleted = 1, userStory_currentStatus = 'Archived'  where userStoryId = '" + userStoryId + "' ";
                 cmd.ExecuteScalar();
+                //Update all sprint tasks related to the deleted user story:
+                cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1, sprintTask_currentStatus = 'Archived' where userStoryId = '" + userStoryId + "'  ";
+                cmd.ExecuteScalar();
+                //Update all test cases related to the deleted sprint tasks of the selected user story:
+                cmd.CommandText = "select count(*) from SprintTasks where userStoryId = '" + userStoryId + "' ";
+                int totalTestCases = Convert.ToInt32(cmd.ExecuteScalar());
+                for (int i = 1; i <= totalTestCases; i++)
+                {
+                    cmd.CommandText = "select [sprintTaskId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY sprintTaskId ASC), * FROM [SprintTasks] where userStoryId = '" + userStoryId + "' ) as t where rowNum = '" + i + "'";
+                    string temp_sprintTaskId = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "update TestCases set testCase_isDeleted = 1, testcase_currentStatus = 'Archived'  where sprintTaskId = '" + temp_sprintTaskId + "'  ";
+                    cmd.ExecuteScalar();
+                }
                 //Email the project creator about the project being deleted:
                 cmd.CommandText = "select userStory_createdBy from UserStories where userStoryId = '" + userStoryId + "' ";
                 string creatorId = cmd.ExecuteScalar().ToString();

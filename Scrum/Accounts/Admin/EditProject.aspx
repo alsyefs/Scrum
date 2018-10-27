@@ -76,8 +76,11 @@
                             </tr>
                             <tr>
                                 <td><asp:Label ID="lblCurrentUsers" runat="server" Text="Selected users" Width="100%"></asp:Label></td>
-                                <td><asp:ListBox ID="drpProjectUsers" runat="server" Width="100%" SelectionMode="Multiple" Height="250px"></asp:ListBox></td>
-                                <td><asp:Button ID="btnRemoveProjectUser" runat="server" Text="Remove selected User" ForeColor="Red" Width="220px" Font-Size="Medium" OnClick="btnRemoveProjectUser_Click" /></td>
+                                <td><asp:ListBox ID="drpProjectUsers" runat="server" Width="100%" Height="250px"></asp:ListBox></td>
+                                <td><asp:Button ID="btnRemoveProjectUser" runat="server" Text="Remove selected User" ForeColor="Red" Width="220px" Font-Size="Medium" OnClick="btnRemoveProjectUser_Click" />
+                                    <br />
+                                    <asp:Label ID="lblRemoveUserError" runat="server" Text="" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
+                                </td>
                             </tr>
                         </table>
                         <table style="width: 100%">

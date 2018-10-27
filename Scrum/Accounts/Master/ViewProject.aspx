@@ -18,7 +18,7 @@
                             <br />
                             <asp:Label ID="lblMessage" runat="server" Text="There are no user stories to display!" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
                             <div id="table">
-                                <asp:GridView ID="grdUserStories" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="20" AllowPaging="True" OnPageIndexChanging="grdUserStories_PageIndexChanging">
+                                <asp:GridView ID="grdUserStories" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="10" AllowPaging="True" OnPageIndexChanging="grdUserStories_PageIndexChanging">
                                     <AlternatingRowStyle BackColor="White" />
                                     <FooterStyle BackColor="#CCCC99" />
                                     <HeaderStyle BackColor="#6B696B" Font-Bold="True" ForeColor="White" />
@@ -108,7 +108,7 @@
                                     <td>
                                         <asp:Label ID="lblDateConsidered" runat="server" Text="Date considered for implementation" Font-Size="Medium" Width="100%"></asp:Label></td>
                                     <td>
-                                        <asp:Calendar ID="calDateConsidered" runat="server" Font-Size="Medium" Width="100%" OnSelectionChanged="calDateConsidered_SelectionChanged" OnDayRender="dayRender"></asp:Calendar>
+                                        <asp:Calendar ID="calDateConsidered" runat="server" Font-Size="Medium" Width="100%"  OnDayRender="dayRender"></asp:Calendar>
                                     </td>
                                     <td>
                                         <asp:Label ID="lblDateConsideredError" runat="server" Text="Label" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label></td>
@@ -177,8 +177,8 @@
                         <asp:AsyncPostBackTrigger ControlID="btnGoBack" EventName="Click" />
                         <asp:AsyncPostBackTrigger ControlID="btnSaveUserStory" EventName="Click" />
                         <asp:AsyncPostBackTrigger ControlID="btnGoBackToListOfUserStories" EventName="Click" />
-                        <asp:AsyncPostBackTrigger ControlID="calDateIntroduced" EventName="SelectionChanged" />
-                        <asp:AsyncPostBackTrigger ControlID="calDateConsidered" EventName="SelectionChanged" />
+                        <%--<asp:AsyncPostBackTrigger ControlID="calDateIntroduced" EventName="SelectionChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="calDateConsidered" EventName="SelectionChanged" />--%>
                         <asp:AsyncPostBackTrigger ControlID="txtDeveloperResponsible" EventName="TextChanged" />
                         <asp:AsyncPostBackTrigger ControlID="drpFindUser" EventName="SelectedIndexChanged" />
                         <asp:AsyncPostBackTrigger ControlID="btnAddUserToList" EventName="Click" />

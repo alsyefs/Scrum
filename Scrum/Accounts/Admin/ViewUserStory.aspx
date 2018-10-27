@@ -18,7 +18,7 @@
                             <br />
                             <asp:Label ID="lblMessage" runat="server" Text="There are no sprint tasks to display!" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
                             <div id="table">
-                                <asp:GridView ID="grdSprintTasks" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="20" AllowPaging="True" OnPageIndexChanging="grdSprintTasks_PageIndexChanging">
+                                <asp:GridView ID="grdSprintTasks" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="10" AllowPaging="True" OnPageIndexChanging="grdSprintTasks_PageIndexChanging">
                                     <AlternatingRowStyle BackColor="White" />
                                     <FooterStyle BackColor="#CCCC99" />
                                     <HeaderStyle BackColor="#6B696B" Font-Bold="True" ForeColor="White" />

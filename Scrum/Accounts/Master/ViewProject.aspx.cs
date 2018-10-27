@@ -47,8 +47,11 @@ namespace Scrum.Accounts.Master
                 getProjectInfo();
                 showView();
             }
-            createTable();
-            checkIfProjectTerminated();
+            if (!AddNewUserStory.Visible)
+            {
+                createTable();
+                checkIfProjectTerminated();
+            }
             //The below to be used whenever needed in the other page. Most likely to be used in ViewUserStory page:
             Session.Add("projectId", projectId);
         }
@@ -214,15 +217,6 @@ namespace Scrum.Accounts.Master
                     grdUserStories.Rows[i].Cells[8].Visible = false;
                     grdUserStories.Rows[i].Cells[9].Visible = false;
                 }
-                //if (int_roleId == 3)//3: Developer
-                //{
-                //    //Hide the header for removing the User Story commands:
-                //    grdUserStories.HeaderRow.Cells[10].Visible = false;
-                //    for (int i = 0; i < grdUserStories.Rows.Count; i++)
-                //    {
-                //        grdUserStories.Rows[i].Cells[10].Visible = false;
-                //    }
-                //}
             }
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
@@ -347,10 +341,10 @@ namespace Scrum.Accounts.Master
             //Delete the selected user story:
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
-            cmd.CommandText = "update UserStories set userStory_isDeleted = 1 where userStoryId = '" + userStoryIdToRemove + "'  ";
+            cmd.CommandText = "update UserStories set userStory_isDeleted = 1, userStory_currentStatus = 'Archived' where userStoryId = '" + userStoryIdToRemove + "'  ";
             cmd.ExecuteScalar();
             //Update all sprint tasks related to the deleted user story:
-            cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1 where userStoryId = '" + userStoryIdToRemove + "'  ";
+            cmd.CommandText = "update SprintTasks set sprintTask_isDeleted = 1, sprintTask_currentStatus = 'Archived' where userStoryId = '" + userStoryIdToRemove + "'  ";
             cmd.ExecuteScalar();
             //Update all test cases related to the deleted sprint tasks of the selected user story:
             cmd.CommandText = "select count(*) from SprintTasks where userStoryId = '" + userStoryIdToRemove + "' ";
@@ -359,7 +353,7 @@ namespace Scrum.Accounts.Master
             {
                 cmd.CommandText = "select [sprintTaskId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY sprintTaskId ASC), * FROM [SprintTasks] where userStoryId = '" + userStoryIdToRemove + "' ) as t where rowNum = '" + i + "'";
                 string temp_sprintTaskId = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "update TestCases set testCase_isDeleted = 1 where sprintTaskId = '" + temp_sprintTaskId + "'  ";
+                cmd.CommandText = "update TestCases set testCase_isDeleted = 1, testcase_currentStatus = 'Archived'  where sprintTaskId = '" + temp_sprintTaskId + "'  ";
                 cmd.ExecuteScalar();
             }
             connect.Close();
@@ -521,6 +515,8 @@ namespace Scrum.Accounts.Master
                 Console.WriteLine("Error: " + e);
             }
             txtUniqueUserStoryID.Text = newId;
+            drpCurrentStatus.Enabled = false;
+            drpCurrentStatus.SelectedIndex = 1;
         }
         protected void clearNewUserStoryInputs()
         {

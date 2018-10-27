@@ -38,8 +38,8 @@
                                 <td>
                                     <asp:Label ID="lblFileUpload" runat="server" Text="Select files" Width="100%" Visible="false"></asp:Label></td>
                                 <td>
-                                    <input type="file" id="FileUpload1" runat="server" multiple style="float: left; width: 70%; height: 34px;" onchange="onInputChange(event)" class="btn-primary" Visible="false">
-                                    <asp:Button ID="btnUpload" runat="server" Text="Upload" class=" btn-primary" Height="34px" Width="30%" Font-Bold="True" Font-Size="Medium" OnClick="btnUpload_Click" Visible="false" />
+                                    <input type="file" id="FileUpload1" runat="server" multiple style="float: left; width: 70%; height: 34px;" onchange="onInputChange(event)" class="btn-primary" Visible="false" />
+                                    <asp:Button ID="btnUpload" runat="server" Text="Upload" class=" btn-primary" Height="34px" Width="30%" Font-Bold="True" Font-Size="Medium" OnClick="btnUpload_Click" Visible="false"/>
                                 </td>
                                 <td>
                                     <div runat="server" clientidmode="Static" id='fileNames'></div>
@@ -49,9 +49,9 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <asp:Label ID="lblStartDate" runat="server" Text="Start date" Visible="false" Width="100%"></asp:Label></td>
+                                    <asp:Label ID="lblStartDate" runat="server" Text="Start date" Width="100%"></asp:Label></td>
                                 <td>
-                                    <asp:Calendar runat="server" ID="calStartDate" Width="100%" Visible="false" OnDayRender="dayRender"></asp:Calendar>
+                                    <asp:Calendar runat="server" ID="calStartDate" Width="100%" OnDayRender="dayRender"></asp:Calendar>
                                 </td>
                                 <td>
                                     <asp:Label ID="lblStartDateError" runat="server" Text="calendar" Visible="false" ForeColor="red"></asp:Label></td>
@@ -76,8 +76,11 @@
                             </tr>
                             <tr>
                                 <td><asp:Label ID="lblCurrentUsers" runat="server" Text="Selected users" Width="100%"></asp:Label></td>
-                                <td><asp:ListBox ID="drpProjectUsers" runat="server" Width="100%" SelectionMode="Multiple" Height="250px"></asp:ListBox></td>
-                                <td><asp:Button ID="btnRemoveProjectUser" runat="server" Text="Remove selected User" ForeColor="Red" Width="220px" Font-Size="Medium" OnClick="btnRemoveProjectUser_Click" /></td>
+                                <td><asp:ListBox ID="drpProjectUsers" runat="server" Width="100%" Height="250px"></asp:ListBox></td>
+                                <td><asp:Button ID="btnRemoveProjectUser" runat="server" Text="Remove selected User" ForeColor="Red" Width="220px" Font-Size="Medium" OnClick="btnRemoveProjectUser_Click" />
+                                    <br />
+                                    <asp:Label ID="lblRemoveUserError" runat="server" Text="" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
+                                </td>
                             </tr>
                         </table>
                         <table style="width: 100%">
@@ -95,7 +98,6 @@
                         </table>
                     </ContentTemplate>
                     <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="calStartDate" EventName="SelectionChanged" />
                         <asp:AsyncPostBackTrigger ControlID="btnSubmit" EventName="Click" />
                         <asp:PostBackTrigger ControlID="btnUpload" />
                         <asp:AsyncPostBackTrigger ControlID="txtDeveloperResponsible" EventName="TextChanged" />
