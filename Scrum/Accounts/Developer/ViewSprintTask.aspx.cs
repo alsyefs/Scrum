@@ -850,19 +850,39 @@ namespace Scrum.Accounts.Developer
         }
         protected void btnAddParameter_Click(object sender, EventArgs e)
         {
+            lblInputParametersError.Visible = false;
             //Check text for paramter:
-            if(string.IsNullOrWhiteSpace(txtInputParameters.Text))
+            if (string.IsNullOrWhiteSpace(txtInputParameters.Text))
             {
                 lblInputParametersError.Visible = true;
                 lblInputParametersError.Text = "Invalid input: Please type something for the input paramters before adding it.";
             }
             else
             {
-                //If passed the check, add the newly entered text:
-                string parameter = txtInputParameters.Text.Replace("'", "''");
-                drpInputParametersList.Items.Add(parameter);
-                //Clear the text entered for parameters and leave the second copy in the ListBox
-                txtInputParameters.Text = "";
+                bool noDuplicateParameter = true;
+                string parameter = txtInputParameters.Text;
+                parameter = parameter.TrimStart(' ').TrimEnd(' ');
+                //check if there is another duplicate parameter:
+                foreach (var p in drpInputParametersList.Items)
+                {
+                    if (p.ToString().Equals(parameter))
+                    {
+                        noDuplicateParameter = false;
+                    }
+                }
+                if (noDuplicateParameter)
+                {
+                    //If passed the check, add the newly entered text:
+                    parameter = parameter.Replace("'", "''");
+                    drpInputParametersList.Items.Add(parameter);
+                    //Clear the text entered for parameters and leave the second copy in the ListBox
+                    txtInputParameters.Text = "";
+                }
+                else
+                {
+                    lblInputParametersError.Visible = true;
+                    lblInputParametersError.Text = "Invalid input: The parameter you entered already exists, please type another parameter.";
+                }
             }
         }
         protected void btnRemoveParameter_Click(object sender, EventArgs e)
