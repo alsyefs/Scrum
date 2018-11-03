@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeBehind="ViewTestCase.aspx.cs" Inherits="Scrum.Accounts.Master.ViewTestCase" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Developer.Master" AutoEventWireup="true" CodeBehind="ViewTestCase.aspx.cs" Inherits="Scrum.Accounts.Developer.ViewTestCase" %>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
      <%--body start:--%>

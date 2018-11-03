@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Scrum.Accounts.Master {
+namespace Scrum.Accounts.Admin {
     
     
     public partial class EditUserStory {

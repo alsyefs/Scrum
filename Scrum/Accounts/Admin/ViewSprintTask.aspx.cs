@@ -51,12 +51,20 @@ namespace Scrum.Accounts.Admin
             }
             if (!AddNewTestCase.Visible)
             {
-                createTable();
+                try
+                {
+                    createTable();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.ToString());
+                }
             }
             //The below to be used whenever needed in the other page:
             Session.Add("projectId", g_projectId);
             Session.Add("userStoryId", g_userStoryId);
             Session.Add("sprintTaskId", g_sprintTaskId);
+            checkIfSprintTaskDeleted();
         }
         protected void initialPageAccess()
         {
@@ -261,13 +269,13 @@ namespace Scrum.Accounts.Admin
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
             //Count the existance of the sprint task:
-            cmd.CommandText = "select count(*) from SprintTasks where sprintTask = '" + g_sprintTaskId + "' ";
+            cmd.CommandText = "select count(*) from SprintTasks where sprintTaskId = '" + g_sprintTaskId + "' ";
             int count = Convert.ToInt32(cmd.ExecuteScalar());
             if (count > 0)//if count > 0, then the project ID exists in DB.
             {
-                cmd.CommandText = "select sprintTask_createdBy from SprintTasks where sprintTask = '" + g_sprintTaskId + "' ";
+                cmd.CommandText = "select sprintTask_createdBy from SprintTasks where sprintTaskId = '" + g_sprintTaskId + "' ";
                 string actual_creatorId = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select sprintTask_isDeleted from SprintTasks where sprintTask = '" + g_sprintTaskId + "' ";
+                cmd.CommandText = "select sprintTask_isDeleted from SprintTasks where sprintTaskId = '" + g_sprintTaskId + "' ";
                 int isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
                 if (isDeleted == 1)
                 {
@@ -437,7 +445,7 @@ namespace Scrum.Accounts.Admin
             {
                 lblMessage.Visible = false;
                 DataTable dt = new DataTable();
-                dt.Columns.Add("Test case ID", typeof(string));
+                dt.Columns.Add("Test case ID", typeof(double));
                 dt.Columns.Add("User story ID", typeof(string));
                 dt.Columns.Add("Sprint task ID", typeof(string));
                 dt.Columns.Add("Test case scenario", typeof(string));
@@ -489,6 +497,14 @@ namespace Scrum.Accounts.Admin
                 connect.Close();
                 grdTestCases.DataSource = dt;
                 grdTestCases.DataBind();
+                //Sort by "Test case ID" column in "ASC" ascending order:
+                if (dt != null)
+                {
+                    DataView dv = new DataView(dt);
+                    dv.Sort = "Test case ID" + " " + "ASC";
+                    grdTestCases.DataSource = dv;
+                    grdTestCases.DataBind();
+                }
                 rebindValues();
             }
         }
@@ -558,7 +574,7 @@ namespace Scrum.Accounts.Admin
                     List<string> theId = newId.Split('.').ToList<string>();
                     int tempId = Convert.ToInt32(theId.ElementAt(1));
                     ++tempId;
-                    int result = Convert.ToInt32(theId.ElementAt(0)) + tempId;
+                    int result = Convert.ToInt32(theId.ElementAt(0)) + 1;
                     newId = result.ToString();
                 }
                 else
@@ -584,7 +600,7 @@ namespace Scrum.Accounts.Admin
                 txtExpectedOutput.Text = "";
                 txtInputParameters.Text = "";
                 txtTestCaseScenario.Text = "";
-                drpCurrentStatus.SelectedIndex = 0;
+                drpCurrentStatus.SelectedIndex = 1;
                 drpInputParametersList.Items.Clear();
                 if (files != null)
                     files.Clear();
@@ -1020,6 +1036,47 @@ namespace Scrum.Accounts.Admin
                 connect.Close();
                 string emailBody = "Hello " + name + ",\n\n" +
                     "This email is to inform you that your sprint task#(" + sprintTaskUID + ") for user story#(" + userStoryUID + ") in the project (" + project_name + ") has been deleted. If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
+                    "Best regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
+                Email email = new Email();
+                email.sendEmail(emailTo, emailBody);
+            }
+        }
+        [WebMethod]
+        [ScriptMethod()]
+        public static void updateSprintTaskStatus_Click(string sprintTaskId, string entry_creatorId, string newStatus)
+        {
+            Configuration config = new Configuration();
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            bool userStoryIdExists = isSprintTaskCorrect(sprintTaskId, entry_creatorId);
+            if (userStoryIdExists)
+            {
+                connect.Open();
+                SqlCommand cmd = connect.CreateCommand();
+                //update the DB and set isDeleted = true:
+                cmd.CommandText = "update SprintTasks set sprintTask_currentStatus = '" + newStatus.Replace("'", "''") + "'  where sprintTaskId = '" + sprintTaskId + "' ";
+                cmd.ExecuteScalar();
+                //Email the Sprint task creator about the project being deleted:
+                cmd.CommandText = "select sprintTask_createdBy from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
+                string creatorId = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select sprintTask_uniqueId from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
+                string sprintTaskUID = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select userStoryId from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
+                string userStoryId = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + userStoryId + "' ";
+                string userStoryUID = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select projectId from UserStories where userStoryId = '" + userStoryId + "' ";
+                string projectId = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
+                string project_name = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select user_firstname from Users where userId = '" + creatorId + "' ";
+                string name = cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select user_lastname from Users where userId = '" + creatorId + "' ";
+                name = name + " " + cmd.ExecuteScalar().ToString();
+                cmd.CommandText = "select user_email from Users where userId = '" + creatorId + "' ";
+                string emailTo = cmd.ExecuteScalar().ToString();
+                connect.Close();
+                string emailBody = "Hello " + name + ",\n\n" +
+                    "This email is to inform you that the status of your sprint task#(" + sprintTaskUID + ") for user story#(" + userStoryUID + ") in the project (" + project_name + ") has been updated to (" + newStatus + "). If you think this happened by mistake, or you did not perform this action, plaese contact the support.\n\n" +
                     "Best regards,\nScrum Tool Support\nScrum.UWL@gmail.com";
                 Email email = new Email();
                 email.sendEmail(emailTo, emailBody);

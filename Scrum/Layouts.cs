@@ -51,6 +51,7 @@ namespace Scrum
                 "</div>";
             return header;
         }
+
         protected static string getProjectMembers(string projectId)
         {
             Configuration config = new Configuration();
@@ -94,19 +95,29 @@ namespace Scrum
             string deleteCommand = "";
             string profileLink = "Created by " + createdBy + " ";
             string editLink = "";
-            //Check if the user viewing the project is the creator, or if the current user viewing is an admin:
+            string statusLink = "";
+            string submitStatusLink = "";
+            //Check if the user viewing the project is a member of the user story, or if the current user viewing is an admin:
             int int_roleId = Convert.ToInt32(roleId);
-            if (createdByUserId.Equals(userId) || int_roleId == 1 || int_roleId == 2)
+            if (isUserStoryMember(userId, userStoryId) || int_roleId == 1 || int_roleId == 2)
             {
                 deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeUserStory('" + userStoryId + "', '" + createdByUserId + "')\">Archive User Story </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editUserStory('" + userStoryId + "')\" >Edit User Story </button>";
-
+                statusLink = "&nbsp;&nbsp;&nbsp;&nbsp;<select id=\"userStoryStatuses\">" +
+                    "<option value = \"Select a status\" > Select a status</option>" +
+                    "<option value = \"Not started\" > Not started </option>" +
+                    "<option value = \"In progress\" > In progress </option>" +
+                    "<option value = \"Completed\" > Completed </option>" +
+                    "</select> ";
+                submitStatusLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"updateStatus('" + userStoryId + "', '" + createdByUserId + "')\" >Update User Story Status</button>";
             }
             profileLink = " Created by <a href=\"Profile.aspx?id=" + createdByUserId + "\">" + createdBy + " </a>";
             if (userStory_isDeleted == 1)
             {
                 deleteCommand = "";
                 editLink = "";
+                statusLink = "";
+                submitStatusLink = "";
             }
             string usersForUserStory = getUserStoryMembers(userStoryId, userStoryMembers);
             
@@ -123,8 +134,24 @@ namespace Scrum
                 imagesHTML + "<br/></div>" +
                 deleteCommand +
                 editLink +
+                statusLink+
+                submitStatusLink+
                 "</div>";
             return header;
+        }
+        protected static bool isUserStoryMember(string userId, string userStoryId)
+        {
+            bool isMember = false;
+            Configuration config = new Configuration();
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select count(*) from UsersForUserStories where userId = '" + userId + "' and userStoryId = '"+userStoryId+"' ";
+            int exists = Convert.ToInt32(cmd.ExecuteScalar());
+            if (exists > 0)
+                isMember = true;
+            connect.Close();
+            return isMember;
         }
         protected static string getUserStoryMembers(string userStoryId, string[] userStoryMembers)
         {
@@ -142,6 +169,7 @@ namespace Scrum
             connect.Close();
             return members;
         }
+
         public static string sprintTaskHeader(string sprintTaskId, string roleId, string loginId, string userId, string userStoryId, string sprintTask_createdBy,
             string sprintTask_createdDate, string createdBy, string sprintTask_uniqueId, string sprintTask_taskDescription, string sprintTask_dateIntroduced, string sprintTask_dateConsideredForImplementation,
             int sprintTask_isDeleted, string imagesHTML, int sprintTask_hasImage, string sprintTask_currentStatus, string[] sprintTaskMembers, string userStoryUId,
@@ -154,19 +182,30 @@ namespace Scrum
             string deleteCommand = "";
             string profileLink = "Created by " + createdBy + " ";
             string editLink = "";
-            //Check if the user viewing the sprint task is the creator, or if the current user viewing is an admin:
+            string statusLink = "";
+            string submitStatusLink = "";
+            //Check if the user viewing the sprint task is a member of the sprint task, or if the current user viewing is an admin:
             int int_roleId = Convert.ToInt32(roleId);
-            if (sprintTask_createdBy.Equals(userId) || int_roleId == 1 || int_roleId == 2)
+            if (isSprintTaskMember(userId, sprintTaskId) || int_roleId == 1 || int_roleId == 2)
             {
                 deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeSprintTask('" + sprintTaskId + "', '" + sprintTask_createdBy + "')\">Archive Sprint Task </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editSprintTask('" + sprintTaskId + "')\" >Edit Sprint Task </button>";
-
+                statusLink = "&nbsp;&nbsp;&nbsp;&nbsp;<select id=\"userStoryStatuses\">" +
+                    "<option value = \"Select a status\" > Select a status</option>" +
+                    "<option value = \"Not started\" >Not started</option>" +
+                    "<option value = \"In progress\" >In progress</option>" +
+                    "<option value = \"In current sprint\" >In current sprint</option>" +
+                    "<option value = \"Completed\" > Completed</option>" +
+                    "</select> ";
+                submitStatusLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"updateStatus('" + sprintTaskId + "', '" + sprintTask_createdBy + "')\" >Update Sprint Task Status</button>";
             }
             profileLink = " Created by <a href=\"Profile.aspx?id=" + sprintTask_createdBy + "\">" + createdBy + " </a>";
             if (sprintTask_isDeleted == 1)
             {
                 deleteCommand = "";
                 editLink = "";
+                statusLink = "";
+                submitStatusLink = "";
             }
             string usersForSprintTask = getSprintTaskMembers(sprintTaskId, sprintTaskMembers);
 
@@ -183,8 +222,39 @@ namespace Scrum
                 imagesHTML + "<br/></div>" +
                 deleteCommand +
                 editLink +
+                statusLink +
+                submitStatusLink +
                 "</div>";
             return header;
+        }
+
+        protected static bool isSprintTaskMember(string userId, string sprintTaskId)
+        {
+            bool isMember = false;
+            Configuration config = new Configuration();
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select count(*) from UsersForSprintTasks where userId = '" + userId + "' and sprintTaskId = '" + sprintTaskId + "' ";
+            int exists = Convert.ToInt32(cmd.ExecuteScalar());
+            if (exists > 0)
+                isMember = true;
+            connect.Close();
+            return isMember;
+        }
+        protected static bool isTestCaseMember(string userId, string testCaseId)
+        {
+            bool isMember = false;
+            Configuration config = new Configuration();
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
+            cmd.CommandText = "select count(*) from UsersForTestCases where userId = '" + userId + "' and testCaseId = '" + testCaseId + "' ";
+            int exists = Convert.ToInt32(cmd.ExecuteScalar());
+            if (exists > 0)
+                isMember = true;
+            connect.Close();
+            return isMember;
         }
         protected static string getSprintTaskMembers(string sprintTaskId, string[] sprintTaskMembers)
         {
@@ -202,6 +272,61 @@ namespace Scrum
             connect.Close();
             return members;
         }
+        public static string testCaseHeader(string testCaseId, string sprintTaskId, string roleId, string loginId, string userId, string testCase_createdBy,
+            string testCase_createdDate, string createdBy, string testCase_uniqueId, string testCase_Scenario, string testCase_expectedOutput, string testCase_inputParameters,
+            int testCase_isDeleted, string imagesHTML, int testCase_hasImage, string testCase_currentStatus, string userStoryUId, string sprintTaskUId,
+            string testCase_editedBy, string testCase_editedDate, string testCase_previousVersion)
+        {
+            testCase_editedBy = (string.IsNullOrWhiteSpace(testCase_editedBy)) ? "Not edited" : testCase_editedBy;
+            testCase_editedDate = (string.IsNullOrWhiteSpace(testCase_editedDate)) ? "Not edited" : getTimeFormat(testCase_editedDate);
+            testCase_previousVersion = (string.IsNullOrWhiteSpace(testCase_previousVersion)) ? "No previous version" : testCase_previousVersion;
+            string deleteCommand = "";
+            string profileLink = "Created by " + createdBy + " ";
+            string editLink = "";
+            string statusLink = "";
+            string submitStatusLink = "";
+            //Check if the user viewing the sprint task is a member of the sprint task, or if the current user viewing is an admin:
+            int int_roleId = Convert.ToInt32(roleId);
+            if (isTestCaseMember(userId, testCaseId) || int_roleId == 1 || int_roleId == 2)
+            {
+                deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeTestCase('" + testCaseId + "', '" + testCase_createdBy + "')\">Archive Test Case </button>";
+                editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editTestCase('" + testCaseId + "')\" >Edit Test Case </button>";
+                statusLink = "&nbsp;&nbsp;&nbsp;&nbsp;<select id=\"statuses\">" +
+                    "<option value = \"Select a status\" > Select a status</option>" +
+                    "<option value = \"Not started\" >Not started</option>" +
+                    "<option value = \"Test failed\" >Test failed</option>" +
+                    "<option value = \"Test passed\" >Test passed</option>" +
+                    "<option value = \"Test needs revision\" >Test needs revision</option>" +
+                    "</select> ";
+                submitStatusLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"updateStatus('" + testCaseId + "', '" + testCase_createdBy + "')\" >Update Test Case Status</button>";
+            }
+            profileLink = " Created by <a href=\"Profile.aspx?id=" + testCase_createdBy + "\">" + createdBy + " </a>";
+            if (testCase_isDeleted == 1)
+            {
+                deleteCommand = "";
+                editLink = "";
+                statusLink = "";
+                submitStatusLink = "";
+            }
+            string messageContent = "<div class=\"userStoryHeaderTable\"><table style=\"border: 1px solid black;\" >" +
+                "<tr><th>Test case ID</th><th>User story ID</th> <th>Sprint Task ID</th> <th>Test case scenario</th> <th>Input parameters</th> <th>Expected output</th> <th>Current status</th></tr>" +
+                "<tr> <td>" + testCase_uniqueId + "</td> <td>" + userStoryUId + "</td> <td>" + sprintTaskUId + "</td> <td>" + testCase_Scenario + "</td> <td>" + testCase_inputParameters + "</td> <td>" + testCase_expectedOutput + "</td> <td>" + testCase_currentStatus + "</td> </tr>" +
+                "</table></div>";
+            string header =
+                "<div id=\"header\" >" +
+                "<div id=\"messageHead\" >" +
+                " Test Case ID:\"" + testCase_uniqueId + "\"" +
+                profileLink + " on (" + getTimeFormat(testCase_createdDate) + ") </div>" +
+                "<div id=\"messageDescription\"><br/>" + messageContent + "<br /><hr>" +
+                imagesHTML + "<br/></div>" +
+                deleteCommand +
+                editLink +
+                statusLink +
+                submitStatusLink +
+                "</div>";
+            return header;
+        }
+
         public static string getTimeFormat(string originalTime)
         {
             string format = "";

@@ -202,6 +202,46 @@
                     function editUserStory(userStoryId) {
                         window.location.href = "EditUserStory.aspx?userStoryId=" + userStoryId;
                     }
+                    function updateStatus(userStoryId, creatorId) {
+                        var e = document.getElementById("userStoryStatuses");
+                        var selectedStatus = e.options[e.selectedIndex].value;
+                        var index = e.options[e.selectedIndex].index;
+                        console.log(index);
+                        if (index == 0) {
+                            alert("Please, select a status to update");
+                        }
+                        else {
+                            if (confirm("Are you sure you want to update the status to '" + selectedStatus + "'?")) {
+                                updateUserStoryStatusConfirmed(userStoryId, creatorId, selectedStatus);
+                            }
+                        }
+                    }
+                    function updateUserStoryStatusConfirmed(userStoryId, creatorId, selectedStatus) {
+                        console.log(userStoryId +" "+ creatorId +" "+ selectedStatus);
+                        var userStoryID = parseInt(userStoryId);
+                        var creatorID = parseInt(creatorId);
+                        var obj = {
+                            userStoryId: userStoryID,
+                            entry_creatorId: creatorID,
+                            newStatus: selectedStatus
+                        };
+                        var param = JSON.stringify(obj);  // stringify the parameter
+                        $.ajax({
+                            method: "POST",
+                            url: '<%= ResolveUrl("ViewUserStory.aspx/updateUserStoryStatus_Click") %>',
+                            data: param,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            async: true,
+                            cache: false,
+                            success: function (msg) {
+                                window.location.href = window.location.href;
+                            },
+                            error: function (xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        });
+                    }
                 </script>
                 <%--Content end--%>
             </div>

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Edit User Story" Language="C#" MasterPageFile="~/Master.Master" AutoEventWireup="true" CodeBehind="EditUserStory.aspx.cs" Inherits="Scrum.Accounts.Master.EditUserStory" %>
+﻿<%@ Page Title="Edit User Story" Language="C#" MasterPageFile="~/Developer.Master" AutoEventWireup="true" CodeBehind="EditUserStory.aspx.cs" Inherits="Scrum.Accounts.Developer.EditUserStory" %>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <%--Body start--%>

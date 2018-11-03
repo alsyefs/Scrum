@@ -7,28 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Scrum.Accounts.Master {
+namespace Scrum.Accounts.Admin {
     
     
-    public partial class ViewTestCase {
-        
-        /// <summary>
-        /// upContent control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel upContent;
-        
-        /// <summary>
-        /// wait control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl wait;
+    public partial class Profile {
         
         /// <summary>
         /// View control.
@@ -40,30 +22,30 @@ namespace Scrum.Accounts.Master {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl View;
         
         /// <summary>
-        /// lblTestCaseInfo control.
+        /// lblRow control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTestCaseInfo;
+        protected global::System.Web.UI.WebControls.Label lblRow;
         
         /// <summary>
-        /// lblMessage control.
+        /// lblAdminCommands control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMessage;
+        protected global::System.Web.UI.WebControls.Label lblAdminCommands;
         
         /// <summary>
-        /// btnGoBack control.
+        /// btnCancel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGoBack;
+        protected global::System.Web.UI.WebControls.Button btnCancel;
     }
 }

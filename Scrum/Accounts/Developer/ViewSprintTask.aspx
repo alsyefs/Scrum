@@ -16,7 +16,7 @@
                             <%--Message to be displayed if there is nothing to show:--%>
                             <asp:Label ID="lblSprintTaskInfo" runat="server" Text=" " Font-Size="Medium" Font-Bold="true"></asp:Label>
                             <br />
-                            <asp:Label ID="lblMessage" runat="server" Text="There are no sprint tasks to display!" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
+                            <asp:Label ID="lblMessage" runat="server" Text="There are no test cases to display!" Visible="false" ForeColor="Red" Font-Size="Medium" Font-Bold="true"></asp:Label>
                             <div id="table">
                                 <asp:GridView ID="grdTestCases" runat="server" Width="100%" HorizontalAlign="Center" BackColor="White" BorderColor="#DEDFDE" BorderStyle="None" BorderWidth="1px" CellPadding="4" ForeColor="Black" GridLines="Vertical" PageSize="10" AllowPaging="True" OnPageIndexChanging="grdTestCases_PageIndexChanging">
                                     <AlternatingRowStyle BackColor="White" />
@@ -202,6 +202,47 @@
                     }
                     function editSprintTask(sprintTaskId) {
                         window.location.href = "EditSprintTask.aspx?sprintTaskId=" + sprintTaskId;
+                    }
+                    function updateStatus(sprintTaskId, creatorId) {
+                        var e = document.getElementById("userStoryStatuses");
+                        var selectedStatus = e.options[e.selectedIndex].value;
+                        var index = e.options[e.selectedIndex].index;
+                        console.log(index);
+                        if (index == 0) {
+                            alert("Please, select a status to update");
+                        }
+                        else {
+                            if (confirm("Are you sure you want to update the status to '" + selectedStatus + "'?")) {
+                                updateSprintTaskStatusConfirmed(sprintTaskId, creatorId, selectedStatus);
+                            }
+                        }
+                    }
+                    function updateSprintTaskStatusConfirmed(sprintTaskId, creatorId, selectedStatus) {
+                        console.log(sprintTaskId +" "+ creatorId +" "+ selectedStatus);
+                        var sprintTaskID = parseInt(sprintTaskId);
+                        var creatorID = parseInt(creatorId);
+                        var obj = {
+                            sprintTaskId: sprintTaskID,
+                            entry_creatorId: creatorID,
+                            newStatus: selectedStatus
+                        };
+                        var param = JSON.stringify(obj);  // stringify the parameter
+                        console.log("Second time: "+sprintTaskId +" "+ creatorId +" "+ selectedStatus);
+                        $.ajax({
+                            method: "POST",
+                            url: '<%= ResolveUrl("ViewSprintTask.aspx/updateSprintTaskStatus_Click") %>',
+                            data: param,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            async: true,
+                            cache: false,
+                            success: function (msg) {
+                                window.location.href = window.location.href;
+                            },
+                            error: function (xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        });
                     }
                 </script>
                 <%--Content end--%>

@@ -394,7 +394,7 @@ namespace Scrum.Accounts.Admin
             {
                 lblMessage.Visible = false;
                 DataTable dt = new DataTable();
-                dt.Columns.Add("User story ID", typeof(string));
+                dt.Columns.Add("User story ID", typeof(double));
                 dt.Columns.Add("As a (type of user)", typeof(string));
                 dt.Columns.Add("I want to (some goal)", typeof(string));
                 dt.Columns.Add("So that (reason)", typeof(string));
@@ -451,6 +451,14 @@ namespace Scrum.Accounts.Admin
                 connect.Close();
                 grdUserStories.DataSource = dt;
                 grdUserStories.DataBind();
+                //Sort by "User story ID" column in "ASC" ascending order:
+                if (dt != null)
+                {
+                    DataView dv = new DataView(dt);
+                    dv.Sort = "User story ID" + " " + "ASC";
+                    grdUserStories.DataSource = dv;
+                    grdUserStories.DataBind();
+                }
                 rebindValues();
             }
         }
@@ -508,7 +516,7 @@ namespace Scrum.Accounts.Admin
                     List<string> theId = newId.Split('.').ToList<string>();
                     int tempId = Convert.ToInt32(theId.ElementAt(1));
                     ++tempId;
-                    int result = Convert.ToInt32(theId.ElementAt(0)) + tempId;
+                    int result = Convert.ToInt32(theId.ElementAt(0)) + 1;
                     newId = result.ToString();
                 }
                 else
@@ -542,7 +550,7 @@ namespace Scrum.Accounts.Admin
                 drpFindUser.Items.Clear();
                 lblFindUserResult.Text = "";
                 lblListOfUsers.Text = "";
-                drpCurrentStatus.SelectedIndex = 0;
+                drpCurrentStatus.SelectedIndex = 1;
                 if (searchedUsers != null)
                     searchedUsers.Clear();
                 if (usersToAdd != null)
