@@ -273,6 +273,7 @@
                     }
                     function printProject(projectId) {
                         console.log('Attempting to print...');
+                        var newWindow = window.open('', '_blank');
                         var projectID = parseInt(projectId);
                         var obj = {
                             projectId: projectID,
@@ -288,7 +289,8 @@
                             cache: false,
                             success: function (pdfDocument, d, a) {
                                 console.log("Successfully processed the pdf file (" + pdfDocument.d + ")");
-                                window.open("../../files/" + pdfDocument.d, '_blank');
+                                //window.open("../../files/" + pdfDocument.d, '_blank');
+                                newWindow.location = "../../files/" + pdfDocument.d;
                                 console.log("Successfully opened the pdf file (" + pdfDocument.d + ")");
                             },
                             error: function (xhr, status, error) {

@@ -1137,66 +1137,71 @@ namespace Scrum.Accounts.Master
         public static string printProject_Click(string projectId)
         {
             string filename = "";
+            Configuration config = new Configuration();
+            SqlConnection connect = new SqlConnection(config.getConnectionString());
+            SqlCommand cmd = connect.CreateCommand();
+            connect.Open();
             if (!string.IsNullOrWhiteSpace(projectId))
             {
-                Configuration config = new Configuration();
-                SqlConnection connect = new SqlConnection(config.getConnectionString());
-                SqlCommand cmd = connect.CreateCommand();
-                connect.Open();
-                cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
-                string project_name = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select count(*) from UsersForProjects where projectId = '" + projectId + "' ";
-                int totalUsersForProject = Convert.ToInt32(cmd.ExecuteScalar());
-                List<string> names = new List<string>();
-                for (int i=1; i<= totalUsersForProject; i++)
+                try
                 {
-                    cmd.CommandText = "select userId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userId ASC), * FROM usersForProjects where projectId = '" + projectId+"' ) as t where rowNum = '"+i+"' ";
-                    string userId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '"+userId+"'  ";
-                    string name = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select loginId from Users where userId = '"+userId+"' ";
-                    string loginId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select roleId from Logins where loginId = '"+loginId+"' ";
-                    int int_roleId = Convert.ToInt32(cmd.ExecuteScalar());
-                    if (int_roleId == 2)
-                        name = "Project Master (" + name + ")";
-                    else
-                        name = "Developer (" + name + ")";
-                    names.Add(name);
-                }
-                connect.Close();
-                filename = project_name.Replace(" ", "_").Replace(":", "-").Replace("/", "-") + "_" + DateTime.Now.ToString().Replace(" ", "_").Replace(":", "-").Replace("/", "-") + ".pdf";
-                string path = System.Web.HttpContext.Current.Server.MapPath("~/files/" + filename);
-                Document doc = new Document();
-                //Section section = doc.AddSection();
-                //section.AddParagraph(project_name);
-                //section.AddParagraph();
-                //Paragraph paragraph = section.AddParagraph(project_name);
-                //paragraph.Format.Font.Color = MigraDoc.DocumentObjectModel.Color.FromCmyk(100, 30, 20, 50);
-                //paragraph.AddFormattedText(project_name, TextFormat.Bold);
-                //FormattedText ft = paragraph.AddFormattedText(" small text", TextFormat.Bold);
-                //ft.Font.Size = 12;
-                //
-                Section title = doc.AddSection();
-                Section userStories = doc.AddSection();
-                Section sprintTasks = doc.AddSection();
-                Section testCases = doc.AddSection();
-                Paragraph title_paragraph = new Paragraph();
-                title_paragraph.AddFormattedText(project_name, TextFormat.Bold);
-                title.AddParagraph();
-                foreach (string n in names)
+                    cmd.CommandText = "select project_name from Projects where projectId = '" + projectId + "' ";
+                    string project_name = cmd.ExecuteScalar().ToString();
+                    cmd.CommandText = "select count(*) from UsersForProjects where projectId = '" + projectId + "' ";
+                    int totalUsersForProject = Convert.ToInt32(cmd.ExecuteScalar());
+                    List<string> names = new List<string>();
+                    for (int i = 1; i <= totalUsersForProject; i++)
+                    {
+                        cmd.CommandText = "select userId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY userId ASC), * FROM usersForProjects where projectId = '" + projectId + "' ) as t where rowNum = '" + i + "' ";
+                        string userId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + userId + "'  ";
+                        string name = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select loginId from Users where userId = '" + userId + "' ";
+                        string loginId = cmd.ExecuteScalar().ToString();
+                        cmd.CommandText = "select roleId from Logins where loginId = '" + loginId + "' ";
+                        int int_roleId = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (int_roleId == 2)
+                            name = "Project Master: " + name + "";
+                        else
+                            name = "Developer: " + name + "";
+                        names.Add(name);
+                    }
+
+                    filename = project_name.Replace(" ", "_").Replace(":", "-").Replace("/", "-") + "_" + DateTime.Now.ToString().Replace(" ", "_").Replace(":", "-").Replace("/", "-") + ".pdf";
+                    string path = System.Web.HttpContext.Current.Server.MapPath("~/files/" + filename);
+                    Document doc = new Document();
+                    //Section section = doc.AddSection();
+                    //section.AddParagraph(project_name);
+                    //section.AddParagraph();
+                    //Paragraph paragraph = section.AddParagraph(project_name);
+                    //paragraph.Format.Font.Color = MigraDoc.DocumentObjectModel.Color.FromCmyk(100, 30, 20, 50);
+                    //paragraph.AddFormattedText(project_name, TextFormat.Bold);
+                    //FormattedText ft = paragraph.AddFormattedText(" small text", TextFormat.Bold);
+                    //ft.Font.Size = 12;
+                    //
+                    Section title = doc.AddSection();
+                    Paragraph title_paragraph = new Paragraph();
+                    title_paragraph.AddFormattedText(project_name, TextFormat.Bold);
+                    title.AddParagraph();
+                    foreach (string n in names)
+                    {
+                        title_paragraph.AddFormattedText(n, TextFormat.Bold);
+                    }
+                    Section userStories = doc.AddSection();
+                    Section sprintTasks = doc.AddSection();
+                    Section testCases = doc.AddSection();
+                    //
+                    PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(false, PdfFontEmbedding.Always);
+                    pdfRenderer.Document = doc;
+                    pdfRenderer.RenderDocument();
+                    pdfRenderer.PdfDocument.Save(path);
+                }catch(Exception ex)
                 {
-                    title_paragraph.AddFormattedText(n, TextFormat.Bold);
+                    Console.WriteLine("Error: "+ ex.ToString());
                 }
-                //
 
-
-
-                PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(false, PdfFontEmbedding.Always);
-                pdfRenderer.Document = doc;
-                pdfRenderer.RenderDocument();
-                pdfRenderer.PdfDocument.Save(path);
             }
+            connect.Close();
             return filename;
         }
     }
