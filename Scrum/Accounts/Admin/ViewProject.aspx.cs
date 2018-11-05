@@ -200,6 +200,11 @@ namespace Scrum.Accounts.Admin
                     btnSaveUserStory.Visible = false;
                     btnUpload.Visible = false;
                 }
+                int int_roleId = Convert.ToInt32(roleId);
+                if (int_roleId != 1 && isDeleted == 1)
+                {
+                    Response.Redirect("Home");
+                }
             }
             connect.Close();
         }
@@ -217,15 +222,6 @@ namespace Scrum.Accounts.Admin
                     grdUserStories.Rows[i].Cells[8].Visible = false;
                     grdUserStories.Rows[i].Cells[9].Visible = false;
                 }
-                //if (int_roleId == 3)//3: Developer
-                //{
-                //    //Hide the header for removing the User Story commands:
-                //    grdUserStories.HeaderRow.Cells[10].Visible = false;
-                //    for (int i = 0; i < grdUserStories.Rows.Count; i++)
-                //    {
-                //        grdUserStories.Rows[i].Cells[10].Visible = false;
-                //    }
-                //}
             }
             SqlCommand cmd = connect.CreateCommand();
             connect.Open();
@@ -296,7 +292,7 @@ namespace Scrum.Accounts.Admin
                 removeUserStoryLink.Text = removeUserStoryCommand + " ";
                 removeUserStoryLink.Command += new CommandEventHandler(RemoveUserStoryLink_Click);
                 removeUserStoryLink.CommandName = id;
-                removeUserStoryLink.CommandArgument = Convert.ToString(row + 1);
+                removeUserStoryLink.CommandArgument = userStoryId;
                 removeUserStoryLink.Enabled = true;
                 removeUserStoryLink.CssClass = "removeUserStoryButton";
                 //Check if the user story has been deleted already, if so, disable the button:

@@ -85,8 +85,23 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MigraDoc.DocumentObjectModel, Version=1.32.4334.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.DocumentObjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.Rendering, Version=1.32.4334.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.Rendering.dll</HintPath>
+    </Reference>
+    <Reference Include="MigraDoc.RtfRendering, Version=1.32.4334.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\MigraDoc.RtfRendering.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp, Version=1.32.3057.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.32.3057.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp-MigraDoc-GDI.1.32.4334.0\lib\net20\PdfSharp.Charting.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
@@ -148,6 +163,7 @@
     <Content Include="Accounts\Admin\Profile.aspx" />
     <Content Include="Accounts\Admin\ReviewUser.aspx" />
     <Content Include="Accounts\Admin\ReviewUsers.aspx" />
+    <Content Include="Accounts\Admin\Search.aspx" />
     <Content Include="Accounts\Admin\ViewProject.aspx" />
     <Content Include="Accounts\Admin\ViewSprintTask.aspx" />
     <Content Include="Accounts\Admin\ViewTestCase.aspx" />
@@ -162,6 +178,7 @@
     <Content Include="Accounts\Developer\EditUserStory.aspx" />
     <Content Include="Accounts\Developer\MyProjects.aspx" />
     <Content Include="Accounts\Developer\Profile.aspx" />
+    <Content Include="Accounts\Developer\Search.aspx" />
     <Content Include="Accounts\Developer\ViewProject.aspx" />
     <Content Include="Accounts\Developer\ViewSprintTask.aspx" />
     <Content Include="Accounts\Developer\ViewTestCase.aspx" />
@@ -375,6 +392,13 @@
     <Compile Include="Accounts\Admin\ReviewUsers.aspx.designer.cs">
       <DependentUpon>ReviewUsers.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Accounts\Admin\Search.aspx.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\Search.aspx.designer.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Accounts\Admin\ViewProject.aspx.cs">
       <DependentUpon>ViewProject.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -472,6 +496,13 @@
     </Compile>
     <Compile Include="Accounts\Developer\Profile.aspx.designer.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Developer\Search.aspx.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Developer\Search.aspx.designer.cs">
+      <DependentUpon>Search.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Developer\ViewProject.aspx.cs">
       <DependentUpon>ViewProject.aspx</DependentUpon>
@@ -755,6 +786,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="files\" />
     <Folder Include="images\" />
   </ItemGroup>
   <ItemGroup>

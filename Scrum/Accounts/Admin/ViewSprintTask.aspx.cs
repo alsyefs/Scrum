@@ -34,8 +34,21 @@ namespace Scrum.Accounts.Admin
             CheckErrors check = new CheckErrors();
             try
             {
-                g_sprintTaskId = Request.QueryString["id"];
-                if (!check.checkSprintTaskAccess(g_sprintTaskId, loginId))
+                if (Request.QueryString["id"] != null)
+                {
+                    g_sprintTaskId = Request.QueryString["id"];
+                    if (!check.checkSprintTaskAccess(g_sprintTaskId, loginId))
+                        goBack();
+                    if (Request.QueryString["userStoryId"] != null)
+                    {
+                        g_userStoryId = Request.QueryString["userStoryId"];
+                    }
+                    if (Request.QueryString["projectId"] != null)
+                    {
+                        g_projectId = Request.QueryString["projectId"];
+                    }
+                }
+                else
                     goBack();
             }
             catch (Exception ex)
@@ -361,7 +374,7 @@ namespace Scrum.Accounts.Admin
                 removeTestCaseLink.Text = removeSprintTaskCommand + " ";
                 removeTestCaseLink.Command += new CommandEventHandler(RemoveTestCaseLink_Click);
                 removeTestCaseLink.CommandName = id;
-                removeTestCaseLink.CommandArgument = Convert.ToString(row + 1);
+                removeTestCaseLink.CommandArgument = testCaseUniqueId;
                 removeTestCaseLink.Enabled = true;
                 removeTestCaseLink.CssClass = "removeUserStoryButton";
                 //Check if the test case has been deleted already, if so, disable the button:

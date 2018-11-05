@@ -17,6 +17,7 @@ namespace Scrum
             string deleteCommand = "";
             string profileLink = "Created by " + createdBy + " ";
             string editLink = "";
+            string printLink = "";
             //Check if the user viewing the project is the creator, or if the current user viewing is an admin:
             int int_roleId = Convert.ToInt32(roleId);
             if (createdByUserId.Equals(userId) || int_roleId == 1)
@@ -24,8 +25,8 @@ namespace Scrum
                 deleteCommand = "&nbsp;<button id='remove_button' type='button' onclick=\"removeProject('" + projectId + "', '" + createdByUserId + "')\">Remove Project </button>";
                 terminateCommand = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id='terminate_button' type='button' onclick=\"terminateProject('" + projectId + "', '" + createdByUserId + "')\">Terminate Project </button>";
                 editLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"edit_button\" type=\"button\" onclick=\"editProject('" + projectId + "')\" >Edit Project </button>";
-                
             }
+            printLink = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id=\"print_button\" type=\"button\" onclick=\"printProject('" + projectId + "')\" >Print Project </button>";
             profileLink = "Created by <a href=\"Profile.aspx?id=" + createdByUserId + "\">" + createdBy + " </a>";
             if (isTerminated == 1)
             {
@@ -48,6 +49,7 @@ namespace Scrum
                 deleteCommand +
                 terminateCommand +
                 editLink +
+                printLink+
                 "</div>";
             return header;
         }

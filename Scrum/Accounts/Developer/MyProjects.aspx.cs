@@ -81,12 +81,15 @@ namespace Scrum.Accounts.Developer
         }
         protected void rebindValues()
         {
-            //Hide the header called "User ID":
-            grdProjects.HeaderRow.Cells[3].Visible = false;
-            //Hide IDs column and content which are located in column index 3:
-            for (int i = 0; i < grdProjects.Rows.Count; i++)
+            if (grdProjects.Rows.Count > 0)
             {
-                grdProjects.Rows[i].Cells[3].Visible = false;
+                //Hide the header called "User ID":
+                grdProjects.HeaderRow.Cells[3].Visible = false;
+                //Hide IDs column and content which are located in column index 3:
+                for (int i = 0; i < grdProjects.Rows.Count; i++)
+                {
+                    grdProjects.Rows[i].Cells[3].Visible = false;
+                }
             }
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();
@@ -155,20 +158,26 @@ namespace Scrum.Accounts.Developer
                     //Get the project ID:
                     cmd.CommandText = "select [projectId] from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY projectId ASC), * FROM [UsersForProjects] where userId = '" + userId + "' ) as t where rowNum = '" + i + "'";
                     id = cmd.ExecuteScalar().ToString();
-                    //Get project name:
-                    cmd.CommandText = "select project_name from Projects where projectId = '" + id + "' ";
-                    project_name = cmd.ExecuteScalar().ToString();
-                    //Get the project's creator User ID:
-                    cmd.CommandText = "select project_createdBy from Projects where projectId = '" + id + "' ";
-                    creatorId = cmd.ExecuteScalar().ToString();
-                    //Convert the User ID to a name:
-                    cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + creatorId + "' ";
-                    createdBy = cmd.ExecuteScalar().ToString();
-                    //Get project creation date:
-                    cmd.CommandText = "select project_createdDate from Projects where projectId = '" + id + "' ";
-                    createdOn = cmd.ExecuteScalar().ToString();
-                    dt.Rows.Add(project_name, createdBy, Layouts.getTimeFormat(createdOn), creatorId);
-                    //Creator ID is not needed here, but it's used to uniquely identify the names in the system in case we have duplicate names.
+                    //Check if the project is deleted:
+                    cmd.CommandText = "select project_isDeleted from Projects where projectId = '" + id + "' ";
+                    int project_isDeleted = Convert.ToInt32(cmd.ExecuteScalar());
+                    if (project_isDeleted == 0)
+                    {
+                        //Get project name:
+                        cmd.CommandText = "select project_name from Projects where projectId = '" + id + "' ";
+                        project_name = cmd.ExecuteScalar().ToString();
+                        //Get the project's creator User ID:
+                        cmd.CommandText = "select project_createdBy from Projects where projectId = '" + id + "' ";
+                        creatorId = cmd.ExecuteScalar().ToString();
+                        //Convert the User ID to a name:
+                        cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + creatorId + "' ";
+                        createdBy = cmd.ExecuteScalar().ToString();
+                        //Get project creation date:
+                        cmd.CommandText = "select project_createdDate from Projects where projectId = '" + id + "' ";
+                        createdOn = cmd.ExecuteScalar().ToString();
+                        dt.Rows.Add(project_name, createdBy, Layouts.getTimeFormat(createdOn), creatorId);
+                        //Creator ID is not needed here, but it's used to uniquely identify the names in the system in case we have duplicate names.
+                    }
                 }
                 connect.Close();
                 grdProjects.DataSource = dt;

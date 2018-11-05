@@ -179,7 +179,14 @@ iframe {
     text-align: center;
     font-weight: 600;
 }
-
+#print_button {
+    background-color: cyan;
+    max-width: 280px;
+    border-radius: 5px;
+    border: 1px solid #000000;
+    text-align: center;
+    font-weight: 600;
+}
 #table {
     text-align: center;
 }

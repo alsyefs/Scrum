@@ -32,8 +32,25 @@ namespace Scrum.Accounts.Admin
             CheckErrors check = new CheckErrors();
             try
             {
-                g_testCaseId = Request.QueryString["id"];
-                if (!check.checkTestCaseAccess(g_testCaseId, loginId))
+                if (Request.QueryString["id"] != null)
+                {
+                    g_testCaseId = Request.QueryString["id"];
+                    if (!check.checkTestCaseAccess(g_testCaseId, loginId))
+                        goBack();
+                    if (Request.QueryString["sprintTaskId"] != null)
+                    {
+                        g_sprintTaskId = Request.QueryString["sprintTaskId"];
+                    }
+                    if (Request.QueryString["userStoryId"] != null)
+                    {
+                        g_userStoryId = Request.QueryString["userStoryId"];
+                    }
+                    if (Request.QueryString["projectId"] != null)
+                    {
+                        g_projectId = Request.QueryString["projectId"];
+                    }
+                }
+                else
                     goBack();
             }
             catch (Exception ex)

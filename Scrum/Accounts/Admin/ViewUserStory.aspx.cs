@@ -328,7 +328,7 @@ namespace Scrum.Accounts.Admin
                 removeSprintTaskLink.Text = removeSprintTaskCommand + " ";
                 removeSprintTaskLink.Command += new CommandEventHandler(RemoveSprintTaskLink_Click);
                 removeSprintTaskLink.CommandName = id;
-                removeSprintTaskLink.CommandArgument = Convert.ToString(row + 1);
+                removeSprintTaskLink.CommandArgument = sprintTaskUniqueId;
                 removeSprintTaskLink.Enabled = true;
                 removeSprintTaskLink.CssClass = "removeUserStoryButton";
                 //Check if the sprint task has been deleted already, if so, disable the button:

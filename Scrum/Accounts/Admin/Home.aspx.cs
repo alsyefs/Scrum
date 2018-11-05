@@ -81,12 +81,15 @@ namespace Scrum.Accounts.Admin
         }
         protected void rebindValues()
         {
-            //Hide the header called "User ID":
-            grdProjects.HeaderRow.Cells[3].Visible = false;
-            //Hide IDs column and content which are located in column index 3:
-            for (int i = 0; i < grdProjects.Rows.Count; i++)
+            if (grdProjects.Rows.Count > 0)
             {
-                grdProjects.Rows[i].Cells[3].Visible = false;
+                //Hide the header called "User ID":
+                grdProjects.HeaderRow.Cells[3].Visible = false;
+                //Hide IDs column and content which are located in column index 3:
+                for (int i = 0; i < grdProjects.Rows.Count; i++)
+                {
+                    grdProjects.Rows[i].Cells[3].Visible = false;
+                }
             }
             connect.Open();
             SqlCommand cmd = connect.CreateCommand();

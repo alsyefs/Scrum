@@ -34,9 +34,23 @@ namespace Scrum.Accounts.Master
             CheckErrors check = new CheckErrors();
             try
             {
-                g_sprintTaskId = Request.QueryString["id"];
-                if (!check.checkSprintTaskAccess(g_sprintTaskId, loginId))
+                if (Request.QueryString["id"] != null)
+                {
+                    g_sprintTaskId = Request.QueryString["id"];
+                    if (!check.checkSprintTaskAccess(g_sprintTaskId, loginId))
+                        goBack();
+                    if (Request.QueryString["userStoryId"] != null)
+                    {
+                        g_userStoryId = Request.QueryString["userStoryId"];
+                    }
+                    if (Request.QueryString["projectId"] != null)
+                    {
+                        g_projectId = Request.QueryString["projectId"];
+                    }
+                }
+                else
                     goBack();
+                
             }
             catch (Exception ex)
             {
@@ -51,6 +65,7 @@ namespace Scrum.Accounts.Master
             }
             if (!AddNewTestCase.Visible)
             {
+                //connect.Open();
                 try
                 {
                     createTable();
@@ -59,6 +74,7 @@ namespace Scrum.Accounts.Master
                 {
                     Console.WriteLine("Error: "+ ex.ToString());
                 }
+                //connect.Close();
             }
             //The below to be used whenever needed in the other page:
             Session.Add("projectId", g_projectId);
@@ -361,7 +377,7 @@ namespace Scrum.Accounts.Master
                 removeTestCaseLink.Text = removeSprintTaskCommand + " ";
                 removeTestCaseLink.Command += new CommandEventHandler(RemoveTestCaseLink_Click);
                 removeTestCaseLink.CommandName = id;
-                removeTestCaseLink.CommandArgument = Convert.ToString(row + 1);
+                removeTestCaseLink.CommandArgument = testCaseUniqueId;
                 removeTestCaseLink.Enabled = true;
                 removeTestCaseLink.CssClass = "removeUserStoryButton";
                 //Check if the test case has been deleted already, if so, disable the button:

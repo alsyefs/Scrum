@@ -9,7 +9,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
-namespace Scrum.Accounts.Master
+namespace Scrum.Accounts.Developer
 {
     public partial class Search : System.Web.UI.Page
     {
@@ -40,7 +40,7 @@ namespace Scrum.Accounts.Master
             if (!correctSession)
                 clearSession();
             int int_roleId = Convert.ToInt32(roleId);
-            if (int_roleId != 2)//2 = Master role.
+            if (int_roleId != 3)
                 clearSession();
         }
         protected string GetIPAddress()
@@ -1579,7 +1579,7 @@ namespace Scrum.Accounts.Master
             {
                 if (int_roleId == 1)//If an admin is searching, get everything:
                 {
-                    cmd.CommandText = "select count(*) from TestCases where testCase_createdDate >= '"+start_time+"' and testCase_createdDate <= '"+end_time+"' ";
+                    cmd.CommandText = "select count(*) from TestCases where testCase_createdDate >= '" + start_time + "' and testCase_createdDate <= '" + end_time + "' ";
                     countMatchingResults = Convert.ToInt32(cmd.ExecuteScalar());
                     for (int i = 1; i <= countMatchingResults; i++)
                     {
