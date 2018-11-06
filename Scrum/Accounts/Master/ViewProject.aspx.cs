@@ -20,6 +20,7 @@ using PdfSharp.Pdf.IO;
 using MigraDoc;
 using MigraDoc.Rendering;
 using MigraDoc.DocumentObjectModel;
+using NReco.PdfGenerator;
 
 namespace Scrum.Accounts.Master
 {
@@ -1167,9 +1168,14 @@ namespace Scrum.Accounts.Master
                         names.Add(name);
                     }
 
-                    filename = project_name.Replace(" ", "_").Replace(":", "-").Replace("/", "-") + "_" + DateTime.Now.ToString().Replace(" ", "_").Replace(":", "-").Replace("/", "-") + ".pdf";
+                    filename = project_name.Replace(" ", "_").Replace(":", "-").Replace("/", "-") + "_" + 
+                        DateTime.Now.ToString().Replace(" ", "_").Replace(":", "-").Replace("/", "-") + ".pdf";
+                    filename = filename.Replace(" ", "_");
                     string path = System.Web.HttpContext.Current.Server.MapPath("~/files/" + filename);
                     Document doc = new Document();
+                    doc.DefaultPageSetup.PageFormat = PageFormat.A4;
+                    int sectionWidth = (int)doc.DefaultPageSetup.PageWidth - (int)doc.DefaultPageSetup.LeftMargin - (int)doc.DefaultPageSetup.RightMargin;
+                    int columnWidth = sectionWidth;
                     //Section section = doc.AddSection();
                     //section.AddParagraph(project_name);
                     //section.AddParagraph();
@@ -1180,22 +1186,221 @@ namespace Scrum.Accounts.Master
                     //ft.Font.Size = 12;
                     //
                     Section title = doc.AddSection();
-                    Paragraph title_paragraph = new Paragraph();
-                    title_paragraph.AddFormattedText(project_name, TextFormat.Bold);
+                    //title.PageSetup.PageFormat = PageFormat.A4;
+                    title.AddParagraph(project_name);
                     title.AddParagraph();
+                    //Declare table:
+                    MigraDoc.DocumentObjectModel.Tables.Table userStoriesTable = new MigraDoc.DocumentObjectModel.Tables.Table();
+                    userStoriesTable.Borders.Width = 0.5;
+
+                    //Declare column:
+                    MigraDoc.DocumentObjectModel.Tables.Column uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    uSColumn = userStoriesTable.AddColumn(columnWidth);
+                    uSColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    //Declare header of table:
+                    MigraDoc.DocumentObjectModel.Tables.Row usRow = userStoriesTable.AddRow();
+                    MigraDoc.DocumentObjectModel.Tables.Cell usCell = usRow.Cells[0];
+                    usCell.AddParagraph("Unique user story ID");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[1];
+                    usCell.AddParagraph("As a <<type of user>>");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[2];
+                    usCell.AddParagraph("I want to <<some goal>>");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[3];
+                    usCell.AddParagraph("so that <<reason>>");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[4];
+                    usCell.AddParagraph("Date introduced");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[5];
+                    usCell.AddParagraph("Date considered for implementation");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[6];
+                    usCell.AddParagraph("Developer responsible for");
+                    usCell.Format.Font.Bold = true;
+                    usCell = usRow.Cells[7];
+                    usCell.AddParagraph("Current Status");
+                    usCell.Format.Font.Bold = true;
+                    //Declare rows of table:
                     foreach (string n in names)
                     {
-                        title_paragraph.AddFormattedText(n, TextFormat.Bold);
+                        usRow = userStoriesTable.AddRow();
+                        usCell = usRow.Cells[0];
+                        usCell.AddParagraph(n);
+
+                        usCell = usRow.Cells[1];
+                        usCell.AddParagraph(n);
+
+                        usCell = usRow.Cells[2];
+                        usCell.AddParagraph(n);
                     }
-                    Section userStories = doc.AddSection();
-                    Section sprintTasks = doc.AddSection();
-                    Section testCases = doc.AddSection();
-                    //
+                    //add table to document:
+                    doc.LastSection.Add(userStoriesTable);
+                    title.AddParagraph();
+                    //Declare the table for sprint tasks:
+                    MigraDoc.DocumentObjectModel.Tables.Table sprintTasksTable = new MigraDoc.DocumentObjectModel.Tables.Table();
+                    sprintTasksTable.Borders.Width = 0.5;
+                    //Declare column:
+                    MigraDoc.DocumentObjectModel.Tables.Column sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(7));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(5));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    sTColumn = sprintTasksTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    sTColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    //Declare header of table:
+                    MigraDoc.DocumentObjectModel.Tables.Row sTRow = sprintTasksTable.AddRow();
+                    MigraDoc.DocumentObjectModel.Tables.Cell sTCell = sTRow.Cells[0];
+                    sTCell.AddParagraph("Unique sprint task ID");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[1];
+                    sTCell.AddParagraph("User Story identifier");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[2];
+                    sTCell.AddParagraph("Task description");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[3];
+                    sTCell.AddParagraph("Date introduced");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[4];
+                    sTCell.AddParagraph("Date considered for implementation");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[5];
+                    sTCell.AddParagraph("Date completed");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[6];
+                    sTCell.AddParagraph("Developer responsible for");
+                    sTCell.Format.Font.Bold = true;
+                    sTCell = sTRow.Cells[7];
+                    sTCell.AddParagraph("Current Status");
+                    sTCell.Format.Font.Bold = true;
+                    //Do stuff here to add content to the rows of the table
+                    //add table to document:
+                    doc.LastSection.Add(sprintTasksTable);
+                    title.AddParagraph();
+                    //Declare the table for sprint tasks:
+                    MigraDoc.DocumentObjectModel.Tables.Table testCasesTable = new MigraDoc.DocumentObjectModel.Tables.Table();
+                    testCasesTable.Borders.Width = 0.5;
+                    //Declare column:
+                    MigraDoc.DocumentObjectModel.Tables.Column tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(7));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+
+                    tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(5));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+
+                    tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    tCColumn = testCasesTable.AddColumn(
+                        MigraDoc.DocumentObjectModel.Unit.FromCentimeter(3));
+                    tCColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    //Declare header of table:
+                    MigraDoc.DocumentObjectModel.Tables.Row tCRow = testCasesTable.AddRow();
+                    MigraDoc.DocumentObjectModel.Tables.Cell tCCell = tCRow.Cells[0];
+                    tCCell.AddParagraph("Unique test case ID");
+                    tCCell.Format.Font.Bold = true;
+                    tCCell = tCRow.Cells[1];
+                    tCCell.AddParagraph("User Story identifier");
+                    tCCell.Format.Font.Bold = true;
+                    tCCell = tCRow.Cells[2];
+                    tCCell.AddParagraph("Sprint task ID");
+                    tCCell.Format.Font.Bold = true;
+                    tCCell = tCRow.Cells[3];
+                    tCCell.AddParagraph("Test case scenario");
+                    tCCell.Format.Font.Bold = true;
+                    tCCell = tCRow.Cells[4];
+                    tCCell.AddParagraph("Input parameters");
+                    tCCell.Format.Font.Bold = true;
+                    tCCell = tCRow.Cells[5];
+                    tCCell.AddParagraph("Expected output");
+                    tCCell.Format.Font.Bold = true;
+                    tCCell = tCRow.Cells[6];
+                    tCCell.AddParagraph("Current Status");
+                    tCCell.Format.Font.Bold = true;
+                    //Do stuff here to add content to the rows of the table
+                    //add table to document:
+                    doc.LastSection.Add(testCasesTable);
+                    title.AddParagraph();
+                    ////TEST Start
+                    ////Declare the table for sprint tasks:
+                    //MigraDoc.DocumentObjectModel.Tables.Table test = new MigraDoc.DocumentObjectModel.Tables.Table();
+                    //test.Borders.Width = 0.5;
+                    ////Declare column:
+                    //MigraDoc.DocumentObjectModel.Tables.Column testColumn = test.AddColumn();
+                    //testColumn.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                    //MigraDoc.DocumentObjectModel.Tables.Row testRow = test.AddRow();
+                    //MigraDoc.DocumentObjectModel.Tables.Cell testCell = testRow.Cells[0];
+                    //testCell.AddParagraph("Unique test case ID");
+                    //testCell.Format.Font.Bold = true;
+                    //testCell = testRow.Cells[1];
+                    //doc.LastSection.Add(test);
+                    //title.AddParagraph();
+                    //string htmlTest = "<table>" +
+                    //    "<tr><th>Head 1</th><th>Head 2</th></tr>"+
+                    //    "<tr><td>content 1</td><td>content 2</td></tr>"+
+                    //    "</table";
+                    //NReco.PdfGenerator.HtmlToPdfConverter converted = new HtmlToPdfConverter();
+                    //converted.GeneratePdf(htmlTest);
+                    ////PdfDocument pdf = converted.GeneratePdf(htmlTest, PdfSharp.PageSize.A4);
+                    //PdfDocument pdf = PdfGenerator.GeneratePdf(htmlTest, PdfSharp.PageSize.A4);
+                    ////TEST End.
+
+
+
+                    ////
                     PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(false, PdfFontEmbedding.Always);
                     pdfRenderer.Document = doc;
                     pdfRenderer.RenderDocument();
                     pdfRenderer.PdfDocument.Save(path);
-                }catch(Exception ex)
+                }
+                catch(Exception ex)
                 {
                     Console.WriteLine("Error: "+ ex.ToString());
                 }
