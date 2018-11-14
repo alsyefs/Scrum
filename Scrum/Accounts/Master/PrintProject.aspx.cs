@@ -145,14 +145,14 @@ namespace Scrum.Accounts.Master
             string sprintTasksTable =
                 "<h3>Sprint Tasks</h3>" +
                 "<table border='1' style='width:100%;' >" +
-                "<tr><th>index#</th><th>Unique sprint task ID</th>" + "<th>Unique user story ID</th>" + "<th>Task description</th>" + "<th>Date introduced</th>" + "<th>Date considered for implementation</th>" + "<th>Date completed</th>" + "<th>Developer responsible for</th>" + "<th>Current Status</th></tr>";
+                "<tr><th>Unique sprint task ID</th>" + "<th>Unique user story ID</th>" + "<th>Task description</th>" + "<th>Date introduced</th>" + "<th>Date considered for implementation</th>" + "<th>Date completed</th>" + "<th>Developer responsible for</th>" + "<th>Current Status</th></tr>";
             string testCasesTables =
                 "<h3>Test Cases</h3>";                
             cmd.CommandText = "select count(*) from UserStories where projectId = '"+projectId+"' ";
             int totalUserStories = Convert.ToInt32(cmd.ExecuteScalar());
             int totalSprintTasks = 0;
             int totalTestCases = 0;
-            int sprintTaskCounter = 0;
+            //int sprintTaskCounter = 0;
             for (int i=1;i<=totalUserStories; i++)
             {
                 cmd.CommandText = "select userStoryId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY CAST(userStory_uniqueId AS float) ASC), * FROM UserStories where projectId = '" + projectId + "' ) as t where rowNum = '" + i + "' ";
@@ -194,7 +194,7 @@ namespace Scrum.Accounts.Master
                 totalSprintTasks += temp_totalSprintTasks;
                 for (int j=1; j<=temp_totalSprintTasks; j++)
                 {
-                    sprintTaskCounter++;
+                    //sprintTaskCounter++;
                     cmd.CommandText = "select sprintTaskId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY CAST(sprintTask_uniqueId AS float) ASC), * FROM SprintTasks where userStoryId = '" + userStoryId + "' ) as t where rowNum = '" + j + "' ";
                     string sprintTaskId = cmd.ExecuteScalar().ToString();
                     cmd.CommandText = "select sprintTask_uniqueId from SprintTasks where sprintTaskId = '"+sprintTaskId+"' ";
@@ -236,9 +236,9 @@ namespace Scrum.Accounts.Master
                     cmd.CommandText = "select sprintTask_currentStatus from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
                     string sprintTask_currentStatus = cmd.ExecuteScalar().ToString();
                     sprintTasksTable +=
-                        "<tr><td>"+ sprintTaskCounter + "</td><td>" + sprintTask_uniqueId + "</td><td>" + userStory_uniqueId + "</td><td>" + sprintTask_taskDescription + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateIntroduced) + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateConsideredForImplementation) + "</td><td>" + sprintTask_dateCompleted + "</td><td>" + usersForSprintTasks + "</td><td>" + sprintTask_currentStatus + "</td></tr>";
-                    string testCaseTable = 
-                        "<h3>Sprint case index#("+ sprintTaskCounter + ") </h3>"+
+                        "<tr><td>" + sprintTask_uniqueId + "</td><td>" + userStory_uniqueId + "</td><td>" + sprintTask_taskDescription + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateIntroduced) + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateConsideredForImplementation) + "</td><td>" + sprintTask_dateCompleted + "</td><td>" + usersForSprintTasks + "</td><td>" + sprintTask_currentStatus + "</td></tr>";
+                    string testCaseTable =
+                        "<h3>Test case for (user story ID: " + userStory_uniqueId + ", sprint task ID: "+sprintTask_uniqueId+") </h3>"+
                         "<table border='1' style='width:100%;' >" +
                         "<tr><th>Unique test case ID</th>" + "<th>Unique user story ID</th>" + "<th>Sprint task ID</th>" + "<th>Test case scenario</th>" + "<th>Input Parameters</th>" + "<th>Expected output</th>" + "<th>Current Status</th></tr>";
                     cmd.CommandText = "select count(*) from TestCases where sprintTaskId = '" + sprintTaskId + "' ";

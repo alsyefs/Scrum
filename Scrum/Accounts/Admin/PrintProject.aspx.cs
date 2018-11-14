@@ -134,30 +134,30 @@ namespace Scrum.Accounts.Admin
                     name = "Developer: " + name + "";
                 names.Add(name);
             }
-            string projectHeader = "<h1>"+project_name+"</h1></br>"+ project_description+ "</br></br>";
+            string projectHeader = "<h1>" + project_name + "</h1></br>" + project_description + "</br></br>";
             foreach (string n in names)
                 projectHeader += n + "</br>";
             projectHeader += "</br></br></br>";
             string userStoriesTable =
-                "<h3>User Stories</h3>"+
+                "<h3>User Stories</h3>" +
                 "<table border='1' style='width:100%;' >" +
                 "<tr><th>Unique user story ID</th>" + "<th>As a \"type of user\"</th>" + "<th>I want to \"some goal\"</th>" + "<th>so that \"reason\"</th>" + "<th>Date introduced</th>" + "<th>Date considered for implementation</th>" + "<th>Developer responsible for</th>" + "<th>Current Status</th></tr>";
             string sprintTasksTable =
                 "<h3>Sprint Tasks</h3>" +
                 "<table border='1' style='width:100%;' >" +
-                "<tr><th>index#</th><th>Unique sprint task ID</th>" + "<th>Unique user story ID</th>" + "<th>Task description</th>" + "<th>Date introduced</th>" + "<th>Date considered for implementation</th>" + "<th>Date completed</th>" + "<th>Developer responsible for</th>" + "<th>Current Status</th></tr>";
+                "<tr><th>Unique sprint task ID</th>" + "<th>Unique user story ID</th>" + "<th>Task description</th>" + "<th>Date introduced</th>" + "<th>Date considered for implementation</th>" + "<th>Date completed</th>" + "<th>Developer responsible for</th>" + "<th>Current Status</th></tr>";
             string testCasesTables =
-                "<h3>Test Cases</h3>";                
-            cmd.CommandText = "select count(*) from UserStories where projectId = '"+projectId+"' ";
+                "<h3>Test Cases</h3>";
+            cmd.CommandText = "select count(*) from UserStories where projectId = '" + projectId + "' ";
             int totalUserStories = Convert.ToInt32(cmd.ExecuteScalar());
             int totalSprintTasks = 0;
             int totalTestCases = 0;
-            int sprintTaskCounter = 0;
-            for (int i=1;i<=totalUserStories; i++)
+            //int sprintTaskCounter = 0;
+            for (int i = 1; i <= totalUserStories; i++)
             {
                 cmd.CommandText = "select userStoryId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY CAST(userStory_uniqueId AS float) ASC), * FROM UserStories where projectId = '" + projectId + "' ) as t where rowNum = '" + i + "' ";
                 string userStoryId = cmd.ExecuteScalar().ToString();
-                cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '"+userStoryId+"' ";
+                cmd.CommandText = "select userStory_uniqueId from UserStories where userStoryId = '" + userStoryId + "' ";
                 string userStory_uniqueId = cmd.ExecuteScalar().ToString();
                 cmd.CommandText = "select userStory_asARole from UserStories where userStoryId = '" + userStoryId + "' ";
                 string userStory_asARole = cmd.ExecuteScalar().ToString();
@@ -175,12 +175,12 @@ namespace Scrum.Accounts.Admin
                 cmd.CommandText = "select count(*) from UsersForUserStories where userStoryId = '" + userStoryId + "' ";
                 int totalUsersForUserStory = Convert.ToInt32(cmd.ExecuteScalar());
                 string usersForUserStories = "";
-                for (int j=1;j<=totalUsersForUserStory; j++)
+                for (int j = 1; j <= totalUsersForUserStory; j++)
                 {
                     cmd.CommandText = "select userId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY usersForUserStoriesId ASC), * FROM UsersForUserStories where userStoryId = '" + userStoryId + "' ) as t where rowNum = '" + j + "' ";
                     string temp_userId = cmd.ExecuteScalar().ToString();
                     //Translate the user ID to a user name:
-                    cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + temp_userId+"' ";
+                    cmd.CommandText = "select (user_firstname + ' ' + user_lastname) from Users where userId = '" + temp_userId + "' ";
                     string temp_name = cmd.ExecuteScalar().ToString();
                     if (j == 1)
                         usersForUserStories = temp_name;
@@ -188,16 +188,16 @@ namespace Scrum.Accounts.Admin
                         usersForUserStories = usersForUserStories + ",</br>" + temp_name;
                 }
                 userStoriesTable +=
-                    "<tr><td>"+userStory_uniqueId+"</td><td>"+userStory_asARole+"</td><td>"+userStory_iWantTo+"</td><td>"+userStory_soThat+"</td><td>"+Layouts.getTimeFormat(userStory_dateIntroduced) +"</td><td>"+Layouts.getTimeFormat(userStory_dateConsideredForImplementation)+"</td><td>"+ usersForUserStories + "</td><td>"+userStory_currentStatus+"</td></tr>";
-                cmd.CommandText = "select count(*) from SprintTasks where userStoryId = '"+userStoryId+"' ";
+                    "<tr><td>" + userStory_uniqueId + "</td><td>" + userStory_asARole + "</td><td>" + userStory_iWantTo + "</td><td>" + userStory_soThat + "</td><td>" + Layouts.getTimeFormat(userStory_dateIntroduced) + "</td><td>" + Layouts.getTimeFormat(userStory_dateConsideredForImplementation) + "</td><td>" + usersForUserStories + "</td><td>" + userStory_currentStatus + "</td></tr>";
+                cmd.CommandText = "select count(*) from SprintTasks where userStoryId = '" + userStoryId + "' ";
                 int temp_totalSprintTasks = Convert.ToInt32(cmd.ExecuteScalar());
                 totalSprintTasks += temp_totalSprintTasks;
-                for (int j=1; j<=temp_totalSprintTasks; j++)
+                for (int j = 1; j <= temp_totalSprintTasks; j++)
                 {
-                    sprintTaskCounter++;
+                    //sprintTaskCounter++;
                     cmd.CommandText = "select sprintTaskId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY CAST(sprintTask_uniqueId AS float) ASC), * FROM SprintTasks where userStoryId = '" + userStoryId + "' ) as t where rowNum = '" + j + "' ";
                     string sprintTaskId = cmd.ExecuteScalar().ToString();
-                    cmd.CommandText = "select sprintTask_uniqueId from SprintTasks where sprintTaskId = '"+sprintTaskId+"' ";
+                    cmd.CommandText = "select sprintTask_uniqueId from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
                     string sprintTask_uniqueId = cmd.ExecuteScalar().ToString();
                     //userStory_uniqueId
                     cmd.CommandText = "select sprintTask_taskDescription from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
@@ -236,29 +236,29 @@ namespace Scrum.Accounts.Admin
                     cmd.CommandText = "select sprintTask_currentStatus from SprintTasks where sprintTaskId = '" + sprintTaskId + "' ";
                     string sprintTask_currentStatus = cmd.ExecuteScalar().ToString();
                     sprintTasksTable +=
-                        "<tr><td>"+ sprintTaskCounter + "</td><td>" + sprintTask_uniqueId + "</td><td>" + userStory_uniqueId + "</td><td>" + sprintTask_taskDescription + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateIntroduced) + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateConsideredForImplementation) + "</td><td>" + sprintTask_dateCompleted + "</td><td>" + usersForSprintTasks + "</td><td>" + sprintTask_currentStatus + "</td></tr>";
-                    string testCaseTable = 
-                        "<h3>Sprint case index#("+ sprintTaskCounter + ") </h3>"+
+                        "<tr><td>" + sprintTask_uniqueId + "</td><td>" + userStory_uniqueId + "</td><td>" + sprintTask_taskDescription + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateIntroduced) + "</td><td>" + Layouts.getTimeFormat(sprintTask_dateConsideredForImplementation) + "</td><td>" + sprintTask_dateCompleted + "</td><td>" + usersForSprintTasks + "</td><td>" + sprintTask_currentStatus + "</td></tr>";
+                    string testCaseTable =
+                        "<h3>Test case for (user story ID: " + userStory_uniqueId + ", sprint task ID: " + sprintTask_uniqueId + ") </h3>" +
                         "<table border='1' style='width:100%;' >" +
                         "<tr><th>Unique test case ID</th>" + "<th>Unique user story ID</th>" + "<th>Sprint task ID</th>" + "<th>Test case scenario</th>" + "<th>Input Parameters</th>" + "<th>Expected output</th>" + "<th>Current Status</th></tr>";
                     cmd.CommandText = "select count(*) from TestCases where sprintTaskId = '" + sprintTaskId + "' ";
                     int temp_totalTestCases = Convert.ToInt32(cmd.ExecuteScalar());
                     totalTestCases += temp_totalTestCases;
-                    for (int m=1; m<=temp_totalTestCases; m++)
+                    for (int m = 1; m <= temp_totalTestCases; m++)
                     {
                         cmd.CommandText = "select testCaseId from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY CAST(testCase_uniqueId AS float) ASC), * FROM TestCases where sprintTaskId = '" + sprintTaskId + "' ) as t where rowNum = '" + m + "' ";
                         string testCaseId = cmd.ExecuteScalar().ToString();
-                        cmd.CommandText = "select testCase_uniqueId from TestCases where testCaseId = '"+testCaseId+"' ";
+                        cmd.CommandText = "select testCase_uniqueId from TestCases where testCaseId = '" + testCaseId + "' ";
                         string testCase_uniqueId = cmd.ExecuteScalar().ToString();
                         //userStory_uniqueId
                         //sprintTask_uniqueId
                         cmd.CommandText = "select testCase_testCaseScenario from TestCases where testCaseId = '" + testCaseId + "' ";
                         string testCase_testCaseScenario = cmd.ExecuteScalar().ToString();
                         //Get the input parameters:
-                        cmd.CommandText = "select count(*) from Parameters where testCaseId = '"+testCaseId+"' ";
+                        cmd.CommandText = "select count(*) from Parameters where testCaseId = '" + testCaseId + "' ";
                         int totalParameters = Convert.ToInt32(cmd.ExecuteScalar());
                         string inputParameters = "";
-                        for (int n=1; n<=totalParameters;n++)
+                        for (int n = 1; n <= totalParameters; n++)
                         {
                             cmd.CommandText = "select parameter_name from(SELECT rowNum = ROW_NUMBER() OVER(ORDER BY parameterId ASC), * FROM Parameters where testCaseId = '" + testCaseId + "' ) as t where rowNum = '" + n + "' ";
                             string parameter = cmd.ExecuteScalar().ToString();
@@ -271,21 +271,21 @@ namespace Scrum.Accounts.Admin
                         string testCase_expectedOutput = cmd.ExecuteScalar().ToString();
                         cmd.CommandText = "select testCase_currentStatus from TestCases where testCaseId = '" + testCaseId + "' ";
                         string testCase_currentStatus = cmd.ExecuteScalar().ToString();
-                        testCaseTable+=
+                        testCaseTable +=
                             "<tr><td>" + testCase_uniqueId + "</td><td>" + userStory_uniqueId + "</td><td>" + sprintTask_uniqueId + "</td><td>" + testCase_testCaseScenario + "</td><td>" + inputParameters + "</td><td>" + testCase_expectedOutput + "</td><td>" + testCase_currentStatus + "</td></tr>";
                     }
-                    testCaseTable = (temp_totalTestCases > 0) ? testCaseTable+"</table></br>" : "";
+                    testCaseTable = (temp_totalTestCases > 0) ? testCaseTable + "</table></br>" : "";
                     testCasesTables += testCaseTable;
                 }
             }
-            userStoriesTable = (totalUserStories > 0) ? userStoriesTable+"</table></br>" : "";
-            sprintTasksTable = (totalSprintTasks > 0) ? sprintTasksTable+"</table></br>" : "";
-            testCasesTables = (totalTestCases > 0) ? testCasesTables+"</br>" : "";
+            userStoriesTable = (totalUserStories > 0) ? userStoriesTable + "</table></br>" : "";
+            sprintTasksTable = (totalSprintTasks > 0) ? sprintTasksTable + "</table></br>" : "";
+            testCasesTables = (totalTestCases > 0) ? testCasesTables + "</br>" : "";
             connect.Close();
-            string result = 
-                projectHeader+
-                userStoriesTable+
-                sprintTasksTable+
+            string result =
+                projectHeader +
+                userStoriesTable +
+                sprintTasksTable +
                 testCasesTables;
             lblContent.Text = result;
 
