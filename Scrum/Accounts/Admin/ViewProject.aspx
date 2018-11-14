@@ -273,31 +273,8 @@
                     }
                     function printProject(projectId) {
                         console.log('Attempting to print...');
-                        var newWindow = window.open('', '_blank');
-                        var projectID = parseInt(projectId);
-                        var obj = {
-                            projectId: projectID,
-                        };
-                        var param = JSON.stringify(obj);  // stringify the parameter
-                        $.ajax({
-                            method: "POST",
-                            url: '<%= ResolveUrl("ViewProject.aspx/printProject_Click") %>',
-                            data: param,
-                            contentType: "application/json; charset=utf-8",
-                            dataType: "json",
-                            async: true,
-                            cache: false,
-                            success: function (pdfDocument, d, a) {
-                                console.log("Successfully processed the pdf file (" + pdfDocument.d + ")");
-                                //window.open("../../files/" + pdfDocument.d, '_blank');
-                                newWindow.location = "../../files/" + pdfDocument.d;
-                                console.log("Successfully opened the pdf file (" + pdfDocument.d + ")");
-                            },
-                            error: function (xhr, status, error) {
-                                console.log("Failed processing the pdf file.");
-                                console.log(xhr.responseText);
-                            }
-                        });
+                        var newWindow = window.open('PrintProject.aspx', '_blank');
+                        console.log('Opened the print format in a new tab.');
                     }
                 </script>
                 <%--Content end--%>

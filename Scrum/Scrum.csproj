@@ -163,6 +163,7 @@
     <Content Include="Accounts\Admin\EditUserStory.aspx" />
     <Content Include="Accounts\Admin\Home.aspx" />
     <Content Include="Accounts\Admin\Notifications.aspx" />
+    <Content Include="Accounts\Admin\PrintProject.aspx" />
     <Content Include="Accounts\Admin\Profile.aspx" />
     <Content Include="Accounts\Admin\ReviewUser.aspx" />
     <Content Include="Accounts\Admin\ReviewUsers.aspx" />
@@ -180,6 +181,7 @@
     <Content Include="Accounts\Developer\EditTestCase.aspx" />
     <Content Include="Accounts\Developer\EditUserStory.aspx" />
     <Content Include="Accounts\Developer\MyProjects.aspx" />
+    <Content Include="Accounts\Developer\PrintProject.aspx" />
     <Content Include="Accounts\Developer\Profile.aspx" />
     <Content Include="Accounts\Developer\Search.aspx" />
     <Content Include="Accounts\Developer\ViewProject.aspx" />
@@ -199,6 +201,7 @@
     <Content Include="Accounts\Master\EditUserStory.aspx" />
     <Content Include="Accounts\Master\Home.aspx" />
     <Content Include="Accounts\Master\MyProjects.aspx" />
+    <Content Include="Accounts\Master\PrintProject.aspx" />
     <Content Include="Accounts\Master\Profile.aspx" />
     <Content Include="Accounts\Master\Search.aspx" />
     <Content Include="Accounts\Master\ViewProject.aspx" />
@@ -374,6 +377,13 @@
     <Compile Include="Accounts\Admin\Notifications.aspx.designer.cs">
       <DependentUpon>Notifications.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Accounts\Admin\PrintProject.aspx.cs">
+      <DependentUpon>PrintProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Admin\PrintProject.aspx.designer.cs">
+      <DependentUpon>PrintProject.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Accounts\Admin\Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -492,6 +502,13 @@
     </Compile>
     <Compile Include="Accounts\Developer\MyProjects.aspx.designer.cs">
       <DependentUpon>MyProjects.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Developer\PrintProject.aspx.cs">
+      <DependentUpon>PrintProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Developer\PrintProject.aspx.designer.cs">
+      <DependentUpon>PrintProject.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Developer\Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
@@ -625,6 +642,13 @@
     </Compile>
     <Compile Include="Accounts\Master\MyProjects.aspx.designer.cs">
       <DependentUpon>MyProjects.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Accounts\Master\PrintProject.aspx.cs">
+      <DependentUpon>PrintProject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Accounts\Master\PrintProject.aspx.designer.cs">
+      <DependentUpon>PrintProject.aspx</DependentUpon>
     </Compile>
     <Compile Include="Accounts\Master\Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
